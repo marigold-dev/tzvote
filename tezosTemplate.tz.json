@@ -1,0 +1,4 @@
+{
+  "text_code":
+    "{ parameter (or (or (int %decrement) (int %increment)) (unit %reset)) ;\n  storage int ;\n  code { UNPAIR ;\n         IF_LEFT { IF_LEFT { SWAP ; SUB } { ADD } } { DROP 2 ; PUSH int 0 } ;\n         NIL operation ;\n         PAIR } }"
+}

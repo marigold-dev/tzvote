@@ -1,0 +1,77 @@
+type storage = {
+  name : string,
+  dateTo : timestamp,
+  dateFrom : timestamp,
+  options : list<string>,
+  votes : map<address, string>, // votes by user
+  results : map<string, int> // results by option
+}
+
+type parameter =
+| ["Vote", string];
+
+type return_ = [list<operation>, storage];
+
+//redefining find_opt function
+let find_opt : (f : (x : _a) => bool, xs : list<_a>) => option<_a> 
+    = (f : (x : _a) => bool, xs : list<_a>) : option<_a> =>
+    match(xs ,list([
+      ([] : list<_a>) => None(),
+      ([x,... xs] : list<_a>) => {
+          if(f(x)) { return Some(x); } else {return find_opt(f, xs); } 
+        } 
+    ]));
+
+
+let vote = ([store, opt] : [storage, string]) : storage => {
+//check if date now is between from/to dates
+if (Tezos.now < store.dateFrom || Tezos.now > store.dateTo) failwith ("Not yet the time to vote");
+//check if option exists
+let opt_ : option<string> = find_opt(( (s : string) => s == opt), store.options);
+if( opt_ == (None () as option<string>)) failwith ("Option does not exist") 
+
+return store
+
+};
+
+
+//check if sender has not yet voted
+//let _ = match Map.find_opt Tezos.sender store.votes with
+//Some v -> (failwith ("A vote with option " ^ v ^ "  already exists for user")) in
+//update results cache
+// & finally add the new vote
+//{store with 
+//store.results = match Map.find_opt option store.results with Some r -> Map.add option r+1 store.results | None -> Map.add option 1 store.results  
+//store.votes = Map.update option Tezos.sender store.votes}
+
+/* Main access point that dispatches to the entrypoints according to
+   the smart contract parameter. */
+let main = ([action, store] : [parameter, storage]) : return_ => {
+ return [
+   (list([]) as list <operation>),    // No operations
+   (match (action, {
+    Vote: (opt: string) => vote([store, opt])} 
+    ))
+  ]
+};
+
+
+/////////////////////// TESTS
+
+let _test1 = () : bool => {
+  
+  let initial_storage = 
+  {  name : "Which is the cutiest pokemon?",
+  dateFrom : ("2022-01-01t00:00:00Z" as timestamp),  
+  dateTo : ("2022-03-01t00:00:00Z" as timestamp),  
+  options : list(["Mew","Pikachu"]) ,  
+  votes : (Map.empty as map<address, string>), 
+   results : (Map.empty as map<string, int>) } ;
+
+  let [taddr, _, _] = Test.originate(main, initial_storage, 0 as tez);
+  let contr = Test.to_contract(taddr);
+  let r = Test.transfer_to_contract_exn(contr, (Vote("Pikachu")), 1 as mutez);
+  return (Test.get_storage(taddr) == "Which is the cutiest pokemon?");
+}
+
+let test1 = _test1();
