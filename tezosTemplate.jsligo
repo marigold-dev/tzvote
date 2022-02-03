@@ -22,25 +22,26 @@ let find_opt : (f : (x : _a) => bool, xs : list<_a>) => option<_a>
         } 
     ]));
 
-
 let vote = ([store, opt] : [storage, string]) : storage => {
+
 //check if date now is between from/to dates
 if (Tezos.now < store.dateFrom || Tezos.now > store.dateTo) failwith ("Not yet the time to vote");
+
 //check if option exists
 let opt_ : option<string> = find_opt(( (s : string) => s == opt), store.options);
-if( opt_ == (None () as option<string>)) failwith ("Option does not exist") 
-return store
-};
-
+if( opt_ == (None () as option<string>)) failwith ("Option does not exist") ;
 
 //check if sender has not yet voted
-//let _ = match Map.find_opt Tezos.sender store.votes with
-//Some v -> (failwith ("A vote with option " ^ v ^ "  already exists for user")) in
-//update results cache
-// & finally add the new vote
-//{store with 
-//store.results = match Map.find_opt option store.results with Some r -> Map.add option r+1 store.results | None -> Map.add option 1 store.results  
-//store.votes = Map.update option Tezos.sender store.votes}
+match(Map.find_opt(Tezos.sender,store.votes), { 
+Some : (voted : string) => failwith ("A vote with option " + voted + "  already exists for this user"),
+None : () => unit
+});
+
+//update results cache & finally add the new vote
+return ({...store, 
+             results : match(Map.find_opt(opt,store.results),{Some : (r:int) => Map.add(opt,r+1,store.results),None: ()=> Map.add(opt,1,store.results)}) ,
+             votes : Map.add(Tezos.sender, opt, store.votes) }); 
+};
 
 /* Main access point that dispatches to the entrypoints according to
    the smart contract parameter. */

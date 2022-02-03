@@ -1,39 +1,75 @@
+
 #include "tezosTemplate.jsligo"
 
+//util function
 let assert_failure = (result : test_exec_result) : bool => {
   return match(result,{
     Success: () => false,
-    Fail:  ( tee : test_exec_error ) => { Test.log (["Exception correctly caught", "tee.address"]) ; return true}
-  })
-}
+    Fail: ( tee : test_exec_error ) => { 
+      Test.log (["Exception correctly caught", 
+      match(tee,{
+        Other: () =>"Other", 
+        Rejected: (s:[michelson_program , address])=>("Cause : Rejected") })
+      ]) ; 
+      return true}
+    })
+  };
+  
+  let initial_storage = 
+  {  name : "Which is the cutiest pokemon?",
+  dateFrom : ("2022-01-01t00:00:00Z" as timestamp),  
+  dateTo : ("2022-03-01t00:00:00Z" as timestamp),  
+  options : list(["Mew","Pikachu"]) ,  
+  votes : (Map.empty as map<address, string>), 
+  results : (Map.empty as map<string, int>) } ;
+  
+  let _1 = Test.reset_state ( 5 as nat, list([]) as list <tez> );
+  let baker1 = Test.nth_bootstrap_account(0);
+  let sender1 = Test.nth_bootstrap_account(1);
+  let sender2 = Test.nth_bootstrap_account(2);
+  let _2 = Test.set_source(sender1);
+  let _3 = Test.set_baker(baker1);
 
-let initial_storage = 
-{  name : "Which is the cutiest pokemon?",
-dateFrom : ("2022-01-01t00:00:00Z" as timestamp),  
-dateTo : ("2022-03-01t00:00:00Z" as timestamp),  
-options : list(["Mew","Pikachu"]) ,  
-votes : (Map.empty as map<address, string>), 
-results : (Map.empty as map<string, int>) } ;
+  let [taddr, _, _] = Test.originate(main, initial_storage, 0 as tez);
+  let contr = Test.to_contract(taddr);
 
-let [taddr, _, _] = Test.originate(main, initial_storage, 0 as tez);
-let contr = Test.to_contract(taddr);
+  let _testOriginate = () : bool => {
+    assert((Test.get_storage(taddr) as storage).name  == "Which is the cutiest pokemon?");
+    assert((Test.get_storage(taddr) as storage).dateFrom  == ("2022-01-01t00:00:00Z" as timestamp));
+    assert((Test.get_storage(taddr) as storage).dateTo  == ("2022-03-01t00:00:00Z" as timestamp));
+    return true ;
+  }
+  
+  let _testVoteOutOfDate = () : bool => {
+    //ovverride out of time
+    Test.set_now('2000-02-01T00:00:00Z' as timestamp);
+    return assert_failure(Test.transfer_to_contract(contr, (Vote("Pikachu")), 1 as mutez));
+  }
+  
+  let _testUnknownOption = (s : address) : bool => {
+    Test.set_source(s);
+    return assert_failure(Test.transfer_to_contract(contr, (Vote("Batman")), 1 as mutez));
+  }
 
-let _testOriginate = () : bool => {
-  assert((Test.get_storage(taddr) as storage).name  == "Which is the cutiest pokemon?");
-  assert((Test.get_storage(taddr) as storage).dateFrom  == ("2022-01-01t00:00:00Z" as timestamp));
-  assert((Test.get_storage(taddr) as storage).dateTo  == ("2022-03-01t00:00:00Z" as timestamp));
-  return true ;
-}
+  let _testVotePikachu = (s : address) : bool => {
+    Test.set_source(s);
+    Test.transfer_to_contract_exn(contr, (Vote("Pikachu")), 1 as mutez);
+    let st = (Test.get_storage(taddr) as storage);
+    Test.log(st);
+    assert(Option.unopt(Map.find_opt(sender1,st.votes))  == "Pikachu");
+    return true;
+  }
 
-let _testVoteOutOfDate = () : bool => {
-  Test.set_now('2000-02-01T00:00:00Z' as timestamp);
-  return assert_failure(Test.transfer_to_contract(contr, (Vote("Pikachu")), 1 as mutez));
-}
-
-let _testUnknownOption = () : bool => {
-  return assert_failure(Test.transfer_to_contract(contr, (Vote("Batman")), 1 as mutez));
-}
-
-let testOriginate = _testOriginate();
-let testVoteOutOfDate = _testVoteOutOfDate();
-let testUnknownOption = _testUnknownOption();
+  let _testVotePikachuAgain = (s : address) : bool => {
+    Test.set_source(s);
+    return assert_failure(Test.transfer_to_contract(contr, (Vote("Pikachu")), 1 as mutez));
+  }
+  
+  let testOriginate = _testOriginate();
+  let testVoteOutOfDate = _testVoteOutOfDate();
+  //return to normal date
+  let _currentTime = Test.set_now('2022-02-01T00:00:00Z' as timestamp);
+  let testUnknownOption = _testUnknownOption(sender1);
+  let testSender1VotePikachu = _testVotePikachu(sender1);
+  let testSender1VotePikachuAgain = _testVotePikachuAgain(sender1);
+  let testSender2VotePikachu = _testVotePikachu(sender2);
