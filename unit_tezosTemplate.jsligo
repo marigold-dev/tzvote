@@ -1,0 +1,39 @@
+#include "tezosTemplate.jsligo"
+
+let assert_failure = (result : test_exec_result) : bool => {
+  return match(result,{
+    Success: () => false,
+    Fail:  ( tee : test_exec_error ) => { Test.log (["Exception correctly caught", "tee.address"]) ; return true}
+  })
+}
+
+let initial_storage = 
+{  name : "Which is the cutiest pokemon?",
+dateFrom : ("2022-01-01t00:00:00Z" as timestamp),  
+dateTo : ("2022-03-01t00:00:00Z" as timestamp),  
+options : list(["Mew","Pikachu"]) ,  
+votes : (Map.empty as map<address, string>), 
+results : (Map.empty as map<string, int>) } ;
+
+let [taddr, _, _] = Test.originate(main, initial_storage, 0 as tez);
+let contr = Test.to_contract(taddr);
+
+let _testOriginate = () : bool => {
+  assert((Test.get_storage(taddr) as storage).name  == "Which is the cutiest pokemon?");
+  assert((Test.get_storage(taddr) as storage).dateFrom  == ("2022-01-01t00:00:00Z" as timestamp));
+  assert((Test.get_storage(taddr) as storage).dateTo  == ("2022-03-01t00:00:00Z" as timestamp));
+  return true ;
+}
+
+let _testVoteOutOfDate = () : bool => {
+  Test.set_now('2000-02-01T00:00:00Z' as timestamp);
+  return assert_failure(Test.transfer_to_contract(contr, (Vote("Pikachu")), 1 as mutez));
+}
+
+let _testUnknownOption = () : bool => {
+  return assert_failure(Test.transfer_to_contract(contr, (Vote("Batman")), 1 as mutez));
+}
+
+let testOriginate = _testOriginate();
+let testVoteOutOfDate = _testVoteOutOfDate();
+let testUnknownOption = _testUnknownOption();

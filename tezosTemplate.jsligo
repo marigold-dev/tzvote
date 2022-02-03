@@ -29,9 +29,7 @@ if (Tezos.now < store.dateFrom || Tezos.now > store.dateTo) failwith ("Not yet t
 //check if option exists
 let opt_ : option<string> = find_opt(( (s : string) => s == opt), store.options);
 if( opt_ == (None () as option<string>)) failwith ("Option does not exist") 
-
 return store
-
 };
 
 
@@ -54,25 +52,3 @@ let main = ([action, store] : [parameter, storage]) : return_ => {
     ))
   ]
 };
-
-
-/////////////////////// TESTS SECTION ////////////////////////////////////
-
-let initial_storage = 
-{  name : "Which is the cutiest pokemon?",
-dateFrom : ("2022-01-01t00:00:00Z" as timestamp),  
-dateTo : ("2022-03-01t00:00:00Z" as timestamp),  
-options : list(["Mew","Pikachu"]) ,  
-votes : (Map.empty as map<address, string>), 
- results : (Map.empty as map<string, int>) } ;
-
-let _testOriginate = () : bool => {
-  Test.set_now('2022-02-01T00:00:00Z' as timestamp);
-  let [taddr, _, _] = Test.originate(main, initial_storage, 0 as tez);
-  let contr = Test.to_contract(taddr);
-  let r = Test.transfer_to_contract_exn(contr, (Vote("Pikachu")), 1 as mutez);
-  return (  (Test.get_storage(taddr) as storage).name  == "Which is the cutiest pokemon?");
-}
-
-
-let test1 = _testOriginate();
