@@ -27,6 +27,7 @@ let assert_failure = (result : test_exec_result) : bool => {
   let baker1 = Test.nth_bootstrap_account(0);
   let sender1 = Test.nth_bootstrap_account(1);
   let sender2 = Test.nth_bootstrap_account(2);
+  let sender3 = Test.nth_bootstrap_account(3);
   let _2 = Test.set_source(sender1);
   let _3 = Test.set_baker(baker1);
 
@@ -46,30 +47,28 @@ let assert_failure = (result : test_exec_result) : bool => {
     return assert_failure(Test.transfer_to_contract(contr, (Vote("Pikachu")), 1 as mutez));
   }
   
-  let _testUnknownOption = (s : address) : bool => {
+  let _testVote = ([s,o,voteCount] : [address,string,int]) : bool => {
     Test.set_source(s);
-    return assert_failure(Test.transfer_to_contract(contr, (Vote("Batman")), 1 as mutez));
-  }
-
-  let _testVotePikachu = (s : address) : bool => {
-    Test.set_source(s);
-    Test.transfer_to_contract_exn(contr, (Vote("Pikachu")), 1 as mutez);
+    Test.transfer_to_contract_exn(contr, (Vote(o)), 1 as mutez);
     let st = (Test.get_storage(taddr) as storage);
     Test.log(st);
-    assert(Option.unopt(Map.find_opt(sender1,st.votes))  == "Pikachu");
+    assert(Option.unopt(Map.find_opt(s,st.votes))  == o);
+    assert(Option.unopt(Map.find_opt(o,st.results))  == voteCount);
     return true;
   }
 
-  let _testVotePikachuAgain = (s : address) : bool => {
+  let _testVoteFail = ( [s,o] : [address,string]) : bool => {
     Test.set_source(s);
-    return assert_failure(Test.transfer_to_contract(contr, (Vote("Pikachu")), 1 as mutez));
+    return assert_failure(Test.transfer_to_contract(contr, (Vote(o)), 1 as mutez));
   }
   
   let testOriginate = _testOriginate();
   let testVoteOutOfDate = _testVoteOutOfDate();
   //return to normal date
   let _currentTime = Test.set_now('2022-02-01T00:00:00Z' as timestamp);
-  let testUnknownOption = _testUnknownOption(sender1);
-  let testSender1VotePikachu = _testVotePikachu(sender1);
-  let testSender1VotePikachuAgain = _testVotePikachuAgain(sender1);
-  let testSender2VotePikachu = _testVotePikachu(sender2);
+  let testSender1VoteUnknownOption = _testVoteFail(sender1, "Batman");
+  let testSender1VotePikachu = _testVote(sender1,"Pikachu",1);
+  let testSender1VotePikachuAgainAndFail = _testVoteFail(sender1,"Pikachu");
+  let testSender2VotePikachu = _testVote(sender2,"Pikachu",2);
+  let testSender2VoteMewAndFail = _testVoteFail(sender2,"Mew");
+  let testSender3VoteMew = _testVote(sender3,"Mew",1);
