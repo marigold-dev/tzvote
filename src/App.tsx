@@ -42,9 +42,9 @@ const App = () => {
     
     if (publicToken && (!userAddress || isNaN(userBalance))) {
       return (
-        <div className="main-box">
-        <h1>Wallet connection</h1>
-        <div id="dialog">
+        <div className="main-box-login">
+        <div className="title"><h1>Wallet connection</h1></div>
+        <div id="dialog-login">
         <header>Please connect</header>
         <div id="content">
         <p className="text-align-center">
@@ -84,7 +84,7 @@ const App = () => {
             </p>
             </div>
             </div>
-            <div id="footer">
+            <div id="footer-login">
             <img src="built-with-taquito.png" alt="Built with Taquito" />
             </div>
             </div>
@@ -93,22 +93,30 @@ const App = () => {
           else if (userAddress && !isNaN(userBalance)) {
             return (
               <div className="main-box">
-              <h1>Welcome</h1>
-              <div id="tabs">
+              <div id="header"> 
+              <div className="column">Marigold Voting app</div> 
+
+              <div id="tabs" className="column">
               <div
               id="vote"
               className={activeTab === "vote" ? "active" : ""}
               onClick={() => setActiveTab("vote")}
               >
-              Make a vote
+              Search
               </div>
               <div
               id="result"
               className={activeTab === "result" ? "active" : ""}
               onClick={() => setActiveTab("result")}
               >
-              See results
+              Manage
               </div>
+              </div>
+
+              <div className="column-right"> 
+            <i className="far fa-user"></i>
+         </div>
+
               </div>
               <div id="dialog">
               <div id="content">
@@ -164,16 +172,15 @@ const App = () => {
                   />
                   </div>
                   <div id="footer">
-                  <img src="built-with-taquito.png" alt="Built with Taquito" />
                   </div>
                   </div>
                   );
                 } 
                 else if (!publicToken && !userAddress && !userBalance) {
                   return (
-                    <div className="main-box">
+                    <div className="main-box-login">
                     <div className="title">
-                    <h1>Delegator Votes</h1>
+                    <h1> Marigold Voting App</h1>
                     <a href="https://www.marigold.dev/">
                     <img
                     height={50}
@@ -181,33 +188,31 @@ const App = () => {
                     alt="marigold-button"
                     />
                     </a>
+                    
+                    
                     </div>
-                    <div id="dialog">
-                    <header>Welcome to Marigold Delegator Votes App!</header>
+
+                    <div id="dialog-login">
+                    <header>Welcome</header>
                     <div id="content">
-                    <p>Dapp for delegators to vote on Tezos governance</p>
-                    <p><b>NB : Baker = Delegate</b></p>
+                    <p>This DApp allows Tz owners to create, edit and remove voting sessions.</p>
+                    
                     <div>
-                    Goal is for delegates to understand what delegators want and avoid just choosing "Pass" or vote against the crowd. It is also a lack of trust on the other direction, many delegators don't find easily if a delegate votes on same alignment.
-                    <br/>
-                    This app :
-                    <ul>
-                    <li>registers delegator votes for a specific Amendment process. There are 3 votes phases :</li>
-                    <ul>
-                    <li>Proposal</li>
-                    <li>Exploratory</li>
-                    <li>Promotion</li>
-                    </ul> 
-                    <li>aggregates vote per delegate and display chart. Goal : Fast choice selection</li>
-                    <li>keeps rating score per delegates (history of aligned votes delegates vs delegators). Goal : For delegators to choose a delegate of same affinity</li>
-                    </ul>
-                    <br/>
-                    Delegator votes are only visible and updated by itself.
-                    Only delegate, can see an aggregate view of its own delegator votes.
-                    Votes can be updated only during the vote phases
+                    Voting session journey :
+                    <ol>
+                    <li>Login : use below button to connect to your wallet</li>
+                    <li>Create voting session : </li>
+                      <ol>
+                      <li>Choose your vote template (as of today only 1 template available : 1 Question, n Choices, 1 Answer)</li>
+                      <li>Enter basic settings : title, dates,etc ...</li>
+                      <li>Click on Create button to deploy the smartcontract on Tezos</li>
+                      </ol>
+                    <li>Go on Search page and select your voting session. Vote on it</li>
+                    <li>To see the seults, click on See Result button to display the chart and details</li>
+                    </ol>
+                    
                     </div>
                     
-                    <p>First of all, identify yourself with your wallet : </p>
                     </div>
                     <ConnectButton
                     Tezos={Tezos}
@@ -222,8 +227,8 @@ const App = () => {
                     wallet={wallet}
                     />
                     </div>
-                    <div id="footer">
-                    <img src="built-with-taquito.png" alt="Built with Taquito" />
+                    <div id="footer-login">
+                      Copyright Marigold 2022
                     </div>
                     </div>
                     );

@@ -6,14 +6,21 @@ body,
   margin: 0px;
   padding: 0px;
   font-size: 1rem;
+  --main-color: #eb3448;
+  --main-bg-color: #eb3448;
+  color: var(--main-color);
 }
 
 #root {
   display: grid;
 }
 
-.main-box {
+.main-box-login {
   margin: auto;
+}
+
+.main-box {
+  margin: 0;
 }
 
 .title {
@@ -23,24 +30,72 @@ body,
   align-items: center;
 }
 
-h1 {
-  color: #35636e;
+.main-box-login .title {
   text-align: left;
+  color: white;
+  background-color: var(--main-color);
+  border-top-right-radius: 0.5em;
+  border-top-left-radius: 0.5em;
+  padding: 0.5em;
 }
 
-header {
-  font-size: 1.5rem;
-  padding: 20px;
-  background-color: #35636e;
+.main-box-login .title a img{
+  background-color:white;
+  padding: 0.2em;
+  border-radius: 2em;
+}
+
+div#header{
+  display: flex;
+  flex-direction:row;
+  
+  margin: 0;
+  background-color: var(--main-color);
+  height: 7vh;
+  color: white;
+  text-align: center;
+  
+}
+
+.column {
+  flex: 1 1 0px;
+  border: none;
+  font-size: 2em;
+  padding: 0.2em;
+  margin: 0.2em;
+}
+
+.column.column-right {
+  text-align: right;
+}
+
+div.column-right{
+  font-size: 3em;
+  padding: 0.1em;
+};
+
+div#header h1{
   color: white;
 }
 
-#dialog {
+
+#dialog-login{
   display: flex;
   flex-direction: column;
   width: 500px;
-  border: 1px solid #35636e;
-  border-radius: 3px;
+  border: 1px solid var(--main-color);
+}
+
+#dialog-login header{
+  text-align: center;
+  padding-top: 0.5em;
+  font-size: 2em;
+}
+
+#dialog{
+  display: flex;
+  flex-direction: column;
+  height: 86vh;
 }
 
 #content {
@@ -52,8 +107,21 @@ header {
 #footer {
   display: flex;
   justify-content: flex-end;
-  padding-top: 20px;
+  background-color: var(--main-color);
+  height: 7vh;
 }
+
+#footer-login {
+  display: flex;
+  justify-content: flex-end;
+  background-color: var(--main-color);
+  height: 7vh;
+  border-bottom-right-radius: 0.5em;
+  border-bottom-left-radius: 0.5em;
+  padding: 0.5em;
+  color: white;
+}
+
 
 .buttons {
   display: flex;
@@ -65,19 +133,19 @@ header {
 .button {
   margin-top: 0px;
   margin-bottom: 5px;
-  color: #35636e;
+  color: var(--main-color);
   font-size: 1rem;
   padding: 15px;
   background-color: white;
   border-radius: 3px;
-  border: solid 2px #35636e;
+  border: solid 2px var(--main-color);
   outline: none;
   cursor: pointer;
   transition: 0.2s;
 }
 .button:hover {
   color: white;
-  background-color: #35636e;
+  background-color: var(--main-bg-color);
 }
 .button:active {
   margin-top: 5px;
@@ -99,7 +167,7 @@ header {
 #public-token-copy:hover {
   border-radius: 3px;
   color: white;
-  background-color: #35636e;
+  background-color: var(--main-bg-color);
 }
 
 .text-align-center {
@@ -108,7 +176,7 @@ header {
 
 a {
   text-decoration: none;
-  color: royalblue;
+  color: rgb(243, 145, 210);
 }
 a:hover {
   font-style: italic;
@@ -117,27 +185,21 @@ a:hover {
 #tabs {
   display: flex;
   flex-direction: row;
-  justify-content: space-around;
-  border: none;
-  color: #35636e;
   margin: 0px;
   transition: 0.3s;
 }
 
 #tabs div {
-  width: 80%;
-  padding: 20px;
-  margin: 0px 10px;
-  border: solid 1px #35636e;
-  border-bottom: none;
+  padding: 0.1em;
+  margin: 0.1em;
+  border: solid 3px white;
   text-align: center;
-  border-top-left-radius: 3px;
-  border-top-right-radius: 3px;
+  border-radius: 5px;
   cursor: pointer;
 }
 
 #tabs div.active {
-  background-color: #35636e;
+  background-color: pink;
   color: white;
 }
 
@@ -153,7 +215,7 @@ a:hover {
   padding: 15px;
   border-top-left-radius: 3px;
   border-bottom-left-radius: 3px;
-  border: solid 2px #35636e;
+  border: solid 2px var(--main-color);
   outline: none;
   font-size: 1rem;
   border-right: none;
@@ -164,7 +226,7 @@ a:hover {
 #transfer-inputs input[type="number"] {
   padding: 15px;
   width: 60px;
-  border: solid 2px #35636e;
+  border: solid 2px var(--main-color);
   border-top-right-radius: 3px;
   border-bottom-right-radius: 3px;
   border-left: none;

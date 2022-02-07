@@ -4,7 +4,7 @@
 //util function
 let assert_failure = (result : test_exec_result) : bool => {
   return match(result,{
-    Success: () => false,
+    Success: (_ : nat) => false,
     Fail: ( tee : test_exec_error ) => { 
       Test.log (["Exception correctly caught", 
       match(tee,{
@@ -49,7 +49,7 @@ let assert_failure = (result : test_exec_result) : bool => {
   
   let _testVote = ([s,o,voteCount] : [address,string,int]) : bool => {
     Test.set_source(s);
-    Test.transfer_to_contract_exn(contr, (Vote(o)), 1 as mutez);
+    let _ = Test.transfer_to_contract_exn(contr, (Vote(o)), 1 as mutez);
     let st = (Test.get_storage(taddr) as storage);
     Test.log(st);
     assert(Option.unopt(Map.find_opt(s,st.votes))  == o);
