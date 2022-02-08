@@ -6,6 +6,8 @@ import DisconnectButton from "./components/DisconnectWallet";
 import qrcode from "qrcode-generator";
 import Votes from "./components/Transfers";
 import Results from "./components/UpdateContract";
+import Popup from 'reactjs-popup';
+
 
 enum BeaconConnection {
   NONE = "",
@@ -114,7 +116,26 @@ const App = () => {
               </div>
 
               <div className="column-right"> 
-            <i className="far fa-user"></i>
+              <Popup trigger={<i className="far fa-user"></i>} position="bottom right">
+                <p>
+                  <i className="far fa-address-card"></i>&nbsp; {userAddress}
+                  </p>
+                <p>
+                  <i className="fas fa-piggy-bank"></i>&nbsp;
+                  {(userBalance / 1000000).toLocaleString("en-US")} ꜩ
+                </p>
+                <hr></hr>
+                <DisconnectButton
+                  wallet={wallet}
+                  setPublicToken={setPublicToken}
+                  setUserAddress={setUserAddress}
+                  setUserBalance={setUserBalance}
+                  setWallet={setWallet}
+                  setTezos={setTezos}
+                  setBeaconConnection={setBeaconConnection}
+                  />
+              </Popup>
+           
          </div>
 
               </div>
@@ -153,23 +174,13 @@ const App = () => {
                   {contractAddress}
                   </a>
                   </p>
-                  <p>
-                  <i className="far fa-address-card"></i>&nbsp; {userAddress}
-                  </p>
+                  
                   <p>
                   <i className="fas fa-piggy-bank"></i>&nbsp;
                   {(userBalance / 1000000).toLocaleString("en-US")} ꜩ
                   </p>
                   </div>
-                  <DisconnectButton
-                  wallet={wallet}
-                  setPublicToken={setPublicToken}
-                  setUserAddress={setUserAddress}
-                  setUserBalance={setUserBalance}
-                  setWallet={setWallet}
-                  setTezos={setTezos}
-                  setBeaconConnection={setBeaconConnection}
-                  />
+                  
                   </div>
                   <div id="footer">
                   </div>

@@ -78,6 +78,13 @@ div#header h1{
   color: white;
 }
 
+.popup-content{
+  background-color: white;
+  border: 0.1em solid;
+  border-radius: 0.2em;
+  padding: 0.5em;
+}
+
 
 #dialog-login{
   display: flex;
