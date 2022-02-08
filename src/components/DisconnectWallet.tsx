@@ -7,6 +7,7 @@ interface ButtonProps {
   setPublicToken: Dispatch<SetStateAction<string | null>>;
   setUserAddress: Dispatch<SetStateAction<string>>;
   setUserBalance: Dispatch<SetStateAction<number>>;
+  setUserRolls: Dispatch<SetStateAction<number>>;
   setWallet: Dispatch<SetStateAction<any>>;
   setTezos: Dispatch<SetStateAction<TezosToolkit>>;
   setBeaconConnection: Dispatch<SetStateAction<boolean>>;
@@ -17,6 +18,7 @@ const DisconnectButton = ({
   setPublicToken,
   setUserAddress,
   setUserBalance,
+  setUserRolls,
   setWallet,
   setTezos,
   setBeaconConnection
@@ -25,6 +27,7 @@ const DisconnectButton = ({
     //window.localStorage.clear();
     setUserAddress("");
     setUserBalance(0);
+    setUserRolls(0);
     setWallet(null);
     const tezosTK = new TezosToolkit("https://hangzhounet.api.tez.ie");
     setTezos(tezosTK);

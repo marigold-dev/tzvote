@@ -6,6 +6,7 @@ import {
   BeaconEvent,
   defaultEventCallbacks
 } from "@airgap/beacon-sdk";
+import { DelegatesResponse } from "@taquito/rpc";
 
 type ButtonProps = {
   Tezos: TezosToolkit;
@@ -13,6 +14,7 @@ type ButtonProps = {
   setWallet: Dispatch<SetStateAction<any>>;
   setUserAddress: Dispatch<SetStateAction<string>>;
   setUserBalance: Dispatch<SetStateAction<number>>;
+  setUserRolls: Dispatch<SetStateAction<number>>;
   setStorage: Dispatch<SetStateAction<number>>;
   contractAddress: string;
   setBeaconConnection: Dispatch<SetStateAction<boolean>>;
@@ -26,6 +28,7 @@ const ConnectButton = ({
   setWallet,
   setUserAddress,
   setUserBalance,
+  setUserRolls,
   setStorage,
   contractAddress,
   setBeaconConnection,
@@ -38,6 +41,19 @@ const ConnectButton = ({
     // updates balance
     const balance = await Tezos.tz.getBalance(userAddress);
     setUserBalance(balance.toNumber());
+    //update rolls
+    try {
+      const delegatesResponse : DelegatesResponse = await Tezos.rpc.getDelegates(userAddress);
+      if(delegatesResponse && delegatesResponse.voting_power){
+        console.log("Pricing power found : "+delegatesResponse.voting_power);
+        setUserRolls(delegatesResponse.voting_power);
+      }else{
+        console.log("No Pricing power found : ");
+      }
+    } catch (error) {
+      console.log("No delegate found");
+    }
+  
     // creates contract instance
     const contract = await Tezos.wallet.at(contractAddress);
     const storage: any = await contract.storage();

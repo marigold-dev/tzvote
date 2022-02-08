@@ -26,6 +26,7 @@ const App = () => {
     const [wallet, setWallet] = useState<any>(null);
     const [userAddress, setUserAddress] = useState<string>("");
     const [userBalance, setUserBalance] = useState<number>(0);
+    const [userRolls, setUserRolls] = useState<number>(0);
     const [storage, setStorage] = useState<number>(0);
     const [copiedPublicToken, setCopiedPublicToken] = useState<boolean>(false);
     const [beaconConnection, setBeaconConnection] = useState<boolean>(false);
@@ -124,12 +125,17 @@ const App = () => {
                   <i className="fas fa-piggy-bank"></i>&nbsp;
                   {(userBalance / 1000000).toLocaleString("en-US")} ꜩ
                 </p>
+                <p>
+                  <i className="fas fa-bolt"></i>&nbsp;
+                  {userRolls} rolls
+                </p>
                 <hr></hr>
                 <DisconnectButton
                   wallet={wallet}
                   setPublicToken={setPublicToken}
                   setUserAddress={setUserAddress}
                   setUserBalance={setUserBalance}
+                  setUserRolls={setUserRolls}
                   setWallet={setWallet}
                   setTezos={setTezos}
                   setBeaconConnection={setBeaconConnection}
@@ -232,6 +238,7 @@ const App = () => {
                     setWallet={setWallet}
                     setUserAddress={setUserAddress}
                     setUserBalance={setUserBalance}
+                    setUserRolls={setUserRolls}
                     setStorage={setStorage}
                     contractAddress={contractAddress}
                     setBeaconConnection={setBeaconConnection}
