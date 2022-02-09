@@ -3,10 +3,19 @@ import { TezosToolkit } from "@taquito/taquito";
 import { Contract, ContractsService,DefaultApiOptions } from '@dipdup/tzkt-api';
 import { render } from "react-dom";
 import { Box, Card, CardContent, CardMedia, Chip, Slider, TextField, Typography } from "@mui/material";
-import { EmojiEvents, PersonOutlined } from "@mui/icons-material";
+import { EmojiEvents, PersonOutlined, RecordVoiceOver } from "@mui/icons-material";
 import { Mark } from "@mui/base";
 import { OverridableComponent } from "@mui/material/OverridableComponent";
 
+class Result {
+  key : string;
+  value : number;
+  constructor(key : string,
+    value : number){
+      this.key = key;
+      this.value = value;
+    }
+}
 
 const Search = ({
   Tezos,
@@ -53,27 +62,33 @@ const Search = ({
     ]; 
   }
 
-  const dateArea = (contract : Contract) : any => {
-    if(false && Date.parse(contract.storage.dateFrom) < Date.now() && Date.now() < Date.parse(contract.storage.dateTo)){
-      return <Slider 
+  const resultArea = (contract : Contract) : any => {
+    if(Date.parse(contract.storage.dateFrom) < Date.now() && Date.now() < Date.parse(contract.storage.dateTo)){
+      console.log("Ping");
+      const status : string = "ONGOING";
+      return <div><Chip style={{marginBottom: "1em"}} color="success" label={status} />
+      <Slider 
       aria-label="Period"
       key={`slider-${contract.address}`}
       value={(new Date()).getTime() / 1000000000000}
       getAriaValueText= {dateSliderToString}
       valueLabelFormat={dateSliderToString}
-      valueLabelDisplay="on"
+      valueLabelDisplay="auto"
       min={Date.parse(contract.storage.dateFrom)/ 1000000000000}
       max={Date.parse(contract.storage.dateTo)/ 1000000000000}
       marks={fromToMarks(contract)}
-      />
+      /></div>;
     }else{
       //get the winner because it is finished
-      console.log(contract.storage.results);
-      if(contract.storage.results){
-
-        return <Chip icon={<EmojiEvents />} label="NO WINNER" />
+      const status : string = "FINISHED";
+      var winner :{ [key:string] : number } = {};
+      var results : {[key:string] : number}[] = contract.storage.results;
+      if(results != undefined && results.length > 0){
+        winner = results.sort((result1 : { [key:string] : number },result2: { [key:string] : number }) => Object.values(result2)[0] - Object.values(result1)[0] )[0];
+        const result : string = "WINNER IS : " + Object.keys(winner)[0];
+        return <div ><Chip style={{marginBottom: "1em"}} color="error" label={status} /><Chip icon={<EmojiEvents />} label={result} /></div>;
       }else {
-        return <Chip icon={<EmojiEvents />} label="NO WINNER" />
+        return <div ><Chip style={{marginBottom: "1em"}} color="warning" label={status} /><Chip icon={<EmojiEvents />} label="NO WINNER" /></div>;
       }
     }
   };
@@ -109,10 +124,8 @@ const Search = ({
       </CardContent>
       
       </Box>
-      <Box paddingTop="5em" paddingRight="5em" width="20%">
-    
-      {dateArea(contract)}
-      
+      <Box paddingTop="1em" paddingRight="5em" paddingLeft="5em" width="20%">
+      {resultArea(contract)}
       </Box>
       <Box padding="1em" height="auto" width="10%">
       <CardMedia
