@@ -72,7 +72,9 @@ div#header{
 div.column-right{
   font-size: 3em;
   padding: 0.1em;
+  cursor: pointer;
 };
+
 
 div#header h1{
   color: white;
@@ -210,7 +212,7 @@ a:hover {
   color: white;
 }
 
-#transfer-inputs {
+#search-inputs {
   display: flex;
   flex-direction: row;
   justify-content: center;
@@ -218,31 +220,15 @@ a:hover {
   padding: 0px 10px 20px 10px;
 }
 
-#transfer-inputs input[type="text"] {
+#search-inputs input {
   padding: 15px;
-  border-top-left-radius: 3px;
-  border-bottom-left-radius: 3px;
+  border-radius: 3px;
   border: solid 2px var(--main-color);
   outline: none;
   font-size: 1rem;
-  border-right: none;
   margin-top: 0px;
   margin-bottom: 5px;
-}
-
-#transfer-inputs input[type="number"] {
-  padding: 15px;
-  width: 60px;
-  border: solid 2px var(--main-color);
-  border-top-right-radius: 3px;
-  border-bottom-right-radius: 3px;
-  border-left: none;
-  outline: none;
-  margin-right: 5px;
-  font-size: 1rem;
-  margin-top: 0px;
-  margin-bottom: 5px;
-  text-align: right;
+  width: 100%;
 }
 
 /* Removes arrows in input number */

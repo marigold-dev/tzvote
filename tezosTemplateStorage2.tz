@@ -1,0 +1,6 @@
+(Pair (Pair (Pair "2022-01-01T00:00:00Z" "2022-03-01T00:00:00Z")
+            "Which is the cutiest pokemon?"
+            { "Mew" ; "Pikachu" })
+      {}
+      {})
+

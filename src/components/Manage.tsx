@@ -1,7 +1,7 @@
 import React, { useState, Dispatch, SetStateAction } from "react";
 import { TezosToolkit, WalletContract } from "@taquito/taquito";
 
-interface UpdateContractProps {
+interface ManageProps {
   contract: WalletContract | any;
   setUserBalance: Dispatch<SetStateAction<any>>;
   Tezos: TezosToolkit;
@@ -9,7 +9,7 @@ interface UpdateContractProps {
   setStorage: Dispatch<SetStateAction<number>>;
 }
 
-const UpdateContract = ({ contract, setUserBalance, Tezos, userAddress, setStorage }: UpdateContractProps) => {
+const Manage = ({ contract, setUserBalance, Tezos, userAddress, setStorage }: ManageProps) => {
   const [loadingIncrement, setLoadingIncrement] = useState<boolean>(false);
   const [loadingDecrement, setLoadingDecrement] = useState<boolean>(false);
 
@@ -72,4 +72,4 @@ const UpdateContract = ({ contract, setUserBalance, Tezos, userAddress, setStora
   );
 };
 
-export default UpdateContract;
+export default Manage;

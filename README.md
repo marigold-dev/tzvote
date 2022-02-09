@@ -9,9 +9,9 @@
 ## Compile
 
 ```
-ligo compile contract tezosTemplate.jsligo --output-file tezosTemplate.tz --entry-point main
+ligo compile contract tezosTemplate2.jsligo --output-file tezosTemplate2.tz --entry-point main
 
-ligo compile contract tezosTemplate.mligo --output-file tezosTemplate.tz -e main
+ligo compile storage tezosTemplate2.jsligo '{  name : "Which is the cutiest pokemon?",dateFrom : ("2022-01-01t00:00:00Z" as timestamp),  dateTo : ("2022-03-01t00:00:00Z" as timestamp),  options : list(["Mew","Pikachu"]) ,  votes : (Map.empty as map<address, string>),  results : (Map.empty as map<string, int>) }' --output-file tezosTemplateStorage2.tz --entry-point main
 
 ```
 
@@ -19,7 +19,7 @@ ligo compile contract tezosTemplate.mligo --output-file tezosTemplate.tz -e main
 
 ```
 
-ligo run dry-run tezosTemplate.jsligo 'Vote("Pikachu")' '{  name : "Which is the cutiest pokemon?",dateFrom : ("2022-01-01t00:00:00Z" as timestamp),  dateTo : ("2022-03-01t00:00:00Z" as timestamp),  options : list(["Mew","Pikachu"]) ,  votes : (Map.empty as map<address, string>),  results : (Map.empty as map<string, int>) }' --now '2022-02-01T00:00:00Z'
+ligo run dry-run tezosTemplate2.jsligo 'Vote("Pikachu")' '{  name : "Which is the cutiest pokemon?",dateFrom : ("2022-01-01t00:00:00Z" as timestamp),  dateTo : ("2022-03-01t00:00:00Z" as timestamp),  options : list(["Mew","Pikachu"]) ,  votes : (Map.empty as map<address, string>),  results : (Map.empty as map<string, int>) }' --now '2022-02-01T00:00:00Z'
 
 
 ```
@@ -27,10 +27,10 @@ ligo run dry-run tezosTemplate.jsligo 'Vote("Pikachu")' '{  name : "Which is the
 ## Deploy 
 
 ```
-tezos-client originate contract contract1 transferring 0 from tz1VApBuWHuaTfDHtKzU3NBtWFYsxJvvWhYk running tezosTemplate.tz --init '0' --burn-cap 1
+tezos-client originate contract tezosTemplate transferring 0 from tz1VApBuWHuaTfDHtKzU3NBtWFYsxJvvWhYk running tezosTemplate2.tz --init "$(cat tezosTemplateStorage2.tz)" --burn-cap 1
 ```
 
-Can return a contract address : KT1D4sUUbyk82dPe4d3oHFXerKSzfxn11pZQ
+Can return a contract address : KT1PYJvdStoHsCsNoKTFigqCqjd5eWo1uMYd
 
 # App
 
@@ -38,7 +38,7 @@ Can return a contract address : KT1D4sUUbyk82dPe4d3oHFXerKSzfxn11pZQ
 
 Install dependencies:
 
-   `npm install`
+   `yarn install`
 
 ## Deploy
 
@@ -46,7 +46,7 @@ Install dependencies:
 
 Start development server:
 
-   `npm run start`
+   `yarn run start`
 
 Open https://localhost:3000 in your browser to see a sample application.
 

@@ -4,8 +4,8 @@ import "./App.css";
 import ConnectButton from "./components/ConnectWallet";
 import DisconnectButton from "./components/DisconnectWallet";
 import qrcode from "qrcode-generator";
-import Votes from "./components/Transfers";
-import Results from "./components/UpdateContract";
+import Search from "./components/Search";
+import Manage from "./components/Manage";
 import Popup from 'reactjs-popup';
 
 
@@ -30,7 +30,7 @@ const App = () => {
     const [storage, setStorage] = useState<number>(0);
     const [copiedPublicToken, setCopiedPublicToken] = useState<boolean>(false);
     const [beaconConnection, setBeaconConnection] = useState<boolean>(false);
-    const [activeTab, setActiveTab] = useState<string>("vote");
+    const [activeTab, setActiveTab] = useState<string>("search");
     
     // Hangzhounet Increment/Decrement contract
     const contractAddress: string = "KT1AQGUvyioqPeoJsez6Vm78Bybe2pA6Jaib";
@@ -101,9 +101,9 @@ const App = () => {
 
               <div id="tabs" className="column">
               <div
-              id="vote"
-              className={activeTab === "vote" ? "active" : ""}
-              onClick={() => setActiveTab("vote")}
+              id="search"
+              className={activeTab === "search" ? "active" : ""}
+              onClick={() => setActiveTab("search")}
               >
               Search
               </div>
@@ -147,21 +147,20 @@ const App = () => {
               </div>
               <div id="dialog">
               <div id="content">
-              {activeTab === "vote" ? (
-                <div id="votes">
-                <h3 className="text-align-center">Make a vote</h3>
-                <Votes
+              {activeTab === "search" ? (
+                <div id="search">
+                <h3 className="text-align-center">Search voting sessions</h3>
+                <Search
                 Tezos={Tezos}
-                setUserBalance={setUserBalance}
                 userAddress={userAddress}
                 />
                 </div>
                 ) : (
                   <div id="increment-decrement">
                   <h3 className="text-align-center">
-                  Current counter: <span>{storage}</span>
+                  Manage voting sessions
                   </h3>
-                  <Results
+                  <Manage
                   contract={contract}
                   setUserBalance={setUserBalance}
                   Tezos={Tezos}
@@ -170,21 +169,6 @@ const App = () => {
                   />
                   </div>
                   )}
-                  <p>
-                  <i className="far fa-file-code"></i>&nbsp;
-                  <a
-                  href={`https://better-call.dev/hangzhounet/${contractAddress}/operations`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  >
-                  {contractAddress}
-                  </a>
-                  </p>
-                  
-                  <p>
-                  <i className="fas fa-piggy-bank"></i>&nbsp;
-                  {(userBalance / 1000000).toLocaleString("en-US")} ꜩ
-                  </p>
                   </div>
                   
                   </div>

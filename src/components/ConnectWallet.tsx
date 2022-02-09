@@ -44,16 +44,18 @@ const ConnectButton = ({
     //update rolls
     try {
       const delegatesResponse : DelegatesResponse = await Tezos.rpc.getDelegates(userAddress);
-      if(delegatesResponse && delegatesResponse.voting_power){
+      if(delegatesResponse != undefined && delegatesResponse.voting_power != undefined){
         console.log("Pricing power found : "+delegatesResponse.voting_power);
         setUserRolls(delegatesResponse.voting_power);
       }else{
-        console.log("No Pricing power found : ");
+        console.log("No Pricing power found");
       }
     } catch (error) {
       console.log("No delegate found");
     }
   
+    
+
     // creates contract instance
     const contract = await Tezos.wallet.at(contractAddress);
     const storage: any = await contract.storage();
