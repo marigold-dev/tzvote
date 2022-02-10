@@ -17,24 +17,22 @@ enum BeaconConnection {
   PERMISSION_REQUEST_SUCCESS = "Wallet is connected"
 }
 
+const votingTemplateAddresses : Array<string> = ["KT1PYJvdStoHsCsNoKTFigqCqjd5eWo1uMYd"];
+
 const App = () => {
   const [Tezos, setTezos] = useState<TezosToolkit>(
     new TezosToolkit("https://hangzhounet.api.tez.ie")
     );
-    const [contract, setContract] = useState<any>(undefined);
     const [publicToken, setPublicToken] = useState<string | null>("");
     const [wallet, setWallet] = useState<any>(null);
     const [userAddress, setUserAddress] = useState<string>("");
     const [userBalance, setUserBalance] = useState<number>(0);
     const [userRolls, setUserRolls] = useState<number>(0);
-    const [storage, setStorage] = useState<number>(0);
     const [copiedPublicToken, setCopiedPublicToken] = useState<boolean>(false);
     const [beaconConnection, setBeaconConnection] = useState<boolean>(false);
     const [activeTab, setActiveTab] = useState<string>("search");
     
-    // Hangzhounet Increment/Decrement contract
-    const contractAddress: string = "KT1AQGUvyioqPeoJsez6Vm78Bybe2pA6Jaib";
-    
+
     const generateQrCode = (): { __html: string } => {
       const qr = qrcode(0, "L");
       qr.addData(publicToken || "");
@@ -161,11 +159,8 @@ const App = () => {
                   Manage voting sessions
                   </h3>
                   <Manage
-                  contract={contract}
-                  setUserBalance={setUserBalance}
                   Tezos={Tezos}
                   userAddress={userAddress}
-                  setStorage={setStorage}
                   />
                   </div>
                   )}
@@ -217,14 +212,11 @@ const App = () => {
                     </div>
                     <ConnectButton
                     Tezos={Tezos}
-                    setContract={setContract}
                     setPublicToken={setPublicToken}
                     setWallet={setWallet}
                     setUserAddress={setUserAddress}
                     setUserBalance={setUserBalance}
                     setUserRolls={setUserRolls}
-                    setStorage={setStorage}
-                    contractAddress={contractAddress}
                     setBeaconConnection={setBeaconConnection}
                     wallet={wallet}
                     />

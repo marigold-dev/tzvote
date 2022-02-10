@@ -10,13 +10,10 @@ import { DelegatesResponse } from "@taquito/rpc";
 
 type ButtonProps = {
   Tezos: TezosToolkit;
-  setContract: Dispatch<SetStateAction<any>>;
   setWallet: Dispatch<SetStateAction<any>>;
   setUserAddress: Dispatch<SetStateAction<string>>;
   setUserBalance: Dispatch<SetStateAction<number>>;
   setUserRolls: Dispatch<SetStateAction<number>>;
-  setStorage: Dispatch<SetStateAction<number>>;
-  contractAddress: string;
   setBeaconConnection: Dispatch<SetStateAction<boolean>>;
   setPublicToken: Dispatch<SetStateAction<string | null>>;
   wallet: BeaconWallet;
@@ -24,13 +21,10 @@ type ButtonProps = {
 
 const ConnectButton = ({
   Tezos,
-  setContract,
   setWallet,
   setUserAddress,
   setUserBalance,
   setUserRolls,
-  setStorage,
-  contractAddress,
   setBeaconConnection,
   setPublicToken,
   wallet
@@ -53,14 +47,6 @@ const ConnectButton = ({
     } catch (error) {
       console.log("No delegate found");
     }
-  
-    
-
-    // creates contract instance
-    const contract = await Tezos.wallet.at(contractAddress);
-    const storage: any = await contract.storage();
-    setContract(contract);
-    setStorage(storage.toNumber());
   };
 
   const connectWallet = async (): Promise<void> => {

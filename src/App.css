@@ -185,7 +185,7 @@ div#header h1{
 
 a {
   text-decoration: none;
-  color: rgb(243, 145, 210);
+  color: var(--main-color)
 }
 a:hover {
   font-style: italic;
