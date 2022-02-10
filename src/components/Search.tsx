@@ -1,11 +1,10 @@
-import React, { useState, Dispatch, SetStateAction, Component } from "react";
+import React, { useState } from "react";
 import { TezosToolkit } from "@taquito/taquito";
-import { Contract, ContractsService,DefaultApiOptions } from '@dipdup/tzkt-api';
-import { render } from "react-dom";
-import { Autocomplete, Box, Button, Card, CardContent, CardMedia, Chip, CircularProgress, Slider, TextField, Typography } from "@mui/material";
-import { EmojiEvents, PersonOutlined, RecordVoiceOver } from "@mui/icons-material";
+import { Contract, ContractsService } from '@dipdup/tzkt-api';
+import { Autocomplete, Box, Button, Card, CardContent, CardMedia, Chip, Grid, Paper, Popover, Slider, TextField, Typography } from "@mui/material";
+import { Block, EmojiEvents, Face, RunningWithErrors } from "@mui/icons-material";
 import { Mark } from "@mui/base";
-import { OverridableComponent } from "@mui/material/OverridableComponent";
+import { red } from "@mui/material/colors";
 
 const Search = ({
   Tezos,
@@ -38,46 +37,39 @@ const Search = ({
   }, [open]);
   
   React.useEffect(() => {
-
-    console.log("React.useEffect");
-
+    
     let active = true;
     
     if (inputValue === '') {
       setOptions(value ? [value] : []);
-      console.log("input is null");
+      setContracts([]);
       return undefined;
     }
     
     (async () => {
-      console.log("Searching contracts...");
       
       setContracts((await contractsService.getSame({address:"KT1PYJvdStoHsCsNoKTFigqCqjd5eWo1uMYd" , includeStorage:true, sort:{desc:"id"}}))
       .filter((c: Contract, index: number, array: Contract[]) => {
         return (c.storage.name as string).search(new RegExp(inputValue, 'gi')) >= 0}
         )); 
         
-        console.log(contracts);
         if (active) {
           let newOptions: Array<string> = [];
-
           
           if (contracts) {
             newOptions = [...newOptions, ...contracts.map((c: Contract, index: number, array: Contract[]) => {return c.storage.name;})];
           }
-
+          
           if (value && options.indexOf(value) === -1) {
             newOptions = [...newOptions,value];
           }
           
           setOptions(newOptions);
         }else{
-          console.log("not active");
         }
       })();
       
       return () => {
-        console.log("returning");
         active = false;
       };
     }, [value, inputValue, loading]);
@@ -99,10 +91,55 @@ const Search = ({
       ]; 
     }
     
+    //BUTTON ACTION AREA
+    
+    
+    
+    //popupvote
+    const [votePopup, setVotePopup] = React.useState<null | HTMLElement>(null);
+    const votePopupId = Boolean(votePopup) ? 'votePopupId' : undefined;
+    const showVote = (event: React.MouseEvent<HTMLButtonElement>) => {
+      setVotePopup(event.currentTarget);
+    };
+    const closeVote = () => {
+      setVotePopup(null);
+    };
+    
+    //buttons
     const buttonChoices = (contract : Contract) : any => {
-      if(STATUS.ONGOING == getStatus(contract) ) return <Button variant="contained">VOTE</Button> ;
-      else return <Button variant="contained">RESULTS</Button> ; 
+      if(STATUS.ONGOING == getStatus(contract) ) 
+      return <div><Button aria-describedby={votePopupId} variant="contained" onClick={showVote}>VOTE</Button>
+      <Popover 
+      id={votePopupId}
+      anchorEl={votePopup}
+      open={Boolean(votePopup)}
+      onClose={closeVote}
+      
+      anchorOrigin={{
+        vertical: 'top',
+        horizontal: 'right',
+      }}
+      transformOrigin={{
+        vertical: 'bottom',
+        horizontal: 'left',
+      }}
+      >
+      <Paper elevation={3} >NOT IMPLEMENTED</Paper>
+      </Popover>
+      </div> ;
     }
+    
+    
+    //RESULT AREA 
+    
+    //popupresults
+    const [resultPopup, setResultPopup] = React.useState<null | HTMLElement>(null);
+    const showResults = (event: React.MouseEvent<HTMLDivElement>) => {
+      setResultPopup(event.currentTarget);
+    };
+    const closeResults = () => {
+      setResultPopup(null);
+    };
     
     const getWinner= (contract : Contract) :  Array<string> => {
       var winnerList : Array<string> = new Array();
@@ -127,7 +164,7 @@ const Search = ({
     
     const resultArea = (contract : Contract) : any => {
       if(Date.parse(contract.storage.dateFrom) < Date.now() && Date.now() < Date.parse(contract.storage.dateTo)){
-        return <div><Chip style={{marginBottom: "1em"}} color="success" label={getStatus(contract)} />
+        return <div><Chip icon={<RunningWithErrors />} style={{marginBottom: "1em"}} color="success" label={getStatus(contract)} />
         <Slider 
         aria-label="Period"
         key={`slider-${contract.address}`}
@@ -144,9 +181,46 @@ const Search = ({
         const winnerList = getWinner(contract);
         if(winnerList.length > 0 ){
           const result : string = "Winner is : " + winnerList.join(' , ');
-          return <div ><Chip style={{marginBottom: "1em"}} color="error" label={getStatus(contract)} /><Chip icon={<EmojiEvents />} label={result} /></div>;
+          return <div ><Chip aria-owns={open ? "resultPopupId" : undefined} aria-haspopup="true" onMouseEnter={showResults} onMouseLeave={closeResults} style={{marginBottom: "1em"}} color="error" label={getStatus(contract)+" ("+(new Date(contract.storage.dateTo)).toLocaleDateString()+")"} />
+          <Chip icon={<EmojiEvents />} label={result} aria-owns={open ? "resultPopupId" : undefined} aria-haspopup="true" onMouseEnter={showResults} onMouseLeave={closeResults}/>
+          <Popover 
+          id="resultPopupId"
+          sx={{
+            pointerEvents: 'none',
+          }}
+          anchorEl={resultPopup}
+          open={Boolean(resultPopup)}
+          onClose={closeResults}
+          disableRestoreFocus
+          anchorOrigin={{
+            vertical: 'top',
+            horizontal: 'center',
+          }}
+          transformOrigin={{
+            vertical: 'bottom',
+            horizontal: 'right',
+          }}
+          >
+          <Paper elevation={3} sx={{width:"50em",height:"25em"}} >
+          <Grid container spacing={2} height={100}>
+          <Grid item xs={8}>
+          <div style={{backgroundColor:"red"}}>RESULTS</div>
+          </Grid>
+          <Grid item xs={4}>
+            <Grid item xs={4}>
+            <div style={{backgroundColor:"green"}}>CAMEMBERT</div>
+            </Grid>
+            <Grid item xs={4}>
+            <div style={{backgroundColor:"yellow"}}>BAKERs</div>
+            </Grid>
+            <div style={{backgroundColor:"blue"}}>ROLLS</div>
+            </Grid>
+          </Grid>
+          </Paper>
+          </Popover>
+          </div>;
         }else {
-          return <div ><Chip style={{marginBottom: "1em"}} color="warning" label={getStatus(contract)} /><Chip icon={<EmojiEvents />} label="NO WINNER" /></div>;
+          return <div ><Chip style={{marginBottom: "1em"}} color="warning" label={getStatus(contract)+" ("+(new Date(contract.storage.dateTo)).toLocaleDateString()+")"} /><Chip icon={<Block />} label="NO WINNER" /></div>;
         }
       }
     };
@@ -177,22 +251,19 @@ const Search = ({
         <TextField {...params} label="Type a question here ..." fullWidth />
         )}
         onInputChange={(event, newInputValue) => {
-          console.log("onInputChange:"+newInputValue);
           setInputValue(newInputValue);
         }}
         onChange={(event, newValue) => {
-          console.log("onChange:"+newValue);
           setOptions(newValue && options.indexOf(newValue) === -1 ? [newValue, ...options] : options);
           setValue(newValue);
         }}
-        
-        
         />
         
         {contracts.map((contract, index) => (
           <Card key={contract.address} sx={{ display: 'flex' }}>
           <Box width="70%" sx={{ display: 'flex', flexDirection: 'column' }}>
           <CardContent sx={{ flex: '1 0 auto' }}>
+          
           <Typography component="div" variant="h5">
           <a
           href={`https://hangzhou2net.tzkt.io/${contract.address}/info`}
@@ -202,9 +273,14 @@ const Search = ({
           {contract.storage.name}
           </a>
           </Typography>
+          
+          
+          
+          
           <Typography variant="subtitle1" color="text.secondary" component="div">
-          Created by <PersonOutlined /> {contract.creator?.address}
+          <span>Created by </span><Chip icon={<Face />} label={contract.creator?.address} clickable target="_blank" component="a" href={`https://hangzhou2net.tzkt.io/${contract.creator?.address}/info`} />  
           </Typography>
+          
           {buttonChoices(contract)}
           </CardContent>
           
