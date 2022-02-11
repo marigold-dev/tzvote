@@ -1,10 +1,9 @@
 import React, { useState } from "react";
 import { TezosToolkit } from "@taquito/taquito";
 import { Contract, ContractsService } from '@dipdup/tzkt-api';
-import { Autocomplete, Box, Button, Card, CardContent, CardMedia, Chip, Grid, Paper, Popover, Slider, TextField, Typography } from "@mui/material";
-import { Block, EmojiEvents, Face, RunningWithErrors } from "@mui/icons-material";
+import { Autocomplete, Avatar, Box, Button, Card, CardContent, CardMedia, Chip, Grid, Paper, Popover, Slider, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TableSortLabel, TextField, Typography } from "@mui/material";
+import { Block, EmojiEvents, Face, Image, RunningWithErrors } from "@mui/icons-material";
 import { Mark } from "@mui/base";
-import { red } from "@mui/material/colors";
 
 const Search = ({
   Tezos,
@@ -24,11 +23,14 @@ const Search = ({
   const [options, setOptions] = useState<Array<string>>([]);
   const loading = open && options.length === 0;
   const [inputValue, setInputValue] = React.useState<string>('');
-  const [value, setValue] = React.useState<string|null>(null);
+  const [searchValue, setSearchValue] = React.useState<string|null>(null);
   
   
   //LIST
   const [contracts, setContracts] = useState<Array<Contract>>([]);
+
+  //SELECTED CONTRACT
+  const [selectedContract, setSelectedContract] = useState<Contract|null>(null);
   
   React.useEffect(() => {
     if (!open) {
@@ -41,7 +43,7 @@ const Search = ({
     let active = true;
     
     if (inputValue === '') {
-      setOptions(value ? [value] : []);
+      setOptions(searchValue ? [searchValue] : []);
       setContracts([]);
       return undefined;
     }
@@ -60,8 +62,8 @@ const Search = ({
             newOptions = [...newOptions, ...contracts.map((c: Contract, index: number, array: Contract[]) => {return c.storage.name;})];
           }
           
-          if (value && options.indexOf(value) === -1) {
-            newOptions = [...newOptions,value];
+          if (searchValue && options.indexOf(searchValue) === -1) {
+            newOptions = [...newOptions,searchValue];
           }
           
           setOptions(newOptions);
@@ -72,7 +74,7 @@ const Search = ({
       return () => {
         active = false;
       };
-    }, [value, inputValue, loading]);
+    }, [searchValue, inputValue, loading]);
     
     const contractsService = new ContractsService( {baseUrl: "https://api.hangzhou2net.tzkt.io" , version : "", withCredentials : false});
     
@@ -134,11 +136,13 @@ const Search = ({
     
     //popupresults
     const [resultPopup, setResultPopup] = React.useState<null | HTMLElement>(null);
-    const showResults = (event: React.MouseEvent<HTMLDivElement>) => {
+    const showResults = (event: React.MouseEvent<HTMLDivElement>, c : Contract) => {
       setResultPopup(event.currentTarget);
+      setSelectedContract(c);
     };
     const closeResults = () => {
       setResultPopup(null);
+      setSelectedContract(null);
     };
     
     const getWinner= (contract : Contract) :  Array<string> => {
@@ -181,17 +185,18 @@ const Search = ({
         const winnerList = getWinner(contract);
         if(winnerList.length > 0 ){
           const result : string = "Winner is : " + winnerList.join(' , ');
-          return <div ><Chip aria-owns={open ? "resultPopupId" : undefined} aria-haspopup="true" onMouseEnter={showResults} onMouseLeave={closeResults} style={{marginBottom: "1em"}} color="error" label={getStatus(contract)+" ("+(new Date(contract.storage.dateTo)).toLocaleDateString()+")"} />
-          <Chip icon={<EmojiEvents />} label={result} aria-owns={open ? "resultPopupId" : undefined} aria-haspopup="true" onMouseEnter={showResults} onMouseLeave={closeResults}/>
+          return <div ><Chip aria-owns={open ? "resultPopupId"+contract.address : undefined} aria-haspopup="true" onMouseEnter={(e) => showResults(e, contract)} onMouseLeave={closeResults} style={{marginBottom: "1em"}} color="error" label={getStatus(contract)+" ("+(new Date(contract.storage.dateTo)).toLocaleDateString()+")"} />
+          <Chip icon={<EmojiEvents />} label={result} aria-owns={open ? "resultPopupId"+contract.address : undefined} aria-haspopup="true" onMouseEnter={(e) => showResults(e, contract)} onMouseLeave={closeResults}/>
+          {selectedContract != null ?
           <Popover 
-          id="resultPopupId"
+          id={"resultPopupId"+selectedContract?.address}
           sx={{
             pointerEvents: 'none',
           }}
           anchorEl={resultPopup}
           open={Boolean(resultPopup)}
           onClose={closeResults}
-          disableRestoreFocus
+          
           anchorOrigin={{
             vertical: 'top',
             horizontal: 'center',
@@ -204,103 +209,136 @@ const Search = ({
           <Paper elevation={3} sx={{width:"50em",height:"25em"}} >
           <Grid container spacing={2} height={100}>
           <Grid item xs={8}>
-          <div style={{backgroundColor:"red"}}>RESULTS</div>
-          </Grid>
-          <Grid item xs={4}>
-            <Grid item xs={4}>
-            <div style={{backgroundColor:"green"}}>CAMEMBERT</div>
+          <div style={{padding:"1em"}}>
+          <TableContainer component={Paper}>
+          <Table aria-label="simple table">
+          <TableHead>
+          <TableRow>
+          <TableCell>Options</TableCell>
+          <TableCell align="right">Result</TableCell>
+          </TableRow>
+          </TableHead>
+          <TableBody>
+          { Object.entries<string>(selectedContract?.storage.options).map(([key,value]) => (
+            <TableRow
+            key={key}
+            sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+            >
+            <TableCell component="th" scope="row">
+            {value}
+            </TableCell>
+            <TableCell align="right"> {getWinner(selectedContract).indexOf(value)>=0?<EmojiEvents/>:""}{ new Map<string,number>(Object.entries(selectedContract?.storage.results)).get(value)} 
+             </TableCell>
+            </TableRow>
+            ))}
+            </TableBody>
+            </Table>
+            </TableContainer>
+            
+            </div>
             </Grid>
             <Grid item xs={4}>
-            <div style={{backgroundColor:"yellow"}}>BAKERs</div>
+            <Grid item xs={4}>
+            
+            <div style={{padding:"1em"}}>
+            
+            <img height={100} width={100} src="https://peltiertech.com/images/2013-09/No3DCharts.png"/>
+            
+            </div>
+            
             </Grid>
-            <div style={{backgroundColor:"blue"}}>ROLLS</div>
+            <Grid item xs={4}>
+            <div style={{padding:"1em"}}><Chip avatar={<Avatar>{Object.entries(selectedContract.storage.votes).length}</Avatar>} label="Bakers involved"/></div>
             </Grid>
-          </Grid>
-          </Paper>
-          </Popover>
-          </div>;
-        }else {
-          return <div ><Chip style={{marginBottom: "1em"}} color="warning" label={getStatus(contract)+" ("+(new Date(contract.storage.dateTo)).toLocaleDateString()+")"} /><Chip icon={<Block />} label="NO WINNER" /></div>;
+            <div style={{padding:"1em"}}><Chip avatar={<Avatar>{  Array.from<number>((new Map<string,number>(Object.entries<number>(selectedContract.storage.results))).values()).reduce( ( value , acc) => Number(value) + Number(acc), 0  )   }</Avatar>} label="Rolls have been stacked"/></div>
+            </Grid>
+            </Grid>
+            </Paper>
+            </Popover>
+            :<div></div>}
+            </div>;
+          }else {
+            return <div ><Chip style={{marginBottom: "1em"}} color="warning" label={getStatus(contract)+" ("+(new Date(contract.storage.dateTo)).toLocaleDateString()+")"} /><Chip icon={<Block />} label="NO WINNER" /></div>;
+          }
         }
-      }
-    };
-    
-    return (
-      <div>
+      };
       
-      <Autocomplete
-      id="searchInput"
-      freeSolo
-      autoComplete
-      includeInputInList
-      filterSelectedOptions
-      value={value}
-      sx={{ width: "90%" }}
-      open={open}
-      onOpen={() => {
-        setOpen(true);
-      }}
-      onClose={() => {
-        setOpen(false);
-      }}
-      isOptionEqualToValue={(option, value) => option === value}
-      getOptionLabel={(option) => option}
-      options={options}
-      loading={loading}
-      renderInput={(params) => (
-        <TextField {...params} label="Type a question here ..." fullWidth />
-        )}
-        onInputChange={(event, newInputValue) => {
-          setInputValue(newInputValue);
-        }}
-        onChange={(event, newValue) => {
-          setOptions(newValue && options.indexOf(newValue) === -1 ? [newValue, ...options] : options);
-          setValue(newValue);
-        }}
-        />
+      return (
+        <div>
         
-        {contracts.map((contract, index) => (
-          <Card key={contract.address} sx={{ display: 'flex' }}>
-          <Box width="70%" sx={{ display: 'flex', flexDirection: 'column' }}>
-          <CardContent sx={{ flex: '1 0 auto' }}>
-          
-          <Typography component="div" variant="h5">
-          <a
-          href={`https://hangzhou2net.tzkt.io/${contract.address}/info`}
-          target="_blank"
-          rel="noopener noreferrer"
-          >
-          {contract.storage.name}
-          </a>
-          </Typography>
-          
-          
-          
-          
-          <Typography variant="subtitle1" color="text.secondary" component="div">
-          <span>Created by </span><Chip icon={<Face />} label={contract.creator?.address} clickable target="_blank" component="a" href={`https://hangzhou2net.tzkt.io/${contract.creator?.address}/info`} />  
-          </Typography>
-          
-          {buttonChoices(contract)}
-          </CardContent>
-          
-          </Box>
-          <Box paddingTop="1em" paddingRight="5em" paddingLeft="5em" width="20%">
-          {resultArea(contract)}
-          </Box>
-          <Box padding="1em" height="auto" width="10%">
-          <CardMedia
-          component="img"
-          height="auto"
-          image="https://static8.depositphotos.com/1009634/988/v/950/depositphotos_9883921-stock-illustration-no-user-profile-picture.jpg"
+        <Autocomplete
+        id="searchInput"
+        freeSolo
+        autoComplete
+        includeInputInList
+        filterSelectedOptions
+        value={searchValue}
+        sx={{ width: "90%" }}
+        open={open}
+        onOpen={() => {
+          setOpen(true);
+        }}
+        onClose={() => {
+          setOpen(false);
+        }}
+        isOptionEqualToValue={(option, value) => option === value}
+        getOptionLabel={(option) => option}
+        options={options}
+        loading={loading}
+        renderInput={(params) => (
+          <TextField {...params} label="Type a question here ..." fullWidth />
+          )}
+          onInputChange={(event, newInputValue) => {
+            setInputValue(newInputValue);
+          }}
+          onChange={(event, newValue) => {
+            setOptions(newValue && options.indexOf(newValue) === -1 ? [newValue, ...options] : options);
+            setSearchValue(newValue);
+          }}
           />
-          </Box>
-          </Card>
-          ))}
           
-          </div>
-          );
-        };
-        
-        export default Search;
-        
+          {contracts.map((contract, index) => (
+            <Card key={contract.address} sx={{ display: 'flex' }}>
+            <Box width="70%" sx={{ display: 'flex', flexDirection: 'column' }}>
+            <CardContent sx={{ flex: '1 0 auto' }}>
+            
+            <Typography component="div" variant="h5">
+            <a
+            href={`https://hangzhou2net.tzkt.io/${contract.address}/info`}
+            target="_blank"
+            rel="noopener noreferrer"
+            >
+            {contract.storage.name}
+            </a>
+            </Typography>
+            
+            
+            
+            
+            <Typography variant="subtitle1" color="text.secondary" component="div">
+            <span>Created by </span><Chip icon={<Face />} label={contract.creator?.address} clickable target="_blank" component="a" href={`https://hangzhou2net.tzkt.io/${contract.creator?.address}/info`} />  
+            </Typography>
+            
+            {buttonChoices(contract)}
+            </CardContent>
+            
+            </Box>
+            <Box paddingTop="1em" paddingRight="5em" paddingLeft="5em" width="20%">
+            {resultArea(contract)}
+            </Box>
+            <Box padding="1em" height="auto" width="10%">
+            <CardMedia
+            component="img"
+            height="auto"
+            image="https://static8.depositphotos.com/1009634/988/v/950/depositphotos_9883921-stock-illustration-no-user-profile-picture.jpg"
+            />
+            </Box>
+            </Card>
+            ))}
+            
+            </div>
+            );
+          };
+          
+          export default Search;
+          
