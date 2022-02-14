@@ -5,7 +5,7 @@ import ConnectButton from "./components/ConnectWallet";
 import DisconnectButton from "./components/DisconnectWallet";
 import qrcode from "qrcode-generator";
 import Search from "./components/Search";
-import Manage from "./components/Manage";
+import Create from "./components/Create";
 import Popup from 'reactjs-popup';
 import { SnackbarProvider } from "notistack";
 
@@ -109,11 +109,11 @@ const App = () => {
               Search
               </div>
               <div
-              id="result"
-              className={activeTab === "result" ? "active" : ""}
-              onClick={() => setActiveTab("result")}
+              id="create"
+              className={activeTab === "create" ? "active" : ""}
+              onClick={() => setActiveTab("create")}
               >
-              Manage
+              Create
               </div>
               </div>
               
@@ -159,9 +159,9 @@ const App = () => {
                 ) : (
                   <div id="increment-decrement">
                   <h3 className="text-align-center">
-                  Manage voting sessions
+                  Create new voting session
                   </h3>
-                  <Manage
+                  <Create
                   Tezos={Tezos}
                   userAddress={userAddress}
                   />
@@ -201,14 +201,13 @@ const App = () => {
                     Voting session journey :
                     <ol>
                     <li>Login : use below button to connect to your wallet</li>
-                    <li>Create voting session : </li>
+                    <li>On Search page and select your voting session. Vote on it. See Result to display the chart and details</li>
+                    <li>On Create page, create a new voting session : </li>
                     <ol>
                     <li>Choose your vote template (as of today only 1 template available : 1 Question, n Choices, 1 Answer)</li>
                     <li>Enter basic settings : title, dates,etc ...</li>
                     <li>Click on Create button to deploy the smartcontract on Tezos</li>
                     </ol>
-                    <li>Go on Search page and select your voting session. Vote on it</li>
-                    <li>To see the seults, click on See Result button to display the chart and details</li>
                     </ol>
                     
                     </div>

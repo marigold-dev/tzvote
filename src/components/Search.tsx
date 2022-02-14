@@ -44,10 +44,6 @@ const Search = ({
   
   const { enqueueSnackbar } = useSnackbar();
   
-  const handleClickVariant = (variant :VariantType,message :any) => {
-    enqueueSnackbar(message.message, {variant , autoHideDuration:10000});
-  };
-  
   //EFFECTS
   
   React.useEffect(() => {
@@ -145,11 +141,11 @@ const Search = ({
           closeVote();
           await op.confirmation();
           handleTezosOperationClose();
-          handleClickVariant('success',"Your vote has been acccepted");
-        } catch (error) {
+          enqueueSnackbar("Your vote has been acccepted", {variant: "success", autoHideDuration:10000});
+        } catch (error : any) {
           //TransactionInvalidBeaconError
           handleTezosOperationClose();
-          handleClickVariant("error",error);
+          enqueueSnackbar(error.message, { variant:"error" , autoHideDuration:10000});
           closeVote();
         } 
         
