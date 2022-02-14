@@ -7,6 +7,7 @@ import qrcode from "qrcode-generator";
 import Search from "./components/Search";
 import Manage from "./components/Manage";
 import Popup from 'reactjs-popup';
+import { SnackbarProvider } from "notistack";
 
 
 enum BeaconConnection {
@@ -32,7 +33,7 @@ const App = () => {
     const [beaconConnection, setBeaconConnection] = useState<boolean>(false);
     const [activeTab, setActiveTab] = useState<string>("search");
     
-
+    
     const generateQrCode = (): { __html: string } => {
       const qr = qrcode(0, "L");
       qr.addData(publicToken || "");
@@ -93,10 +94,12 @@ const App = () => {
           }
           else if (userAddress && !isNaN(userBalance)) {
             return (
+              
+              
               <div className="main-box">
               <div id="header"> 
               <div className="column">Marigold Voting app</div> 
-
+              
               <div id="tabs" className="column">
               <div
               id="search"
@@ -113,35 +116,35 @@ const App = () => {
               Manage
               </div>
               </div>
-
+              
               <div className="column-right"> 
               <Popup trigger={<i className="far fa-user"></i>} position="bottom right">
-                <p>
-                  <i className="far fa-address-card"></i>&nbsp; {userAddress}
-                  </p>
-                <p>
-                  <i className="fas fa-piggy-bank"></i>&nbsp;
-                  {(userBalance / 1000000).toLocaleString("en-US")} ꜩ
-                </p>
-                <p>
-                  <i className="fas fa-bolt"></i>&nbsp;
-                  {userRolls} rolls
-                </p>
-                <hr></hr>
-                <DisconnectButton
-                  wallet={wallet}
-                  setPublicToken={setPublicToken}
-                  setUserAddress={setUserAddress}
-                  setUserBalance={setUserBalance}
-                  setUserRolls={setUserRolls}
-                  setWallet={setWallet}
-                  setTezos={setTezos}
-                  setBeaconConnection={setBeaconConnection}
-                  />
+              <p>
+              <i className="far fa-address-card"></i>&nbsp; {userAddress}
+              </p>
+              <p>
+              <i className="fas fa-piggy-bank"></i>&nbsp;
+              {(userBalance / 1000000).toLocaleString("en-US")} ꜩ
+              </p>
+              <p>
+              <i className="fas fa-bolt"></i>&nbsp;
+              {userRolls} rolls
+              </p>
+              <hr></hr>
+              <DisconnectButton
+              wallet={wallet}
+              setPublicToken={setPublicToken}
+              setUserAddress={setUserAddress}
+              setUserBalance={setUserBalance}
+              setUserRolls={setUserRolls}
+              setWallet={setWallet}
+              setTezos={setTezos}
+              setBeaconConnection={setBeaconConnection}
+              />
               </Popup>
-           
-         </div>
-
+              
+              </div>
+              
               </div>
               <div id="dialog">
               <div id="content">
@@ -170,6 +173,7 @@ const App = () => {
                   <div id="footer">
                   </div>
                   </div>
+                  
                   );
                 } 
                 else if (!publicToken && !userAddress && !userBalance) {
@@ -187,7 +191,7 @@ const App = () => {
                     
                     
                     </div>
-
+                    
                     <div id="dialog-login">
                     <header>Welcome</header>
                     <div id="content">
@@ -198,11 +202,11 @@ const App = () => {
                     <ol>
                     <li>Login : use below button to connect to your wallet</li>
                     <li>Create voting session : </li>
-                      <ol>
-                      <li>Choose your vote template (as of today only 1 template available : 1 Question, n Choices, 1 Answer)</li>
-                      <li>Enter basic settings : title, dates,etc ...</li>
-                      <li>Click on Create button to deploy the smartcontract on Tezos</li>
-                      </ol>
+                    <ol>
+                    <li>Choose your vote template (as of today only 1 template available : 1 Question, n Choices, 1 Answer)</li>
+                    <li>Enter basic settings : title, dates,etc ...</li>
+                    <li>Click on Create button to deploy the smartcontract on Tezos</li>
+                    </ol>
                     <li>Go on Search page and select your voting session. Vote on it</li>
                     <li>To see the seults, click on See Result button to display the chart and details</li>
                     </ol>
@@ -222,7 +226,7 @@ const App = () => {
                     />
                     </div>
                     <div id="footer-login">
-                      Copyright Marigold 2022
+                    Copyright Marigold 2022
                     </div>
                     </div>
                     );
