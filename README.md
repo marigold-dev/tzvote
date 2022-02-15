@@ -17,11 +17,17 @@ ligo compile storage tezosTemplate2.jsligo '{  name : "Which is the cutiest poke
 
 ## Test
 
+
+### Dry run
+
+```
+ligo run dry-run tezosTemplate2.jsligo 'Vote(["Pikachu",Crypto.hash_key("edpkuBknW28nW72KG6RoHtYW7p12T6GKc7nAbwYX5m8Wd9sDVC9yav" as key)])' '{  name : "Which is the cutiest pokemon?",dateFrom : ("2022-01-01t00:00:00Z" as timestamp),  dateTo : ("2022-03-01t00:00:00Z" as timestamp),  options : list(["Mew","Pikachu"]) ,  votes : (Map.empty as map<address, string>),  results : (Map.empty as map<string, int>) }' --now '2022-02-01T00:00:00Z'
 ```
 
-ligo run dry-run tezosTemplate2.jsligo 'Vote("Pikachu")' '{  name : "Which is the cutiest pokemon?",dateFrom : ("2022-01-01t00:00:00Z" as timestamp),  dateTo : ("2022-03-01t00:00:00Z" as timestamp),  options : list(["Mew","Pikachu"]) ,  votes : (Map.empty as map<address, string>),  results : (Map.empty as map<string, int>) }' --now '2022-02-01T00:00:00Z'
+### Unit tests
 
-
+```
+ligo run test unit_tezosTemplate2.jsligo
 ```
 
 ## Deploy 

@@ -16,8 +16,7 @@ let assert_failure = (result : test_exec_result) : bool => {
   
   let initial_storage = 
   {  name : "Which is the cutiest pokemon?",
-  dateFrom : ("2022-01-01t00:00:00Z" as timestamp),  
-  dateTo : ("2022-03-01t00:00:00Z" as timestamp),  
+  votingPeriodIndex : 25,  
   options : list(["Mew","Pikachu"]) ,  
   votes : (Map.empty as map<address, string>), 
   results : (Map.empty as map<string, int>) } ;
@@ -44,11 +43,11 @@ let assert_failure = (result : test_exec_result) : bool => {
   
   // account list
   let senderKey1 : [string,key] = Test.new_account();
-  //let _1 = Test.baker_account(senderKey1);
+  let _1 = Test.baker_account(senderKey1);
   let senderKey2 : [string,key] = Test.new_account();
-  //let _2 = Test.baker_account(senderKey2);
+  let _2 = Test.baker_account(senderKey2);
   let senderKey3 : [string,key] = Test.new_account();
-  //let _3 = Test.baker_account(senderKey3);
+  let _3 = Test.baker_account(senderKey3);
 
   let keys : list<[string,key]> = list([senderKey1,senderKey2,senderKey3]);
   let addresses : list<address> = List.fold(initAccount, keys, list([]) as list<address>);
@@ -69,8 +68,7 @@ let assert_failure = (result : test_exec_result) : bool => {
   
   let _testOriginate = () : bool => {
     assert((Test.get_storage(taddr) as storage).name  == "Which is the cutiest pokemon?");
-    assert((Test.get_storage(taddr) as storage).dateFrom  == ("2022-01-01t00:00:00Z" as timestamp));
-    assert((Test.get_storage(taddr) as storage).dateTo  == ("2022-03-01t00:00:00Z" as timestamp));
+    assert((Test.get_storage(taddr) as storage).votingPeriodIndex  == 25);
     return true ;
   };
   
@@ -97,10 +95,10 @@ let assert_failure = (result : test_exec_result) : bool => {
   let testOriginate = _testOriginate();
   
   //ovverride out of time
-  let _oldTime = Test.set_now("2000-02-01T00:00:00Z" as timestamp);
+  let _oldPeriod = Test.set_voting_period_index(0);
   let testVoteOutOfDate = _testVoteFail(sender1,"Pikachu",Crypto.hash_key(senderKey1[1]));
-  //return to normal date
-  let _currentTime = Test.set_now("2022-02-01T00:00:00Z" as timestamp);
+  //return to normal period
+  let _currentPeriod = Test.set_voting_period_index(25);
   let testSender1VoteUnknownOption = _testVoteFail(sender1, "Batman",Crypto.hash_key(senderKey1[1]));
   let testSender1VotePikachu = _testVote(sender1,"Pikachu",Crypto.hash_key(senderKey1[1]),1);
   let testSender1VotePikachuAgainAndFail = _testVoteFail(sender1,"Pikachu",Crypto.hash_key(senderKey1[1]));
