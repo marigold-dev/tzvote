@@ -164,6 +164,7 @@ const App = () => {
                   <Create
                   Tezos={Tezos}
                   userAddress={userAddress}
+                  setActiveTab={setActiveTab}
                   />
                   </div>
                   )}

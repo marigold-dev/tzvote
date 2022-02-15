@@ -1,8 +1,37 @@
+import { DateRangeSharp } from "@mui/icons-material";
 import { TezosToolkit } from "@taquito/taquito";
 import BigNumber from 'bignumber.js';
 
 export abstract class TezosUtils{
-     
+    
+    /**
+    * Return count + 1 dates that correspond to current voting period start date until end date of the last count period,
+    * @param Tezos 
+    * @param count 
+    */
+    public static async getCurrentAndNextAtBestVotingPeriodDates(Tezos: TezosToolkit, count: number): Promise<Array<Date>> {
+        return new Promise<Array<Date>>(  async(resolve, reject) => { 
+            var dates : Array<Date>= new Array();
+            var startDate : Date = await this.getVotingPeriodStartDate(Tezos);
+            dates.push(startDate);
+            const blocks_per_voting_period = await(await Tezos.rpc.getConstants()).blocks_per_voting_period ;
+            const time_between_blocks = await(await Tezos.rpc.getConstants()).time_between_blocks;
+            for(let i = 0 ; i< count;i++){
+                let endDate : Date = new Date(  startDate.getTime()  + (1000 * blocks_per_voting_period * time_between_blocks[0].toNumber()))
+                dates.push(endDate);
+                startDate = endDate;
+            }
+            resolve(dates);
+        });
+    }
+    
+    /**
+    * Give index of current voting period 
+    */
+    public static async getVotingPeriodIndex(Tezos : TezosToolkit) : Promise<number> {
+        return await (await Tezos.rpc.getCurrentPeriod()).voting_period.index;
+    }
+    
     /**
     * Give date of current voting period start
     */
@@ -13,11 +42,13 @@ export abstract class TezosUtils{
     
     /**
     * Estimated best end of current voting period
-    * dateFrom.getTime() + (1000 * blocks_per_voting_period * time_between_blocks[0].toNumber() */       
-    public static async getVotingPeriodBestEndDate(Tezos : TezosToolkit) : Promise<Date> {
+    * dateFrom.getTime() + (1000 * blocks_per_voting_period * time_between_blocks[0].toNumber() 
+    * @param startDate (optional) by default it is the current period
+    * */       
+    public static async getVotingPeriodBestEndDate(Tezos : TezosToolkit , startDate? : Date) : Promise<Date> {
         const blocks_per_voting_period = await (await Tezos.rpc.getConstants()).blocks_per_voting_period ;
         const time_between_blocks = await (await Tezos.rpc.getConstants()).time_between_blocks;
-        return  new Date( (await this.getVotingPeriodStartDate(Tezos)).getTime() + (1000 * blocks_per_voting_period * time_between_blocks[0].toNumber()));
+        return  new Date(  (startDate?startDate.getTime():(await this.getVotingPeriodStartDate(Tezos)).getTime())       + (1000 * blocks_per_voting_period * time_between_blocks[0].toNumber()));
     }
     
     /**

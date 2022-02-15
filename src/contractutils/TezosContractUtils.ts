@@ -7,6 +7,7 @@ export enum STATUS {
 
 export class TezosVotingContract{
     name : string;
+    index : number;
     dateTo : Date;
     dateFrom : Date;
     options : Array<string>;
@@ -16,6 +17,7 @@ export class TezosVotingContract{
     
     constructor(
         name : string,  
+        index : number,
         dateTo : Date, 
         dateFrom : Date,   
         options : Array<string>,
@@ -23,6 +25,7 @@ export class TezosVotingContract{
         results : Map<string, number>,
         tzkt : Contract){
             this.name=name;
+            this.index=index;
             this.dateTo=dateTo;
             this.dateFrom=dateFrom;
             this.options=options;
@@ -47,6 +50,7 @@ export class TezosVotingContract{
         public static convertFromTZKTTezosContract(tzktContract : Contract) : TezosVotingContract {
             return new TezosVotingContract(
                 tzktContract.storage.name,
+                0,
                 new Date(tzktContract.storage.dateTo),
                 new Date(tzktContract.storage.dateFrom),
                 Array.from<string>(new Map(Object.entries<string>(tzktContract.storage.options)).values()),
