@@ -8,9 +8,9 @@ let assert_failure = (result : test_exec_result) : bool => {
       Test.log (["Exception correctly caught", 
       match(tee,{
         Other: () =>"Other", 
-        Rejected: (s:[michelson_program , address])=> "HELP ME !!!" })
+        Rejected: (s:[michelson_program , address])=>{Test.log(s[0]);return "(see previous log above)"} })
       ]) ; 
-      return true}
+      return true;}
     })
   };
   

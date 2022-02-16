@@ -17,15 +17,12 @@ const Search = ({
   userAddress: string;
 }): JSX.Element => {
   
-  
-  
   //SEARCH
   const [open, setOpen] = React.useState(false);
   const [options, setOptions] = useState<Array<string>>([]);
   const loading = open && options.length === 0;
   const [inputValue, setInputValue] = React.useState<string>('');
   const [searchValue, setSearchValue] = React.useState<string|null>(null);
-  
   
   //LIST
   const [allContracts, setAllContracts] = useState<Array<TezosVotingContract>>([]);
@@ -318,7 +315,7 @@ const Search = ({
             options={options}
             loading={loading}
             loadingText="Type at least 2 characters for autocomplete"
-            renderInput={(params) => (<TextField {...params} label="Search ..." fullWidth /> )}
+            renderInput={(params) => (<TextField {...params} label="Search ... and press Enter" fullWidth /> )}
             onInputChange={(event, newInputValue) => {setInputValue(newInputValue);}}
             onChange={(event, newValue) => {filterOnNewInput(newValue)}}
             renderOption={(props, option, { inputValue }) => {
