@@ -31,7 +31,7 @@ let opt_ : option<string> = find_opt(( (s : string) => s == opt), store.options)
 if( opt_ == (None () as option<string>)) failwith ("Option does not exist") ;
 
 //check if sender is a baker who has rolls
-if ( int( Tezos.voting_power(senderHashKey) == 0 ) failwith ("Sender has no rolls and cannot vote") ;
+if ( (int(Tezos.voting_power(senderHashKey)) == 0 )) failwith ("Sender has no rolls and cannot vote") ;
 
 //check if sender has not yet voted
 match(Map.find_opt(Tezos.sender,store.votes), { 
