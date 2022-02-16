@@ -2,10 +2,12 @@ import React, { ChangeEvent, FormEvent, useState } from "react";
 import { TezosToolkit, WalletContract } from "@taquito/taquito";
 import { Contract, ContractsService } from '@dipdup/tzkt-api';
 import { Autocomplete, Avatar, Backdrop, Box, Button, Card, CardContent, CardMedia, Chip, CircularProgress, FormControl, FormControlLabel, FormHelperText, FormLabel, Grid, Paper, Popover, Radio, RadioGroup, Slider, Snackbar, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TableSortLabel, TextField, Typography } from "@mui/material";
-import { Block, EmojiEvents, Face, Image, RunningWithErrors } from "@mui/icons-material";
+import { Block, EmojiEvents, Face, RunningWithErrors } from "@mui/icons-material";
 import { Mark } from "@mui/base";
-import { useSnackbar, VariantType } from "notistack";
+import { useSnackbar } from "notistack";
 import { STATUS, TezosVotingContract,TezosVotingContractUtils } from "../contractutils/TezosContractUtils";
+import parse from 'autosuggest-highlight/parse';
+import match from 'autosuggest-highlight/match';
 
 const Search = ({
   Tezos,
@@ -15,7 +17,7 @@ const Search = ({
   userAddress: string;
 }): JSX.Element => {
   
-
+  
   
   //SEARCH
   const [open, setOpen] = React.useState(false);
@@ -26,6 +28,7 @@ const Search = ({
   
   
   //LIST
+  const [allContracts, setAllContracts] = useState<Array<TezosVotingContract>>([]);
   const [contracts, setContracts] = useState<Array<TezosVotingContract>>([]);
   
   //SELECTED CONTRACT
@@ -33,66 +36,29 @@ const Search = ({
   
   //TEZOS OPERATIONS
   const [tezosLoading, setTezosLoading]  = React.useState(false);
-  const handleTezosOperationClose = () => {
-    setTezosLoading(false);
-  };
-  const handleTezosOperationToggle = () => {
-    setTezosLoading(!open);
-  };
   
   // MESSAGES
-  
   const { enqueueSnackbar } = useSnackbar();
   
   //EFFECTS
-  
   React.useEffect(() => {
-    if (!open) {
-      setOptions([]);
-    }
-  }, [open]);
-  
-  React.useEffect(() => {
-    
-    let active = true;
-    
-    if (inputValue === '') {
-      setOptions(searchValue ? [searchValue] : []);
-      setContracts([]);
-      return undefined;
-    }
-    
+    console.log("init list of options and all same contracts once");
     (async () => {
-      
-      setContracts((await contractsService.getSame({address:"KT1PYJvdStoHsCsNoKTFigqCqjd5eWo1uMYd" , includeStorage:true, sort:{desc:"id"}}))
-      .map( (tzktObject:Contract) => TezosVotingContractUtils.convertFromTZKTTezosContract(tzktObject)).filter((c: TezosVotingContract) => {
-        return c.name.search(new RegExp(inputValue, 'gi')) >= 0}
-        )); 
-        
-        if (active) {
-          let newOptions: Array<string> = [];
-          
-          if (contracts) {
-            newOptions = [...newOptions, ...contracts.map((c: TezosVotingContract) => c.name)];
-          }
-          
-          if (searchValue && options.indexOf(searchValue) === -1) {
-            newOptions = [...newOptions,searchValue];
-          }
-          
-          setOptions(newOptions);
-        }else{
-        }
-      })();
-      
-      return () => {
-        active = false;
-      };
-    }, [searchValue, inputValue, loading]);
+      let allContracts = (await contractsService.getSame({address:"KT1PYJvdStoHsCsNoKTFigqCqjd5eWo1uMYd" , includeStorage:true, sort:{desc:"id"}}))
+      .map( (tzktObject:Contract) => TezosVotingContractUtils.convertFromTZKTTezosContract(tzktObject)); 
+      setAllContracts(allContracts);
+      setOptions(allContracts.map((c: TezosVotingContract) => c.name));
+    })();
+  }, []);
+  
+  const filterOnNewInput = async(filterValue : string | null) => {
+    if(filterValue == null || filterValue === '')setContracts([]);
+    setContracts(allContracts.filter((c: TezosVotingContract) => {
+      return c.name.search(new RegExp(""+filterValue, 'gi')) >= 0}
+      )); 
+    }
     
     const contractsService = new ContractsService( {baseUrl: "https://api.hangzhou2net.tzkt.io" , version : "", withCredentials : false});
-    
-    
     
     const dateSliderToString = (value : number,index : number) : string =>{
       return new Date(value*1000000000000).toLocaleString();
@@ -129,29 +95,30 @@ const Search = ({
     const handleVoteSubmit = async (event : FormEvent<HTMLFormElement>, contract : TezosVotingContract) => {
       
       event.preventDefault();
+      setTezosLoading(true);
+      
       let c : WalletContract = await Tezos.wallet.at(""+contract.tzkt.address);
       if (voteValue !== '') {
         
         try {
           const pkh = await Tezos.wallet.pkh();
           
-          handleTezosOperationToggle();
-          
           const op = await c.methods.default(voteValue,pkh).send();
           closeVote();
           await op.confirmation();
-          handleTezosOperationClose();
           enqueueSnackbar("Your vote has been acccepted", {variant: "success", autoHideDuration:10000});
         } catch (error : any) {
-          //TransactionInvalidBeaconError
-          handleTezosOperationClose();
           enqueueSnackbar(error.message, { variant:"error" , autoHideDuration:10000});
           closeVote();
-        } 
+        } finally {
+        }
         
       } else {
         setVoteHelperText('Please select an option.');
       }
+      
+      setTezosLoading(false);
+      
     };
     
     const buttonChoices = (contract : TezosVotingContract) : any => {
@@ -330,8 +297,8 @@ const Search = ({
             <div>
             <Backdrop
             sx={{ color: '#fff', zIndex: (theme : any) => theme.zIndex.drawer + 1 }}
-            open={open}
-            onClick={handleTezosOperationClose}
+            open={tezosLoading}
+            onClick={()=>{setTezosLoading(false)}}
             >
             <CircularProgress color="inherit" />
             </Backdrop>
@@ -340,75 +307,84 @@ const Search = ({
             id="searchInput"
             freeSolo
             autoComplete
-            includeInputInList
             filterSelectedOptions
             value={searchValue}
             sx={{ width: "90%" }}
             open={open}
-            onOpen={() => {
-              setOpen(true);
-            }}
-            onClose={() => {
-              setOpen(false);
-            }}
+            onOpen={() => {setOpen(true);}}
+            onClose={() => {setOpen(false);}}
             isOptionEqualToValue={(option, value) => option === value}
             getOptionLabel={(option) => option}
             options={options}
             loading={loading}
-            renderInput={(params) => (
-              <TextField {...params} label="Type a question here ..." fullWidth />
-              )}
-              onInputChange={(event, newInputValue) => {
-                setInputValue(newInputValue);
-              }}
-              onChange={(event, newValue) => {
-                setOptions(newValue && options.indexOf(newValue) === -1 ? [newValue, ...options] : options);
-                setSearchValue(newValue);
-              }}
-              />
-              
-              {contracts.map((contract, index) => (
-                <Card key={contract.tzkt.address} sx={{ display: 'flex' }}>
-                <Box width="70%" sx={{ display: 'flex', flexDirection: 'column' }}>
-                <CardContent sx={{ flex: '1 0 auto' }}>
-                
-                <Typography component="div" variant="h5">
-                <a
-                href={`https://hangzhou2net.tzkt.io/${contract.tzkt.address}/info`}
-                target="_blank"
-                rel="noopener noreferrer"
-                >
-                {contract.name}
-                </a>
-                </Typography>
-                
-                
-                
-                
-                <Typography variant="subtitle1" color="text.secondary" component="div">
-                <span>Created by </span><Chip icon={<Face />} label={contract.tzkt.creator?.address} clickable target="_blank" component="a" href={`https://hangzhou2net.tzkt.io/${contract.tzkt.creator?.address}/info`} />  
-                </Typography>
-                
-                {buttonChoices(contract)}
-                </CardContent>
-                
-                </Box>
-                <Box paddingTop="1em" paddingRight="5em" paddingLeft="5em" width="20%">
-                {resultArea(contract)}
-                </Box>
-                <Box padding="1em" height="auto" width="10%">
-                <CardMedia
-                component="img"
-                height="auto"
-                image="https://static8.depositphotos.com/1009634/988/v/950/depositphotos_9883921-stock-illustration-no-user-profile-picture.jpg"
+            loadingText="Type at least 2 characters for autocomplete"
+            renderInput={(params) => (<TextField {...params} label="Search ..." fullWidth /> )}
+            onInputChange={(event, newInputValue) => {setInputValue(newInputValue);}}
+            onChange={(event, newValue) => {filterOnNewInput(newValue)}}
+            renderOption={(props, option, { inputValue }) => {
+              const matches = match(option, inputValue);
+              const parts = parse(option, matches);
+              return (
+                <li {...props}>
+                <div>
+                {parts.map((part, index) => (
+                  <span
+                  key={index}
+                  style={{
+                    fontWeight: part.highlight ? 700 : 400,
+                  }}
+                  >
+                  {part.text}
+                  </span>
+                  ))}
+                  </div>
+                  </li>
+                  );
+                }}  
                 />
-                </Box>
-                </Card>
-                ))}
                 
-                </div>
-                );
-              };
-              
-              export default Search;
-              
+                {contracts.map((contract, index) => (
+                  <Card key={contract.tzkt.address} sx={{ display: 'flex' }}>
+                  <Box width="70%" sx={{ display: 'flex', flexDirection: 'column' }}>
+                  <CardContent sx={{ flex: '1 0 auto' }}>
+                  
+                  <Typography component="div" variant="h5">
+                  <a
+                  href={`https://hangzhou2net.tzkt.io/${contract.tzkt.address}/info`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  >
+                  {contract.name}
+                  </a>
+                  </Typography>
+                  
+                  
+                  
+                  
+                  <Typography variant="subtitle1" color="text.secondary" component="div">
+                  <span>Created by </span><Chip icon={<Face />} label={contract.tzkt.creator?.address} clickable target="_blank" component="a" href={`https://hangzhou2net.tzkt.io/${contract.tzkt.creator?.address}/info`} />  
+                  </Typography>
+                  
+                  {buttonChoices(contract)}
+                  </CardContent>
+                  
+                  </Box>
+                  <Box paddingTop="1em" paddingRight="5em" paddingLeft="5em" width="20%">
+                  {resultArea(contract)}
+                  </Box>
+                  <Box padding="1em" height="auto" width="10%">
+                  <CardMedia
+                  component="img"
+                  height="auto"
+                  image="https://static8.depositphotos.com/1009634/988/v/950/depositphotos_9883921-stock-illustration-no-user-profile-picture.jpg"
+                  />
+                  </Box>
+                  </Card>
+                  ))}
+                  
+                  </div>
+                  );
+                };
+                
+                export default Search;
+                
