@@ -1,12 +1,12 @@
-import React, { useState, Dispatch, SetStateAction, FormEvent, useEffect, ChangeEvent } from "react";
+import React, { useState, Dispatch, SetStateAction, FormEvent, useEffect, ChangeEvent, useRef, FocusEvent } from "react";
 import { TezosToolkit } from "@taquito/taquito";
 import { TezosVotingContract } from "../contractutils/TezosContractUtils";
-import { Box, Button, CardMedia, FormControl, FormControlLabel, FormLabel, Grid, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Paper, Radio, RadioGroup, StepIcon, TextField, Tooltip, Typography } from "@mui/material";
+import { Box, Button, CardMedia, FormControl, FormControlLabel, FormLabel, Grid, Input, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Paper, Radio, RadioGroup, StepIcon, TextField, Tooltip, Typography } from "@mui/material";
 import { Account } from "@dipdup/tzkt-api";
 import { useSnackbar } from "notistack";
 import { TezosUtils } from "../contractutils/TezosUtils";
 import RadioButtonUncheckedIcon from '@mui/icons-material/RadioButtonUnchecked';
-import { Delete } from "@mui/icons-material";
+import { Delete, Label } from "@mui/icons-material";
 import { updateOptionalTypeNode } from "typescript";
 
 interface CreateProps {
@@ -28,30 +28,15 @@ const Create = ({ Tezos, userAddress ,setActiveTab }: CreateProps) => {
     0,
     new Date(),
     new Date(),
-    ["new option"],
+    [],
     new Map<string,string>(),
     new Map<string,number>(),
     {} as Account));
     
     const [currentVotingPeriodIndex,setCurrentVotingPeriodIndex] =useState<number>(0);   
     const [periodDates,setPeriodDates] =useState<Array<Date>>([]);   
-    
-    //init on load once
-    useEffect(() => {
-      
-      async function fetchCurrentIndex() {
-        setCurrentVotingPeriodIndex(await TezosUtils.getVotingPeriodIndex(Tezos));
-        setContract({...contract , index : await TezosUtils.getVotingPeriodIndex(Tezos)});
-      }
-      
-      async function fetchCurrentAndNextVotingPeriodDates(count :number){
-        fetchCurrentIndex();
-        setPeriodDates(await TezosUtils.getCurrentAndNextAtBestVotingPeriodDates(Tezos,5));
-      }
-      
-      fetchCurrentAndNextVotingPeriodDates(5);
-    }, [])
-    
+    const [inputOption,setInputOption] =useState<string>("");   
+
     const createVoteContract = async(event: FormEvent<HTMLFormElement>, contract: TezosVotingContract) => {
       event.preventDefault();
       try {
@@ -68,9 +53,11 @@ const Create = ({ Tezos, userAddress ,setActiveTab }: CreateProps) => {
         setContract({...contract});
     }
 
-    const updateOption = (e : ChangeEvent, index: number) => {
+    //TIP do not rerender the full object to avoid issue on typing
+    const updateOption = (e : FormEvent, index: number) => {
+      console.log("updateOption");
       contract.options[index]=(""+(e.target as HTMLFormElement).value);
-      setContract({...contract});
+      setContract({...contract});      
   }
 
     return <div style={{padding:"1em"}}>
@@ -123,11 +110,13 @@ const Create = ({ Tezos, userAddress ,setActiveTab }: CreateProps) => {
         </Grid>
         <Grid item xs={12}>
         
+       
+        <FormLabel required id="demo-radio-buttons-group-label">Options</FormLabel>
         <Box>
-        <FormLabel id="demo-radio-buttons-group-label">Options</FormLabel>
-        <Button sx={{ marginLeft: "1em" }}  variant="outlined" onClick={()=>{setContract({...contract,options:contract.options.concat("new option")})}}>Add option</Button>
+        <TextField value={inputOption} sx={{ marginLeft: "1em" }} label="type your option here" onChange={(e) => setInputOption(e.target.value)} ></TextField>
+        <Button sx={{ marginLeft: "1em" }}  variant="outlined" onClick={()=>{setContract({...contract,options:contract.options.concat(inputOption)});setInputOption("")}}>Add option</Button>
         </Box>
-        <List   inputMode="text" >
+        <List inputMode="text" >
         {
           contract.options.map((option: string, index: number) => (
             <ListItem key={option} disablePadding value={option} >
@@ -135,7 +124,7 @@ const Create = ({ Tezos, userAddress ,setActiveTab }: CreateProps) => {
             <ListItemIcon>
             <RadioButtonUncheckedIcon   />
             </ListItemIcon>
-            <TextField onChange={(e : ChangeEvent ) => updateOption(e,index)} value={option} /> 
+            <FormLabel>{option}</FormLabel> 
             <Delete onClick={() => removeOption(index)}/>
             </ListItemButton>
             </ListItem>
