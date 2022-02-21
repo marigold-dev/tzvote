@@ -4,6 +4,36 @@
 
 [Full details here](https://hackmd.io/EBB3pObiT5y5eJs4tPQjXQ?view)
 
+
+# Oracle
+
+The Oracle is here to store missing information of current **voting period index**
+
+## compile
+
+```
+ligo compile contract votingPeriodOracle.jsligo --output-file votingPeriodOracle.tz --entry-point main
+
+ligo compile storage votingPeriodOracle.jsligo '{votingPeriodIndexes:(Map.empty as map<string, nat>),admin:("tz1VApBuWHuaTfDHtKzU3NBtWFYsxJvvWhYk" as address)}' --output-file votingPeriodOracleStorage.tz --entry-point main
+
+```
+
+## Test 
+
+### Dry run
+
+```
+ligo run dry-run votingPeriodOracle.jsligo 'UpdateCurrentVotingPeriod(["PtHangz2aRngywmSRGGvrcTyMbbdpWdpFKuS4uMWxg2RaH9i1qx",(25 as nat)])' '{votingPeriodIndexes:(Map.empty as map<string, nat>),admin:("tz1VApBuWHuaTfDHtKzU3NBtWFYsxJvvWhYk" as address)}'
+
+```
+
+### Unit tests
+
+```
+ligo run test unit_votingPeriodOracle.jsligo
+```
+
+
 # Smart contract
 
 ## Compile
@@ -14,6 +44,7 @@ ligo compile contract tezosTemplate2.jsligo --output-file tezosTemplate2.tz --en
 ligo compile storage tezosTemplate2.jsligo '{  name : "Which is the cutiest pokemon?",dateFrom : ("2022-01-01t00:00:00Z" as timestamp),  dateTo : ("2022-03-01t00:00:00Z" as timestamp),  options : list(["Mew","Pikachu"]) ,  votes : (Map.empty as map<address, string>),  results : (Map.empty as map<string, int>) }' --output-file tezosTemplateStorage2.tz --entry-point main
 
 ```
+
 
 ## Test
 

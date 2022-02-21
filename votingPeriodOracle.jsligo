@@ -1,0 +1,41 @@
+//key is protocol, value is current voting period
+type storage = {
+    votingPeriodIndexes : map<string,nat>,
+    admin : address
+};
+
+type return_ = [list<operation>, storage];
+
+type returned_val = [nat, string, key_hash]; // currentVotingPeriodIndex , option , senderHashKey (because there is a callback and we don't want to lose this param)
+type oracle_param = [string, string, key_hash, contract<returned_val>];
+
+type entrypoint =
+| ["GetCurrentVotingPeriod" , oracle_param]
+| ["UpdateCurrentVotingPeriod" , string , nat];
+
+let getCurrentVotingPeriod = ([protocol,opt,senderHashkey, contract_callback , store]: [string,string, key_hash, contract<returned_val>, storage]): return_ => { 
+    
+    let op : operation = Tezos.transaction(
+        match(Map.find_opt(protocol,store.votingPeriodIndexes), { 
+            Some : (currentVotingPeriodIndex : nat) => [currentVotingPeriodIndex,opt,senderHashkey],
+            None : () => failwith ("Cannot find current voting period index for protocol " + protocol)}), 
+            (0 as mutez),
+            contract_callback
+            );
+            
+            return [list([op]) ,store];
+        }
+        
+
+        let updateCurrentVotingPeriod = ([protocol , currentVotingIndex , store]: [string, nat , storage]): return_ => {
+            if(Tezos.sender != store.admin) failwith ("You are not the admin !!!")
+            return [(list([]) as list <operation>) ,{...store,votingPeriodIndexes:Map.add(protocol, currentVotingIndex, store.votingPeriodIndexes)}];
+        }
+        
+        let main = ([action, store] : [entrypoint , storage]) : return_ => {
+            return match (action, {
+                GetCurrentVotingPeriod: (params: oracle_param) => getCurrentVotingPeriod([params[0],params[1],params[2],params[3],store]),
+                UpdateCurrentVotingPeriod: (params: [string,nat]) => updateCurrentVotingPeriod([params[0], params[1],store])
+            } 
+            )
+        };

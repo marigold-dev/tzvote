@@ -1,61 +1,88 @@
 type storage = {
   name : string,
-  votingPeriodIndex : number,
+  votingPeriodIndex : nat,
   options : list<string>,
   votes : map<address, string>, // votes by user
-  results : map<string, int> // results by option
+  results : map<string, int>, // results by option
+  votingPeriodOracle : address, // address of the oracle
+  protocol : string  //deployed on this network protocol
 }
 
 type parameter =
 | ["Vote", string, key_hash];
 
 type return_ = [list<operation>, storage];
+type returned_val = [nat, string, key_hash]; // currentVotingPeriodIndex , option , senderHashKey (because there is a callback and we don't want to lose this param)
+type oracle_param = [string, string, key_hash, contract<returned_val>];
+
 
 //redefining find_opt function
 let find_opt : (f : (x : _a) => bool, xs : list<_a>) => option<_a> 
-    = (f : (x : _a) => bool, xs : list<_a>) : option<_a> =>
-    match(xs ,list([
-      ([] : list<_a>) => None(),
-      ([x,... xs] : list<_a>) => {
-          if(f(x)) { return Some(x); } else {return find_opt(f, xs); } 
+= (f : (x : _a) => bool, xs : list<_a>) : option<_a> =>
+match(xs ,list([
+  ([] : list<_a>) => None(),
+  ([x,... xs] : list<_a>) => {
+    if(f(x)) { return Some(x); } else {return find_opt(f, xs); } 
+  } 
+]));
+
+//first party of vote function before callback
+let vote = ([store, opt, senderHashKey] : [storage, string, key_hash]) : return_ => {
+  
+  //check if sender is a baker who has rolls
+  if ( (int(Tezos.voting_power(senderHashKey)) == 0 )) failwith ("Sender has no rolls and cannot vote") ;
+  
+  //check if option exists
+  let opt_ : option<string> = find_opt(( (s : string) => s == opt), store.options);
+  if( opt_ == (None () as option<string>)) failwith ("Option does not exist") ;
+  
+  //check if sender has not yet voted
+  match(Map.find_opt(Tezos.sender,store.votes), { 
+    Some : (voted : string) => failwith ("A vote with option " + voted + "  already exists for this user"),
+    None : () => unit
+  });
+  
+  //Prepares call to oracle on missing voting period info
+  let call_to_oracle = () : contract<oracle_param> => { 
+    return match(Tezos.get_entrypoint_opt("%GetCurrentVotingPeriod",store.votingPeriodOracle) as option<contract<oracle_param>>,{ 
+      None : () => failwith("NO_ORACLE_FOUND"),
+      Some : (contract : contract<oracle_param>) => contract
+    });
+  };
+  
+  // Builds transaction
+  let op: operation = Tezos.transaction(
+    ([store.protocol,opt,senderHashKey,(Tezos.self("%voteCallback") as contract<returned_val>)]),
+    (0 as mutez),
+    call_to_oracle());
+    
+    return [  list([op])  , store];
+    
+  };
+  
+  //second party of vote function after callback
+  let voteCallback = ([rvm,store] : [returned_val , storage]) : return_ => {
+    
+    let [votingPeriodIndex,opt,senderHashKey]: [nat,string, key_hash  ] = rvm;
+    
+    //check if voting period is the current one
+    if (votingPeriodIndex != store.votingPeriodIndex) failwith ("Not yet the time to vote");
+    
+    //update results cache & finally add the new vote
+    return [  list([]) as list<operation>, {...store, 
+      results : match(Map.find_opt(opt,store.results),{
+        Some : (r:int) => Map.add(opt,r+(int( Tezos.voting_power(senderHashKey) ) ),store.results),
+        None: ()=> Map.add(opt,( int( Tezos.voting_power(senderHashKey) ) ),store.results)}) ,
+        votes : Map.add(Tezos.sender, opt, store.votes) }]; 
+      };
+      
+      
+      /* Main access point that dispatches to the entrypoints according to
+      the smart contract parameter. */
+      let main = ([action, store] : [parameter, storage]) : return_ => {
+        return match (action, {
+          Vote: (params: [string,key_hash]) => vote([store, params[0], params[1]]),
+          VoteCallback: (params : [returned_val , storage]) => voteCallback(params)
         } 
-    ]));
-
-let vote = ([store, opt, senderHashKey] : [storage, string, key_hash]) : storage => {
-
-//check if voting period is the current one
-if (Tezos.voting_period_index !== store.votingPeriodIndex) failwith ("Not yet the time to vote");
-
-//check if option exists
-let opt_ : option<string> = find_opt(( (s : string) => s == opt), store.options);
-if( opt_ == (None () as option<string>)) failwith ("Option does not exist") ;
-
-//check if sender is a baker who has rolls
-if ( (int(Tezos.voting_power(senderHashKey)) == 0 )) failwith ("Sender has no rolls and cannot vote") ;
-
-//check if sender has not yet voted
-match(Map.find_opt(Tezos.sender,store.votes), { 
-Some : (voted : string) => failwith ("A vote with option " + voted + "  already exists for this user"),
-None : () => unit
-});
-
-//update results cache & finally add the new vote
-return ({...store, 
-             results : match(Map.find_opt(opt,store.results),{
-               Some : (r:int) => Map.add(opt,r+(int( Tezos.voting_power(senderHashKey) ) ),store.results),
-               None: ()=> Map.add(opt,( int( Tezos.voting_power(senderHashKey) ) ),store.results)}) ,
-             votes : Map.add(Tezos.sender, opt, store.votes) }); 
-};
-
-
-
-/* Main access point that dispatches to the entrypoints according to
-   the smart contract parameter. */
-let main = ([action, store] : [parameter, storage]) : return_ => {
- return [
-   (list([]) as list <operation>),    // No operations
-   (match (action, {
-    Vote: (params: [string,key_hash]) => vote([store, params[0], params[1]])} 
-    ))
-  ]
-};
+        )
+      };

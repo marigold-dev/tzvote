@@ -1,7 +1,6 @@
 (Pair (Pair (Pair "2021-01-01T00:00:00Z" "2021-03-01T00:00:00Z")
-            "What is the best restaurant in Bordeaux?"
-            { "La taverne" ; "McDo" })
-      { Elt "La taverne" 3 ; Elt "McDo" 1 }
-      { Elt "tz1U9iTJBWj8L3ByKLxkAEzUmto9LEpCQUNs" "McDo" ;
-        Elt "tz1VApBuWHuaTfDHtKzU3NBtWFYsxJvvWhYk" "La Taverne" })
+            "What is the best restaurant in Lille?"
+            { "Le Fossile" ; "McDo" })
+      { Elt "Le Fossile" 1 }
+      { Elt "tz1VApBuWHuaTfDHtKzU3NBtWFYsxJvvWhYk" "Le Fossile" })
 
