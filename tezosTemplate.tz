@@ -1,7 +1,0 @@
-{ parameter string ;
-  storage
-    (pair (pair (pair (timestamp %dateFrom) (timestamp %dateTo))
-                (pair (string %name) (list %options string)))
-          (pair (map %results string int) (map %votes address string))) ;
-  code { CDR ; NIL operation ; PAIR } }
-
