@@ -73,9 +73,17 @@ Can return a contract address : KT1PYJvdStoHsCsNoKTFigqCqjd5eWo1uMYd
 
 ## Build 
 
+### Locally
+
 Install dependencies:
 
    `yarn install`
+
+### Docker
+
+```
+docker build -t delegator-votes .
+```
 
 ## Deploy
 
@@ -86,4 +94,10 @@ Start development server:
    `yarn run start`
 
 Open https://localhost:3000 in your browser to see a sample application.
+
+### Docker
+
+```
+docker run -d -p 3000:80 delegator-votes
+```
 
