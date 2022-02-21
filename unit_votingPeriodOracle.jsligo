@@ -42,29 +42,39 @@ let assert_failure = (result : test_exec_result) : bool => {
   let sender1 = initAccount(senderKey1);
   
 
-  let votingInitial_storage = 
-  {  name : "Which is the cutiest pokemon?",
-  votingPeriodIndex : 25,  
-  options : list(["Mew","Pikachu"]) ,  
-  votes : (Map.empty as map<address, string>), 
-  results : (Map.empty as map<string, int>) } ;
+
+
+  let _2 = Test.set_source(admin);
+  let _3 = Test.set_baker(baker1);
+  
 
   let initial_storage = {
     admin : admin,
     votingPeriodIndexes: Map.empty as map<string, nat>
   };
-  
-  let _2 = Test.set_source(admin);
-  let _3 = Test.set_baker(baker1);
-  
-  let mStorage = Test.compile_value(votingInitial_storage);
-  let [votingtaddr, _, _] = Test.originate_from_file("tezosTemplate3.jsligo" ,"main", mStorage, 0 as tez); //TODO FIX BUG
-  let tvotingtaddr : typed_address<[list<operation>, storage],storage> = Test.cast_address(votingtaddr) ;
-  let votingContract = Test.to_contract(tvotingtaddr);
+
   
   let [taddr, _, _] = Test.originate(main, initial_storage, 0 as tez);
   let contr = Test.to_contract(taddr);
+
+
+
+  let votingInitial_storage = 
+  {  name : "Which is the cutiest pokemon?",
+  votingPeriodIndex : 25 as nat,  
+  options : list(["Mew","Pikachu"]) ,  
+  votes : (Map.empty as map<address, string>), 
+  results : (Map.empty as map<string, int>),
+  votingPeriodOracle : contr,
+  protocol : "PtHangz2aRngywmSRGGvrcTyMbbdpWdpFKuS4uMWxg2RaH9i1qx" } ;
+
   
+  let mStorage = Test.compile_value(votingInitial_storage);
+  let [votingtaddr, _, _] = Test.originate_from_file("tezosTemplate3.jsligo" ,"main", mStorage, 0 as tez); 
+  let tvotingtaddr : typed_address<[list<operation>, storage],storage> = Test.cast_address(votingtaddr) ;
+  let votingContract = Test.to_contract(tvotingtaddr);
+
+ 
   let _testOriginate = () : bool => {
     assert((Test.get_storage(taddr) as storage).admin  == admin);
     assert((Test.get_storage(taddr) as storage).votingPeriodIndexes  == (Map.empty as map<string,nat>));
