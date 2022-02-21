@@ -19,6 +19,7 @@ enum BeaconConnection {
 }
 
 const votingTemplateAddresses : Array<string> = ["KT1PYJvdStoHsCsNoKTFigqCqjd5eWo1uMYd"];
+const votingPeriodOracle : string = "KT1GLuqbSEoaRb3GE4UtUgGkDukVS766V53A";
 
 const App = () => {
   const [Tezos, setTezos] = useState<TezosToolkit>(
@@ -164,6 +165,8 @@ const App = () => {
                   <Create
                   Tezos={Tezos}
                   userAddress={userAddress}
+                  votingPeriodOracle={votingPeriodOracle}
+                  wallet={wallet}
                   setActiveTab={setActiveTab}
                   />
                   </div>

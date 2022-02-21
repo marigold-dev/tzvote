@@ -1,6 +1,12 @@
 import { DateRangeSharp } from "@mui/icons-material";
 import { TezosToolkit } from "@taquito/taquito";
 import BigNumber from 'bignumber.js';
+import { TezosVotingContract } from "./TezosContractUtils";
+
+export enum STATUS {
+    ONGOING = "ONGOING",
+    FINISHED = "FINISHED"
+}
 
 export abstract class TezosUtils{
     
@@ -60,6 +66,15 @@ export abstract class TezosUtils{
         const blocks_per_voting_period = await (await Tezos.rpc.getConstants()).blocks_per_voting_period ;
         const time_between_blocks = await (await Tezos.rpc.getConstants()).time_between_blocks;
         return  new Date( (await this.getVotingPeriodStartDate(Tezos)).getTime() + (1000 * blocks_per_voting_period * ((time_between_blocks[0].toNumber() +  (  time_between_blocks[1].toNumber() * 1 ) + (delay_per_missing_endorsement?delay_per_missing_endorsement.toNumber():0) * (initial_endorsers?initial_endorsers*0.1:0)    )     )) );
+    }
+    
+    public static async getVotingPeriodStatus(Tezos: TezosToolkit,contract: TezosVotingContract) {
+        //fetch votingPeriodIndex
+        //getCurrentPeriod(options?: RPCOptions): Promise<>;
+        let votingPeriodBlockResult  = await Tezos.rpc.getCurrentPeriod();
+        if(contract.votingPeriodIndex == votingPeriodBlockResult.voting_period.index)
+        return STATUS.ONGOING; else
+        return STATUS.FINISHED;
     }
     
 }

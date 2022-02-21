@@ -4,13 +4,10 @@
 let assert_failure = ([result,message] : [test_exec_result,string]) : bool => {
   return match(result,{
     Success: (_ : nat) => false,
-    Fail: ( tee : test_exec_error ) => { 
-      Test.log (["Exception correctly caught above, compare it manually this error message :", 
+    Fail: ( tee : test_exec_error ) => 
       match(tee,{
-        Other: () =>"Other", 
-        Rejected: (s:[michelson_program , address])=>{Test.log(s[0]);return message} })
-      ]) ; 
-      return true}
+        Other: () => false, 
+        Rejected: (s:[michelson_program , address])=>{  Test.log (["expected error : ", message, " Actual : "]) ; Test.log(s[0]) ; return ((Test.eval(message)) == s[0]) } }) 
     })
   };
   
@@ -66,7 +63,7 @@ let assert_failure = ([result,message] : [test_exec_result,string]) : bool => {
   
   let oracleInitialStorage = {
     admin : faucet,
-    votingPeriodIndexes: Map.literal(list([["PtHangz2aRngywmSRGGvrcTyMbbdpWdpFKuS4uMWxg2RaH9i1qx",25 as nat],["PtGRANADsDU8R9daYKAgWnQYAJ64omN1o3KMGVCykShA97vQbvV",254 as nat]]))
+    votingPeriodIndexes: Map.literal(list([["hangzhounet",25 as nat],["granadanet",254 as nat]]))
   };
   let mStorage = Test.compile_value(oracleInitialStorage);
   let [oracletaddr, _, _] = Test.originate_from_file("votingPeriodOracle.jsligo" ,"main", mStorage, 0 as tez);
@@ -86,7 +83,7 @@ let assert_failure = ([result,message] : [test_exec_result,string]) : bool => {
   votes : (Map.empty as map<address, string>), 
   results : (Map.empty as map<string, int>),
   votingPeriodOracle : oracletaddr,
-  protocol : "PtHangz2aRngywmSRGGvrcTyMbbdpWdpFKuS4uMWxg2RaH9i1qx"
+  protocol : "hangzhounet"
 } ;
 
 
@@ -127,7 +124,7 @@ let _testVoteFailOutOfDate = ( [s,o,k,message] : [address,string,key_hash,string
   votes : (Map.empty as map<address, string>), 
   results : (Map.empty as map<string, int>),
   votingPeriodOracle : oracletaddr,
-  protocol : "PtGRANADsDU8R9daYKAgWnQYAJ64omN1o3KMGVCykShA97vQbvV"
+  protocol : "granadanet"
 } ;
 let [taddr, _, _] = Test.originate(main, initial_storage, (0 as tez));
 let oldContr = Test.to_contract(taddr);

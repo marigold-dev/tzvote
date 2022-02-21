@@ -5,9 +5,11 @@ import { Autocomplete, Avatar, Backdrop, Box, Button, Card, CardContent, CardMed
 import { Block, EmojiEvents, Face, RunningWithErrors } from "@mui/icons-material";
 import { Mark } from "@mui/base";
 import { useSnackbar } from "notistack";
-import { STATUS, TezosVotingContract,TezosVotingContractUtils } from "../contractutils/TezosContractUtils";
+import { TezosVotingContract,TezosVotingContractUtils } from "../contractutils/TezosContractUtils";
 import parse from 'autosuggest-highlight/parse';
 import match from 'autosuggest-highlight/match';
+import { STATUS, TezosUtils } from "../contractutils/TezosUtils";
+import { resolve } from "path";
 
 const Search = ({
   Tezos,
@@ -61,13 +63,15 @@ const Search = ({
       return new Date(value*1000000000000).toLocaleString();
     }
     
-    const fromToMarks = (contract : TezosVotingContract) : Mark[] =>{ 
-      const min :number = contract.dateFrom.getTime() / 1000000000000;
-      const max :number = contract.dateTo.getTime() / 1000000000000;
-      return [
-        {value : min , label : dateSliderToString(min,0) },
-        {value :max, label : dateSliderToString(max,0) }
-      ]; 
+    const fromToMarks = async(contract : TezosVotingContract) : Promise<Mark[]> =>{ 
+      return new Promise(async(resolve, reject) => {
+        const min :number =  (await TezosUtils.getVotingPeriodStartDate(Tezos)).getTime() / 1000000000000;
+        const max :number = (await TezosUtils.getVotingPeriodBestEndDate(Tezos)).getTime() / 1000000000000;
+        resolve([
+          {value : min , label : dateSliderToString(min,0) },
+          {value :max, label : dateSliderToString(max,0) }
+        ]) ; 
+      });
     }
     
     //BUTTON ACTION AREA
@@ -118,9 +122,12 @@ const Search = ({
       
     };
     
-    const buttonChoices = (contract : TezosVotingContract) : any => {
-      if(STATUS.ONGOING == TezosVotingContractUtils.getVotingPeriodStatus(contract) && TezosVotingContractUtils.userNotYetVoted(userAddress,contract)) 
-      return <div><Button aria-describedby={"votePopupId"+selectedContract?.tzkt.address} variant="contained" onClick={(e)=>showVote(e,contract)}>VOTE</Button>
+    const buttonChoices = async(contract : TezosVotingContract) : Promise<any> => {
+
+      return new Promise(async(resolve, reject) => {
+
+      if(STATUS.ONGOING == (await TezosUtils.getVotingPeriodStatus(Tezos,contract)) && TezosVotingContractUtils.userNotYetVoted(userAddress,contract)) 
+      resolve(<div><Button aria-describedby={"votePopupId"+selectedContract?.tzkt.address} variant="contained" onClick={(e)=>showVote(e,contract)}>VOTE</Button>
       {selectedContract != null ?
         <Popover 
         id={"votePopupId"+selectedContract?.tzkt.address}
@@ -159,8 +166,9 @@ const Search = ({
         </Paper>
         </Popover>
         : <div/>}
-        </div> ;
-      }
+        </div> );
+      });
+    }
       
       
       //RESULT AREA 
@@ -193,9 +201,14 @@ const Search = ({
       
       
       
-      const resultArea = (contract : TezosVotingContract) : any => {
-        if(contract.dateFrom < new Date() && new Date() < contract.dateTo){
-          return <div><Chip aria-owns={open ? "resultPopupId"+contract.tzkt.address : undefined} aria-haspopup="true" onMouseEnter={(e) => showResults(e, contract)} onMouseLeave={closeResults} icon={<RunningWithErrors />} style={{marginBottom: "1em"}} color="success" label={TezosVotingContractUtils.getVotingPeriodStatus(contract)} />
+      const resultArea = async (contract : TezosVotingContract) : Promise<any> => {
+
+        return new Promise(async(resolve, reject) => {
+
+        let status = await TezosUtils.getVotingPeriodStatus(Tezos,contract);
+        //ONGOING
+        if(status == STATUS.ONGOING){
+          resolve(<div><Chip aria-owns={open ? "resultPopupId"+contract.tzkt.address : undefined} aria-haspopup="true" onMouseEnter={(e) => showResults(e, contract)} onMouseLeave={closeResults} icon={<RunningWithErrors />} style={{marginBottom: "1em"}} color="success" label={await TezosUtils.getVotingPeriodStatus(Tezos,contract)} />
           <Slider 
           aria-label="Period"
           key={`slider-${contract.tzkt.address}`}
@@ -203,16 +216,16 @@ const Search = ({
           getAriaValueText= {dateSliderToString}
           valueLabelFormat={dateSliderToString}
           valueLabelDisplay="auto"
-          min={contract.dateFrom.getTime()/ 1000000000000}
-          max={contract.dateTo.getTime()/ 1000000000000}
-          marks={fromToMarks(contract)}
-          /></div>;
+          min={(await TezosUtils.getVotingPeriodStartDate(Tezos)).getTime() / 1000000000000}
+          max={(await TezosUtils.getVotingPeriodBestEndDate(Tezos)).getTime() / 1000000000000}
+          marks={await fromToMarks(contract)}
+          /></div>);
         }else{
           //get the winner because it is finished
           const winnerList = getWinner(contract);
           if(winnerList.length > 0 ){
             const result : string = "Winner is : " + winnerList.join(' , ');
-            return <div ><Chip aria-owns={open ? "resultPopupId"+contract.tzkt.address : undefined} aria-haspopup="true" onMouseEnter={(e) => showResults(e, contract)} onMouseLeave={closeResults} style={{marginBottom: "1em"}} color="error" label={TezosVotingContractUtils.getVotingPeriodStatus(contract)+" ("+(new Date(contract.dateTo)).toLocaleDateString()+")"} />
+            resolve(<div ><Chip aria-owns={open ? "resultPopupId"+contract.tzkt.address : undefined} aria-haspopup="true" onMouseEnter={(e) => showResults(e, contract)} onMouseLeave={closeResults} style={{marginBottom: "1em"}} color="error" label={await TezosUtils.getVotingPeriodStatus(Tezos,contract)+" (Period:"+contract.votingPeriodIndex+")"} />
             <Chip icon={<EmojiEvents />} label={result} />
             {selectedContract != null ?
               <Popover 
@@ -283,11 +296,14 @@ const Search = ({
                 </Paper>
                 </Popover>
                 :<div></div>}
-                </div>;
+                </div>);
               }else {
-                return <div ><Chip aria-owns={open ? "resultPopupId"+contract.tzkt.address : undefined} aria-haspopup="true" onMouseEnter={(e) => showResults(e, contract)} onMouseLeave={closeResults}  style={{marginBottom: "1em"}} color="warning" label={TezosVotingContractUtils.getVotingPeriodStatus(contract)+" ("+contract.dateTo.toLocaleDateString()+")"} /><Chip icon={<Block />} label="NO WINNER" /></div>;
+                resolve(<div ><Chip aria-owns={open ? "resultPopupId"+contract.tzkt.address : undefined} aria-haspopup="true" onMouseEnter={(e) => showResults(e, contract)} onMouseLeave={closeResults}  style={{marginBottom: "1em"}} color="warning" label={await TezosUtils.getVotingPeriodStatus(Tezos,contract)+" (Period : "+contract.votingPeriodIndex+")"} /><Chip icon={<Block />} label="NO WINNER" /></div>);
               }
             }
+
+          });
+
           };
           
           return (

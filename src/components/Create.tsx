@@ -7,15 +7,19 @@ import { useSnackbar } from "notistack";
 import { TezosUtils } from "../contractutils/TezosUtils";
 import RadioButtonUncheckedIcon from '@mui/icons-material/RadioButtonUnchecked';
 import { Delete, Label } from "@mui/icons-material";
-import { updateOptionalTypeNode } from "typescript";
+import { BeaconWallet } from "@taquito/beacon-wallet";
+
+const jsonContractTemplate = require('../contracttemplates/tezosTemplate3.tz.json')
 
 interface CreateProps {
   Tezos: TezosToolkit;
   userAddress: string;
+  votingPeriodOracle : string;
+  wallet : BeaconWallet;
   setActiveTab : Dispatch<SetStateAction<string>>;
 }
 
-const Create = ({ Tezos, userAddress ,setActiveTab }: CreateProps) => {
+const Create = ({ Tezos, userAddress , votingPeriodOracle, wallet, setActiveTab }: CreateProps) => {
   
   // MESSAGES
   
@@ -26,40 +30,90 @@ const Create = ({ Tezos, userAddress ,setActiveTab }: CreateProps) => {
   const [contract, setContract] = useState<TezosVotingContract>(new TezosVotingContract(
     '',
     0,
-    new Date(),
-    new Date(),
     [],
     new Map<string,string>(),
     new Map<string,number>(),
+    votingPeriodOracle,
+    wallet.client.preferredNetwork,
     {} as Account));
     
     const [currentVotingPeriodIndex,setCurrentVotingPeriodIndex] =useState<number>(0);   
     const [periodDates,setPeriodDates] =useState<Array<Date>>([]);   
     const [inputOption,setInputOption] =useState<string>("");   
-
+    
+    
+    // INIT ONCE 
+    React.useEffect(() => {
+      (async () => {
+        contract.votingPeriodIndex = await TezosUtils.getVotingPeriodIndex(Tezos);
+        setCurrentVotingPeriodIndex(contract.votingPeriodIndex);
+        setPeriodDates(await TezosUtils.getCurrentAndNextAtBestVotingPeriodDates(Tezos,5));
+        setContract({...contract});
+      })();
+    }, []);
+    
+    
     const createVoteContract = async(event: FormEvent<HTMLFormElement>, contract: TezosVotingContract) => {
       event.preventDefault();
-      try {
-        console.log(contract);
-        setActiveTab("search");
-        enqueueSnackbar("Not yet implemented", { variant:"warning" , autoHideDuration:10000});
-      } catch (error : any) {
-        enqueueSnackbar(error.message, { variant:"error" , autoHideDuration:10000});
+      
+      console.log(contract);
+      
+      /*
+      type storage = {
+        name : string,
+        votingPeriodIndex : nat,
+        options : list<string>,
+        votes : map<address, string>, // votes by user
+        results : map<string, int>, // results by option
+        votingPeriodOracle : address, // address of the oracle
+        protocol : string  //deployed on this network protocol
       }
+      */
+
+      //https://tezostaquito.io/docs/michelsonmap
+
+      //MichelsonMap.fromLiteral({  tz1VSUr8wwNhLAzempoch5d6hLRiTh8Cjcjb: new BigNumber(123),});
+
+      Tezos.wallet
+      .originate({
+        code: jsonContractTemplate,
+        storage: {
+          name : contract.name,
+          votingPeriodIndex : contract.votingPeriodIndex,
+          options : contract.options,
+          votes : contract.votes, //MichelsonMap<address, string>
+          results : contract.results, //MichelsonMap<string, int>
+          votingPeriodOracle : contract.votingPeriodOracle, 
+          protocol : contract.protocol
+        },
+      })
+      .send()
+      .then((originationOp) => {
+        console.log(`Waiting for confirmation of origination...`);
+        return originationOp.contract();
+      })
+      .then((contract) => {
+        setActiveTab("search");
+        enqueueSnackbar(`Origination completed for ${contract.address}.`, { variant:"warning" , autoHideDuration:10000});
+      })
+      .catch((error) => {
+        console.log(`Error: ${JSON.stringify(error, null, 2)}`);
+        enqueueSnackbar(JSON.stringify(error, null, 2), { variant:"error" , autoHideDuration:10000});
+      });
     };
     
     const removeOption = (index: number) => {
-        contract.options.splice(index, 1);
-        setContract({...contract});
+      contract.options.splice(index, 1);
+      setContract({...contract});
     }
-
+    
     //TIP do not rerender the full object to avoid issue on typing
     const updateOption = (e : FormEvent, index: number) => {
       console.log("updateOption");
       contract.options[index]=(""+(e.target as HTMLFormElement).value);
       setContract({...contract});      
-  }
-
+    }
+    
     return <div style={{padding:"1em"}}>
     <form  onSubmit={(e)=>createVoteContract(e,contract)}>
     <FormControl fullWidth>
@@ -81,8 +135,8 @@ const Create = ({ Tezos, userAddress ,setActiveTab }: CreateProps) => {
     aria-labelledby="demo-radio-buttons-group-label"
     defaultValue="25"
     name="radio-buttons-group"
-    value={contract.index}
-    onChange={(e) => setContract({...contract, index: Number(e.target.value)})}
+    value={contract.votingPeriodIndex}
+    onChange={(e) => setContract({...contract, votingPeriodIndex: Number(e.target.value)})}
     >
     {[
       ...Array(5),
@@ -110,7 +164,7 @@ const Create = ({ Tezos, userAddress ,setActiveTab }: CreateProps) => {
         </Grid>
         <Grid item xs={12}>
         
-       
+        
         <FormLabel required id="demo-radio-buttons-group-label">Options</FormLabel>
         <Box>
         <TextField value={inputOption} sx={{ marginLeft: "1em" }} label="type your option here" onChange={(e) => setInputOption(e.target.value)} ></TextField>

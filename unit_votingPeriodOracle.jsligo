@@ -1,16 +1,14 @@
 #include "votingPeriodOracle.jsligo"
 
+
 //util function
 let assert_failure = ([result,message] : [test_exec_result,string]) : bool => {
   return match(result,{
     Success: (_ : nat) => false,
-    Fail: ( tee : test_exec_error ) => { 
-      Test.log (["Exception correctly caught above, compare it manually this error message :", 
+    Fail: ( tee : test_exec_error ) => 
       match(tee,{
-        Other: () =>"Other", 
-        Rejected: (s:[michelson_program , address])=>{Test.log(s[0]);return message} })
-      ]) ; 
-      return true}
+        Other: () => false, 
+        Rejected: (s:[michelson_program , address])=>{  Test.log (["expected error : ", message, " Actual : "]) ; Test.log(s[0]) ; return ((Test.eval(message)) == s[0]) } }) 
     })
   };
   
@@ -68,7 +66,7 @@ let assert_failure = ([result,message] : [test_exec_result,string]) : bool => {
   votes : (Map.empty as map<address, string>), 
   results : (Map.empty as map<string, int>),
   votingPeriodOracle : contr,
-  protocol : "PtHangz2aRngywmSRGGvrcTyMbbdpWdpFKuS4uMWxg2RaH9i1qx" } ;
+  protocol : "hangzhounet" } ;
   
   
   let mStorage = Test.compile_value(votingInitial_storage);
@@ -112,13 +110,13 @@ let assert_failure = ([result,message] : [test_exec_result,string]) : bool => {
   let testOriginate = _testOriginate();
   
   //FILL
-  let testSender1UpdateNotAdmin = _testUpdateFail(sender1, "PtHangz2aRngywmSRGGvrcTyMbbdpWdpFKuS4uMWxg2RaH9i1qx",25 as nat,"You are not the admin !!!");
-  let testAdminUpdateHangzhou = _testUpdate(admin,"PtHangz2aRngywmSRGGvrcTyMbbdpWdpFKuS4uMWxg2RaH9i1qx",25 as nat);
-  let testAdminUpdateHangzhouAgain = _testUpdate(admin,"PtHangz2aRngywmSRGGvrcTyMbbdpWdpFKuS4uMWxg2RaH9i1qx",26 as nat);
-  let testAdminUpdateGranada = _testUpdate(admin,"PtGRANADsDU8R9daYKAgWnQYAJ64omN1o3KMGVCykShA97vQbvV",254 as nat);
+  let testSender1UpdateNotAdmin = _testUpdateFail(sender1, "hangzhounet",25 as nat,"You are not the admin !!!");
+  let testAdminUpdateHangzhou = _testUpdate(admin,"hangzhounet",25 as nat);
+  let testAdminUpdateHangzhouAgain = _testUpdate(admin,"hangzhounet",26 as nat);
+  let testAdminUpdateGranada = _testUpdate(admin,"granadanet",254 as nat);
   
   
   
   //GET
-  let testSender1GetGranada = _testGet(sender1,Crypto.hash_key(senderKey1[1]),"PtGRANADsDU8R9daYKAgWnQYAJ64omN1o3KMGVCykShA97vQbvV",254 as nat);
+  let testSender1GetGranada = _testGet(sender1,Crypto.hash_key(senderKey1[1]),"granadanet",254 as nat);
   let testSender1GetUnkonwn = _testGetFail(sender1,Crypto.hash_key(senderKey1[1]),"Unkonwn",254 as nat,"Cannot find current voting period index for protocol");
