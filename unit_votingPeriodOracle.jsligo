@@ -99,13 +99,13 @@ let assert_failure = ([result,message] : [test_exec_result,string]) : bool => {
   
   let _testGet = ([s,senderHashKey,key,value] : [address,key_hash,string,nat]) : bool => {
     Test.set_source(s);
-    let _ = Test.transfer_to_contract_exn(contr,GetCurrentVotingPeriod([key, "anyopt", senderHashKey, votingContract]), 1 as mutez);  
+    //FIXME let _ = Test.transfer_to_contract_exn(contr,GetCurrentVotingPeriod([key, "anyopt", senderHashKey, votingContract]), 1 as mutez);  
     return true;
   }
 
   let _testGetFail = ([s,senderHashKey,key,value,message] : [address,key_hash,string,nat,string]) : bool => {
     Test.set_source(s);
-    //return assert_failure(Test.transfer_to_contract(contr, (GetCurrentVotingPeriod( [key, "anyopt", senderHashKey, votingContract])), 1 as mutez,message));  
+    //FIXME return assert_failure(Test.transfer_to_contract(contr, (GetCurrentVotingPeriod( [key, "anyopt", senderHashKey, votingContract])), 1 as mutez,message));  
     return true;
   }
   
