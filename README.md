@@ -57,7 +57,7 @@ ligo compile parameter tezosTemplate3.jsligo 'Vote(["Pikachu",Crypto.hash_key("e
 ## Compile for the frontend
 
 ```
-ligo compile contract tezosTemplate3.jsligo --output-file ./src/contracttemplates/tezosTemplate3.tz.json --entry-point main --michelson-format json
+ligo compile contract tezosTemplate3.jsligo --output-file ./tezosTemplate3.tz.json --entry-point main --michelson-format json
 ```
 
 ## Test

@@ -1,4 +1,4 @@
-#include "tezosTemplate3.jsligo"
+#include "../src/contracttemplates/tezosTemplate3.jsligo"
 
 //util function
 let assert_failure = ([result,message] : [test_exec_result,string]) : bool => {
@@ -10,7 +10,6 @@ let assert_failure = ([result,message] : [test_exec_result,string]) : bool => {
         Rejected: (s:[michelson_program , address])=>{  Test.log (["expected error : ", message, " Actual : "]) ; Test.log(s[0]) ; return ((Test.eval(message)) == s[0]) } }) 
     })
   };
-  
   
   
   let initAccount = ([accList, keypair]: [list<address>, [string,key]]) : list<address> => {
@@ -42,7 +41,7 @@ let assert_failure = ([result,message] : [test_exec_result,string]) : bool => {
   let johndoeKey : [string,key] = Test.new_account();
   
   let keys : list<[string,key]> = list([senderKey1,senderKey2,senderKey3,johndoeKey]);
-  
+
   // reset state
   let _reset = Test.reset_state ( 10 as nat, list([]) as list <tez> );
   let faucet = Test.nth_bootstrap_account(0);
@@ -56,7 +55,7 @@ let assert_failure = ([result,message] : [test_exec_result,string]) : bool => {
   
   let _setbaker = Test.set_baker(faucet);
   let _setsource = Test.set_source(sender1);
-  
+
   /**
   * PREPARE ORACLE
   */
@@ -66,8 +65,8 @@ let assert_failure = ([result,message] : [test_exec_result,string]) : bool => {
     votingPeriodIndexes: Map.literal(list([["hangzhounet",25 as nat],["granadanet",254 as nat]]))
   };
   let mStorage = Test.compile_value(oracleInitialStorage);
-  let [oracletaddr, _, _] = Test.originate_from_file("votingPeriodOracle.jsligo" ,"main", mStorage, 0 as tez);
-  let toracletaddr : typed_address<[list<operation>, storage],storage> = Test.cast_address(oracletaddr) ;
+  let [oracletaddr, _, _] = Test.originate_from_file("../src/contracttemplates/votingPeriodOracle.jsligo" ,"main", mStorage, 0 as tez);  
+  let toracletaddr : typed_address<[list<operation>, oracleStorage],oracleStorage> = Test.cast_address(oracletaddr) ;
   let oracleContract = Test.to_contract(toracletaddr);
   let log_ = Test.log("oracleContract");
   let log_1 = Test.log(oracleContract);

@@ -1,23 +1,4 @@
-type storage = {
-  name : string,
-  votingPeriodIndex : nat,
-  options : list<string>,
-  votes : map<address, string>, // votes by user
-  results : map<string, int>, // results by option
-  votingPeriodOracle : address, // address of the oracle
-  protocol : string  //deployed on this network protocol
-}
-
-
-
-type return_ = [list<operation>, storage];
-type returned_val = [nat, string, key_hash]; // currentVotingPeriodIndex , option , senderHashKey (because there is a callback and we don't want to lose this param)
-type oracle_param = [string, string, key_hash, contract<returned_val>];
-
-
-type parameter =
-| ["Vote", string, key_hash]
-| ["VoteCallback", returned_val];
+#include "./shared/types.jsligo"
 
 //redefining find_opt function
 let find_opt : (f : (x : _a) => bool, xs : list<_a>) => option<_a> 
@@ -64,7 +45,7 @@ let vote = ([store, opt, senderHashKey] : [storage, string, key_hash]) : return_
   };
   
   //second party of vote function after callback
-  let voteCallback = ([rvm,store] : [returned_val , storage]) : return_ => {
+let voteCallback = ([rvm,store] : [returned_val , storage]) : return_ => {
     
     let [votingPeriodIndex,opt,senderHashKey]: [nat,string, key_hash  ] = rvm;
     
@@ -80,12 +61,12 @@ let vote = ([store, opt, senderHashKey] : [storage, string, key_hash]) : return_
       };
       
       
-      /* Main access point that dispatches to the entrypoints according to
-      the smart contract parameter. */
-      let main = ([action, store] : [parameter, storage]) : return_ => {
-        return match (action, {
-          Vote: (params: [string,key_hash]) => vote([store, params[0], params[1]]),
-          VoteCallback: (params : returned_val) => voteCallback(params,store)
-        } 
-        )
-      };
+/* Main access point that dispatches to the entrypoints according to
+the smart contract parameter. */
+let main = ([action, store] : [parameter, storage]) : return_ => {
+  return match (action, {
+    Vote: (params: [string,key_hash]) => vote([store, params[0], params[1]]),
+    VoteCallback: (params : returned_val) => voteCallback(params,store)
+  } 
+  )
+};
