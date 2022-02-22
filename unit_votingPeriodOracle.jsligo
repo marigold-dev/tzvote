@@ -1,4 +1,4 @@
-#include "votingPeriodOracle.jsligo"
+#include "votingPeriodOracle.jsligo" 
 
 
 //util function
@@ -57,8 +57,6 @@ let assert_failure = ([result,message] : [test_exec_result,string]) : bool => {
   let [taddr, _, _] = Test.originate(main, initial_storage, 0 as tez);
   let contr = Test.to_contract(taddr);
   
-  
-  
   let votingInitial_storage = 
   {  name : "Which is the cutiest pokemon?",
   votingPeriodIndex : 25 as nat,  
@@ -97,7 +95,8 @@ let assert_failure = ([result,message] : [test_exec_result,string]) : bool => {
   
   let _testGet = ([s,senderHashKey,key,value] : [address,key_hash,string,nat]) : bool => {
     Test.set_source(s);
-    //FIXME let _ = Test.transfer_to_contract_exn(contr,GetCurrentVotingPeriod([key, "anyopt", senderHashKey, votingContract]), 1 as mutez);  
+    //FIXME let message = GetCurrentVotingPeriod([key, "anyopt", senderHashKey, votingContract]);
+    //FIXME let _1 = Test.transfer_to_contract(contr,message, 1 as mutez);  
     return true;
   }
 
