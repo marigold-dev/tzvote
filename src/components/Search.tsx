@@ -14,11 +14,13 @@ import { ReactJSXElement } from "@emotion/react/types/jsx-namespace";
 const Search = ({
   Tezos,
   userAddress,
-  votingTemplateAddress
+  votingTemplateAddress,
+  userRolls
 }: {
   Tezos: TezosToolkit;
   userAddress: string;
   votingTemplateAddress: string;
+  userRolls:number;
 }): JSX.Element => {
   
   //SEARCH
@@ -124,7 +126,7 @@ const Search = ({
       };
       
       const buttonChoices = (contract : TezosVotingContract) => {
-        if(STATUS.ONGOING == contract.status && TezosVotingContractUtils.userNotYetVoted(userAddress,contract)) 
+        if(STATUS.ONGOING == contract.status && TezosVotingContractUtils.userNotYetVoted(userAddress,contract) && userRolls!=0) 
         return(<div><Button aria-describedby={"votePopupId"+selectedContract?.tzkt.address} variant="contained" onClick={(e)=>showVote(e,contract)}>VOTE</Button>
         {selectedContract != null ?
           <Popover 

@@ -153,6 +153,7 @@ const App = () => {
                 <Search
                 Tezos={Tezos}
                 userAddress={userAddress}
+                userRolls={userRolls}
                 votingTemplateAddress={votingTemplateAddress}
                 />
                 </div>
