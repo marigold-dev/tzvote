@@ -16,6 +16,8 @@ body,
   height: 100vh;
 }
 
+/* HOME */
+
 .main-box-login {
   width: 100vw;
   background-color: var(--main-color);
@@ -46,17 +48,6 @@ body,
   color: white;
 }
 
-
-
-
-
-
-.main-box {
-  margin: 0;
-}
-
-
-
 .main-box-login .title {
   text-align: left;
   color: white;
@@ -66,11 +57,25 @@ body,
   padding: 0.5em;
 }
 
+.main-box-login .title #title{
+text-align: center;
+width: 100%;
+font-size: 2em;
+}
+
 .main-box-login .title a img{
   background-color:white;
   padding: 0.2em;
   border-radius: 2em;
 }
+
+
+/* SPA */
+
+.main-box {
+  margin: 0;
+}
+
 
 div#header{
   display: flex;

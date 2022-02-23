@@ -44,7 +44,7 @@ const App = () => {
     if (publicToken && (!userAddress || isNaN(userBalance))) {
       return (
         <div className="main-box-login">
-        <div className="title"><h1>Wallet connection</h1></div>
+        <div className="title"><div id="title">Wallet connection</div></div>
         <div id="dialog-login">
         <header>Please connect</header>
         <div id="content">
@@ -184,7 +184,7 @@ const App = () => {
                   return (
                     <div className="main-box-login">
                     <div className="title">
-                    <h1> Marigold Voting App</h1>
+                    <div id="title">Marigold Voting App</div>
                     <a href="https://www.marigold.dev/">
                     <img
                     height={50}
