@@ -7,8 +7,6 @@ import qrcode from "qrcode-generator";
 import Search from "./components/Search";
 import Create from "./components/Create";
 import Popup from 'reactjs-popup';
-import { SnackbarProvider } from "notistack";
-
 
 enum BeaconConnection {
   NONE = "",
@@ -18,7 +16,7 @@ enum BeaconConnection {
   PERMISSION_REQUEST_SUCCESS = "Wallet is connected"
 }
 
-const votingTemplateAddresses : Array<string> = ["KT1PYJvdStoHsCsNoKTFigqCqjd5eWo1uMYd"];
+const votingTemplateAddress : string = "KT1AYExp5VgnG1kQdkTa7mZmqHnj8cwVnZ7v";
 const votingPeriodOracle : string = "KT1GLuqbSEoaRb3GE4UtUgGkDukVS766V53A";
 
 const App = () => {
@@ -155,6 +153,7 @@ const App = () => {
                 <Search
                 Tezos={Tezos}
                 userAddress={userAddress}
+                votingTemplateAddress={votingTemplateAddress}
                 />
                 </div>
                 ) : (

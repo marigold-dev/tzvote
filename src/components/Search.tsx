@@ -8,15 +8,17 @@ import { useSnackbar } from "notistack";
 import { TezosVotingContract,TezosVotingContractUtils } from "../contractutils/TezosContractUtils";
 import parse from 'autosuggest-highlight/parse';
 import match from 'autosuggest-highlight/match';
-import { STATUS, TezosUtils } from "../contractutils/TezosUtils";
-import { resolve } from "path";
+import { STATUS, TransactionInvalidBeaconError } from "../contractutils/TezosUtils";
+import { ReactJSXElement } from "@emotion/react/types/jsx-namespace";
 
 const Search = ({
   Tezos,
-  userAddress
+  userAddress,
+  votingTemplateAddress
 }: {
   Tezos: TezosToolkit;
   userAddress: string;
+  votingTemplateAddress: string;
 }): JSX.Element => {
   
   //SEARCH
@@ -41,277 +43,273 @@ const Search = ({
   
   //EFFECTS
   React.useEffect(() => {
-    console.log("init list of options and all same contracts once");
     (async () => {
-      let allContracts = (await contractsService.getSame({address:"KT1PYJvdStoHsCsNoKTFigqCqjd5eWo1uMYd" , includeStorage:true, sort:{desc:"id"}}))
-      .map( (tzktObject:Contract) => TezosVotingContractUtils.convertFromTZKTTezosContract(tzktObject)); 
-      setAllContracts(allContracts);
-      setOptions(allContracts.map((c: TezosVotingContract) => c.name));
+      let allContracts : Array<Contract>= (await contractsService.getSame({address:votingTemplateAddress , includeStorage:true, sort:{desc:"id"}}));
+      let allConvetertedContracts :Array<TezosVotingContract>= await Promise.all(allContracts.map( async(tzktObject:Contract) => await TezosVotingContractUtils.convertFromTZKTTezosContract(Tezos,tzktObject))); 
+      setAllContracts(allConvetertedContracts);
+      setOptions(allConvetertedContracts.map((c: TezosVotingContract) => c.name));
     })();
   }, []);
   
   const filterOnNewInput = async(filterValue : string | null) => {
     if(filterValue == null || filterValue === '')setContracts([]);
-    setContracts(allContracts.filter((c: TezosVotingContract) => {
-      return c.name.search(new RegExp(""+filterValue, 'gi')) >= 0}
-      )); 
-    }
-    
-    const contractsService = new ContractsService( {baseUrl: "https://api.hangzhou2net.tzkt.io" , version : "", withCredentials : false});
-    
-    const dateSliderToString = (value : number,index : number) : string =>{
-      return new Date(value*1000000000000).toLocaleString();
-    }
-    
-    const fromToMarks = async(contract : TezosVotingContract) : Promise<Mark[]> =>{ 
-      return new Promise(async(resolve, reject) => {
-        const min :number =  (await TezosUtils.getVotingPeriodStartDate(Tezos)).getTime() / 1000000000000;
-        const max :number = (await TezosUtils.getVotingPeriodBestEndDate(Tezos)).getTime() / 1000000000000;
-        resolve([
+    else{
+      let filteredContract = allContracts.filter((c: TezosVotingContract) => {
+        return c.name.search(new RegExp(""+filterValue, 'gi')) >= 0}
+        )
+        setContracts(filteredContract); 
+      }}
+      
+      const contractsService = new ContractsService( {baseUrl: "https://api.hangzhou2net.tzkt.io" , version : "", withCredentials : false});
+      
+      const dateSliderToString = (value : number,index : number) : string =>{
+        return new Date(value*1000000000000).toLocaleString();
+      }
+      
+      const fromToMarks = (contract : TezosVotingContract) : Mark[] =>{ 
+        const min :number =  contract.dateFrom.getTime() / 1000000000000;
+        const max :number = contract.dateTo.getTime() / 1000000000000;
+        return([
           {value : min , label : dateSliderToString(min,0) },
           {value :max, label : dateSliderToString(max,0) }
         ]) ; 
-      });
-    }
-    
-    //BUTTON ACTION AREA
-    //popupvote
-    const [votePopup, setVotePopup] = React.useState<null | HTMLElement>(null);
-    const showVote = (event: React.MouseEvent<HTMLButtonElement>, c : TezosVotingContract|null) => {
-      setVotePopup(event.currentTarget);
-      setSelectedContract(c);
-    };
-    const closeVote = () => {
-      setVotePopup(null);
-      setSelectedContract(null);
-    };
-    
-    //buttons
-    const [voteHelperText, setVoteHelperText] = React.useState('');
-    const [voteValue, setVoteValue] = React.useState('');
-    const handleVoteRadioChange = (event : ChangeEvent<HTMLInputElement>) => {
-      setVoteValue(event.target.value);
-      setVoteHelperText(' ');
-    };
-    const handleVoteSubmit = async (event : FormEvent<HTMLFormElement>, contract : TezosVotingContract) => {
-      
-      event.preventDefault();
-      setTezosLoading(true);
-      
-      let c : WalletContract = await Tezos.wallet.at(""+contract.tzkt.address);
-      if (voteValue !== '') {
-        
-        try {
-          const pkh = await Tezos.wallet.pkh();
-          
-          const op = await c.methods.default(voteValue,pkh).send();
-          closeVote();
-          await op.confirmation();
-          enqueueSnackbar("Your vote has been acccepted", {variant: "success", autoHideDuration:10000});
-        } catch (error : any) {
-          enqueueSnackbar(error.message, { variant:"error" , autoHideDuration:10000});
-          closeVote();
-        } finally {
-        }
-        
-      } else {
-        setVoteHelperText('Please select an option.');
       }
       
-      setTezosLoading(false);
-      
-    };
-    
-    const buttonChoices = async(contract : TezosVotingContract) : Promise<any> => {
-
-      return new Promise(async(resolve, reject) => {
-
-      if(STATUS.ONGOING == (await TezosUtils.getVotingPeriodStatus(Tezos,contract)) && TezosVotingContractUtils.userNotYetVoted(userAddress,contract)) 
-      resolve(<div><Button aria-describedby={"votePopupId"+selectedContract?.tzkt.address} variant="contained" onClick={(e)=>showVote(e,contract)}>VOTE</Button>
-      {selectedContract != null ?
-        <Popover 
-        id={"votePopupId"+selectedContract?.tzkt.address}
-        anchorEl={votePopup}
-        open={Boolean(votePopup)}
-        onClose={closeVote}
-        anchorOrigin={{
-          vertical: 'top',
-          horizontal: 'right',
-        }}
-        transformOrigin={{
-          vertical: 'bottom',
-          horizontal: 'left',
-        }}
-        >
-        <Paper elevation={3} sx={{minWidth:"20em",minHeight:"10em"}} >
-        <div style={{padding:"1em"}}>
-        <form onSubmit={(e)=>handleVoteSubmit(e,selectedContract)}>
-        <FormControl>
-        <FormLabel id="demo-radio-buttons-group-label">Options</FormLabel>
-        <RadioGroup 
-        aria-labelledby="demo-radio-buttons-group-label"
-        name="radio-buttons-group"
-        value={voteValue}
-        onChange={handleVoteRadioChange}
-        >
-        {selectedContract.options.map((option : string) => (<FormControlLabel key={option} value={option} control={<Radio />} label={option} />))}
-        </RadioGroup>
-        <FormHelperText style={{color:"red"}}>{voteHelperText}</FormHelperText>
-        <Button sx={{ mt: 1, mr: 1 }} type="submit" variant="outlined">
-        VOTE
-        </Button>
-        </FormControl>   
-        </form>    
-        </div>
-        </Paper>
-        </Popover>
-        : <div/>}
-        </div> );
-      });
-    }
-      
-      
-      //RESULT AREA 
-      
-      //popupresults
-      const [resultPopup, setResultPopup] = React.useState<null | HTMLElement>(null);
-      const showResults = (event: React.MouseEvent<HTMLDivElement>, c : TezosVotingContract) => {
-        setResultPopup(event.currentTarget);
+      //BUTTON ACTION AREA
+      //popupvote
+      const [votePopup, setVotePopup] = React.useState<null | HTMLElement>(null);
+      const showVote = (event: React.MouseEvent<HTMLButtonElement>, c : TezosVotingContract|null) => {
+        setVotePopup(event.currentTarget);
         setSelectedContract(c);
       };
-      const closeResults = () => {
-        setResultPopup(null);
+      const closeVote = () => {
+        setVotePopup(null);
         setSelectedContract(null);
       };
       
-      const getWinner= (contract : TezosVotingContract) :  Array<string> => {
-        var winnerList : Array<string> = new Array();
-        var maxScore :number = 0;
-        for (let [key ,value ] of contract.results){
-          if(value == maxScore){
-            winnerList.push(key);
-          }else if(value > maxScore){
-            winnerList= new Array(); winnerList.push(key);
-          }else{
-            //pass
+      //buttons
+      const [voteHelperText, setVoteHelperText] = React.useState('');
+      const [voteValue, setVoteValue] = React.useState('');
+      const handleVoteRadioChange = (event : ChangeEvent<HTMLInputElement>) => {
+        setVoteValue(event.target.value);
+        setVoteHelperText(' ');
+      };
+      const handleVoteSubmit = async (event : FormEvent<HTMLFormElement>, contract : TezosVotingContract) => {
+        
+        event.preventDefault();
+        setTezosLoading(true);
+        
+        let c : WalletContract = await Tezos.wallet.at(""+contract.tzkt.address);
+        if (voteValue !== '') {
+          
+          try {
+            const pkh = await Tezos.wallet.pkh();            
+            const op = await c.methods.vote(voteValue,pkh).send();
+            closeVote();
+            await op.confirmation();
+            enqueueSnackbar("Your vote has been acccepted", {variant: "success", autoHideDuration:10000});
+          } catch (error : any) {
+            console.table(`Error: ${JSON.stringify(error, null, 2)}`);
+            let tibe : TransactionInvalidBeaconError = new TransactionInvalidBeaconError(error);
+            enqueueSnackbar(tibe.data_message, { variant:"error" , autoHideDuration:10000});
+            closeVote();
+          } finally {
+            setTezosLoading(false);
           }
+          
+        } else {
+          setVoteHelperText('Please select an option.');
         }
-        return winnerList;
-      }
+        setTezosLoading(false);
+      };
       
-      
-      
-      const resultArea = async (contract : TezosVotingContract) : Promise<any> => {
-
-        return new Promise(async(resolve, reject) => {
-
-        let status = await TezosUtils.getVotingPeriodStatus(Tezos,contract);
-        //ONGOING
-        if(status == STATUS.ONGOING){
-          resolve(<div><Chip aria-owns={open ? "resultPopupId"+contract.tzkt.address : undefined} aria-haspopup="true" onMouseEnter={(e) => showResults(e, contract)} onMouseLeave={closeResults} icon={<RunningWithErrors />} style={{marginBottom: "1em"}} color="success" label={await TezosUtils.getVotingPeriodStatus(Tezos,contract)} />
-          <Slider 
-          aria-label="Period"
-          key={`slider-${contract.tzkt.address}`}
-          value={(new Date()).getTime() / 1000000000000}
-          getAriaValueText= {dateSliderToString}
-          valueLabelFormat={dateSliderToString}
-          valueLabelDisplay="auto"
-          min={(await TezosUtils.getVotingPeriodStartDate(Tezos)).getTime() / 1000000000000}
-          max={(await TezosUtils.getVotingPeriodBestEndDate(Tezos)).getTime() / 1000000000000}
-          marks={await fromToMarks(contract)}
-          /></div>);
-        }else{
-          //get the winner because it is finished
-          const winnerList = getWinner(contract);
-          if(winnerList.length > 0 ){
-            const result : string = "Winner is : " + winnerList.join(' , ');
-            resolve(<div ><Chip aria-owns={open ? "resultPopupId"+contract.tzkt.address : undefined} aria-haspopup="true" onMouseEnter={(e) => showResults(e, contract)} onMouseLeave={closeResults} style={{marginBottom: "1em"}} color="error" label={await TezosUtils.getVotingPeriodStatus(Tezos,contract)+" (Period:"+contract.votingPeriodIndex+")"} />
-            <Chip icon={<EmojiEvents />} label={result} />
-            {selectedContract != null ?
-              <Popover 
-              id={"resultPopupId"+selectedContract?.tzkt.address}
-              sx={{
-                pointerEvents: 'none',
-              }}
-              anchorEl={resultPopup}
-              open={Boolean(resultPopup)}
-              onClose={closeResults}
-              
-              anchorOrigin={{
-                vertical: 'top',
-                horizontal: 'center',
-              }}
-              transformOrigin={{
-                vertical: 'bottom',
-                horizontal: 'right',
-              }}
+      const buttonChoices = (contract : TezosVotingContract) => {
+        if(STATUS.ONGOING == contract.status && TezosVotingContractUtils.userNotYetVoted(userAddress,contract)) 
+        return(<div><Button aria-describedby={"votePopupId"+selectedContract?.tzkt.address} variant="contained" onClick={(e)=>showVote(e,contract)}>VOTE</Button>
+        {selectedContract != null ?
+          <Popover 
+          id={"votePopupId"+selectedContract?.tzkt.address}
+          anchorEl={votePopup}
+          open={Boolean(votePopup)}
+          onClose={closeVote}
+          anchorOrigin={{
+            vertical: 'top',
+            horizontal: 'right',
+          }}
+          transformOrigin={{
+            vertical: 'bottom',
+            horizontal: 'left',
+          }}
+          >
+          <Paper elevation={3} sx={{minWidth:"20em",minHeight:"10em"}} >
+          <div style={{padding:"1em"}}>
+          <form onSubmit={(e)=>handleVoteSubmit(e,selectedContract)}>
+          <FormControl>
+          <FormLabel id="demo-radio-buttons-group-label">Options</FormLabel>
+          <RadioGroup 
+          aria-labelledby="demo-radio-buttons-group-label"
+          name="radio-buttons-group"
+          value={voteValue}
+          onChange={handleVoteRadioChange}
+          >
+          {selectedContract.options.map((option : string) => (<FormControlLabel key={option} value={option} control={<Radio />} label={option} />))}
+          </RadioGroup>
+          <FormHelperText style={{color:"red"}}>{voteHelperText}</FormHelperText>
+          <Button sx={{ mt: 1, mr: 1 }} type="submit" variant="outlined">
+          VOTE
+          </Button>
+          </FormControl>   
+          </form>    
+          </div>
+          </Paper>
+          </Popover>
+          : <div/>}
+          </div> );
+        }
+        
+        
+        /*************************************/
+        /***  RESULT AREA *******************
+        *************************************/
+        
+        //popupresults
+        const [resultPopup, setResultPopup] = React.useState<null | HTMLElement>(null);
+        const showResults = (event: React.MouseEvent<HTMLDivElement>, c : TezosVotingContract) => {
+          setSelectedContract(c);
+          setResultPopup(event.currentTarget);
+        };
+        const closeResults = () => {
+          setSelectedContract(null);
+          setResultPopup(null);
+        };
+        
+        const getWinner= (contract : TezosVotingContract) :  Array<string> => {
+          var winnerList : Array<string> = new Array();
+          var maxScore :number = 0;
+          for (let [key ,value ] of contract.results){
+            if(value == maxScore){
+              winnerList.push(key);
+            }else if(value > maxScore){
+              winnerList= new Array(); winnerList.push(key);
+            }else{
+              //pass
+            }
+          }
+          return winnerList;
+        }
+        
+        const resultArea = (contract : TezosVotingContract) => {
+          
+          const popover = () : ReactJSXElement =>{ if(selectedContract != null)return <Popover 
+            id={"resultPopupId"+selectedContract?.tzkt.address}
+            sx={{
+              pointerEvents: 'none',
+            }}
+            anchorEl={resultPopup}
+            open={Boolean(resultPopup)}
+            onClose={closeResults}
+            
+            anchorOrigin={{
+              vertical: 'top',
+              horizontal: 'center',
+            }}
+            transformOrigin={{
+              vertical: 'bottom',
+              horizontal: 'right',
+            }}
+            >
+            <Paper elevation={3} sx={{minWidth:"40em",minHeight:"20em"}} >
+            <Grid container spacing={2} height={100}>
+            <Grid item xs={8}>
+            <div style={{padding:"1em"}}>
+            <TableContainer component={Paper}>
+            <Table aria-label="simple table">
+            <TableHead>
+            <TableRow>
+            <TableCell>Options</TableCell>
+            <TableCell align="right">Result</TableCell>
+            </TableRow>
+            </TableHead>
+            <TableBody>
+            { Object.entries<string>(selectedContract?.options).map(([key,value]) => (
+              <TableRow
+              key={key}
+              sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
               >
-              <Paper elevation={3} sx={{minWidth:"40em",minHeight:"20em"}} >
-              <Grid container spacing={2} height={100}>
-              <Grid item xs={8}>
-              <div style={{padding:"1em"}}>
-              <TableContainer component={Paper}>
-              <Table aria-label="simple table">
-              <TableHead>
-              <TableRow>
-              <TableCell>Options</TableCell>
-              <TableCell align="right">Result</TableCell>
+              <TableCell component="th" scope="row">
+              {value}
+              </TableCell>
+              <TableCell align="right"> {getWinner(selectedContract).indexOf(value)>=0?<EmojiEvents/>:""}{ selectedContract?.results.get(value)} 
+              </TableCell>
               </TableRow>
-              </TableHead>
-              <TableBody>
-              { Object.entries<string>(selectedContract?.options).map(([key,value]) => (
-                <TableRow
-                key={key}
-                sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
-                >
-                <TableCell component="th" scope="row">
-                {value}
-                </TableCell>
-                <TableCell align="right"> {getWinner(selectedContract).indexOf(value)>=0?<EmojiEvents/>:""}{ selectedContract?.results.get(value)} 
-                </TableCell>
-                </TableRow>
-                ))}
-                </TableBody>
-                </Table>
-                </TableContainer>
-                
-                </div>
-                </Grid>
-                <Grid item xs={4}>
-                <Grid item xs={4}>
-                
-                <div style={{padding:"1em"}}>
-                
-                <img height={100} width={100} src="https://peltiertech.com/images/2013-09/No3DCharts.png"/>
-                
-                </div>
-                
-                </Grid>
-                <Grid item xs={4}>
-                <div style={{padding:"1em"}}><Chip avatar={<Avatar>{selectedContract.votes.size}</Avatar>} label="Bakers involved"/></div>
-                </Grid>
-                <div style={{padding:"1em"}}><Chip avatar={<Avatar>{Array.from(selectedContract.results.values()).reduce( ( value :number , acc : number) => value + acc, 0)   }</Avatar>} label="Rolls have been stacked"/></div>
-                </Grid>
-                </Grid>
-                </Paper>
-                </Popover>
-                :<div></div>}
+              ))}
+              </TableBody>
+              </Table>
+              </TableContainer>
+              
+              </div>
+              </Grid>
+              <Grid item xs={4}>
+              <Grid item xs={4}>
+              
+              <div style={{padding:"1em"}}>
+              
+              <img height={100} width={100} src="https://peltiertech.com/images/2013-09/No3DCharts.png"/>
+              
+              </div>
+              
+              </Grid>
+              <Grid item xs={4}>
+              <div style={{padding:"1em"}}><Chip avatar={<Avatar>{selectedContract?.votes.size}</Avatar>} label="Bakers involved"/></div>
+              </Grid>
+              <div style={{padding:"1em"}}><Chip avatar={<Avatar>{Array.from(selectedContract?.results.values()).reduce( ( value :number , acc : number) => value + acc, 0)   }</Avatar>} label="Rolls have been stacked"/></div>
+              </Grid>
+              </Grid>
+              </Paper>
+              </Popover>
+              else return<div />; 
+            };
+            
+            // STATUS.ONGOING
+            if(contract.status == STATUS.ONGOING){
+              return(<div><Chip aria-owns={open ? "resultPopupId"+contract.tzkt.address : undefined} aria-haspopup="true" onMouseEnter={(e) => showResults(e, contract)} onMouseLeave={closeResults} icon={<RunningWithErrors />} style={{marginBottom: "1em"}} color="success" label={contract.status} />
+              <Slider 
+              aria-label="Period"
+              key={`slider-${contract.tzkt.address}`}
+              value={(new Date()).getTime() / 1000000000000}
+              getAriaValueText= {dateSliderToString}
+              valueLabelFormat={dateSliderToString}
+              valueLabelDisplay="auto"
+              min={contract.dateFrom.getTime() / 1000000000000}
+              max={contract.dateTo.getTime() / 1000000000000}
+              marks={fromToMarks(contract)}
+              />
+              {popover()}
+              </div>);
+            }else{
+              // STATUS.LOCKED
+              const winnerList = getWinner(contract);
+              if(winnerList.length > 0 ){
+                const result : string = "Winner is : " + winnerList.join(' , ');
+                return(<div ><Chip aria-owns={open ? "resultPopupId"+contract.tzkt.address : undefined} aria-haspopup="true" onMouseEnter={(e) => showResults(e, contract)} onMouseLeave={closeResults} style={{marginBottom: "1em"}} color="error" label={contract.status+" (Period:"+contract.votingPeriodIndex+")"} />
+                <Chip icon={<EmojiEvents />} label={result} />
+                {popover()}
                 </div>);
               }else {
-                resolve(<div ><Chip aria-owns={open ? "resultPopupId"+contract.tzkt.address : undefined} aria-haspopup="true" onMouseEnter={(e) => showResults(e, contract)} onMouseLeave={closeResults}  style={{marginBottom: "1em"}} color="warning" label={await TezosUtils.getVotingPeriodStatus(Tezos,contract)+" (Period : "+contract.votingPeriodIndex+")"} /><Chip icon={<Block />} label="NO WINNER" /></div>);
+                return(<div ><Chip aria-owns={open ? "resultPopupId"+contract.tzkt.address : undefined} aria-haspopup="true" onMouseEnter={(e) => showResults(e, contract)} onMouseLeave={closeResults}  style={{marginBottom: "1em"}} color="warning" label={contract.status+" (Period : "+contract.votingPeriodIndex+")"} /><Chip icon={<Block />} label="NO WINNER" /></div>);
               }
             }
-
-          });
-
+            
           };
           
+          /*************************************/
+          /***  MAIN FRAME *******************
+          *************************************/
           return (
             <div>
             <Backdrop
             sx={{ color: '#fff', zIndex: (theme : any) => theme.zIndex.drawer + 1 }}
             open={tezosLoading}
-            onClick={()=>{setTezosLoading(false)}}
             >
             <CircularProgress color="inherit" />
             </Backdrop>
@@ -355,7 +353,6 @@ const Search = ({
                   );
                 }}  
                 />
-                
                 {contracts.map((contract, index) => (
                   <Card key={contract.tzkt.address} sx={{ display: 'flex' }}>
                   <Box width="70%" sx={{ display: 'flex', flexDirection: 'column' }}>
@@ -370,9 +367,6 @@ const Search = ({
                   {contract.name}
                   </a>
                   </Typography>
-                  
-                  
-                  
                   
                   <Typography variant="subtitle1" color="text.secondary" component="div">
                   <span>Created by </span><Chip icon={<Face />} label={contract.tzkt.creator?.address} clickable target="_blank" component="a" href={`https://hangzhou2net.tzkt.io/${contract.tzkt.creator?.address}/info`} />  

@@ -48,7 +48,7 @@ tezos-client transfer 1 from tz1VApBuWHuaTfDHtKzU3NBtWFYsxJvvWhYk to KT1GLuqbSEo
 ```
 ligo compile contract tezosTemplate3.jsligo --output-file tezosTemplate3.tz --entry-point main
 
-ligo compile storage tezosTemplate3.jsligo '{  name : "Which is the cutiest pokemon?",dateFrom : ("2022-01-01t00:00:00Z" as timestamp),  dateTo : ("2022-03-01t00:00:00Z" as timestamp),  options : list(["Mew","Pikachu"]) ,  votes : (Map.empty as map<address, string>),  results : (Map.empty as map<string, int>) }' --output-file tezosTemplate3Storage.tz --entry-point main
+ligo compile storage tezosTemplate3.jsligo '{  name : "Which is the cutiest pokemon?",votingPeriodIndex : (27 as nat),  options : list(["Mew","Pikachu"]) ,  votes : (Map.empty as map<address, string>),  results : (Map.empty as map<string, int>) , votingPeriodOracle :  ("KT1GLuqbSEoaRb3GE4UtUgGkDukVS766V53A" as address)  ,   protocol : "hangzhounet"}' --output-file tezosTemplate3Storage.tz --entry-point main
 
 ligo compile parameter tezosTemplate3.jsligo 'Vote(["Pikachu",Crypto.hash_key("edpkuBknW28nW72KG6RoHtYW7p12T6GKc7nAbwYX5m8Wd9sDVC9yav" as key)])' --output-file tezosTemplate3Parameter.tz --entry-point main
 
@@ -66,20 +66,26 @@ ligo compile contract tezosTemplate3.jsligo --output-file ./tezosTemplate3.tz.js
 ### Dry run
 
 ```
-ligo run dry-run tezosTemplate2.jsligo 'Vote(["Pikachu",Crypto.hash_key("edpkuBknW28nW72KG6RoHtYW7p12T6GKc7nAbwYX5m8Wd9sDVC9yav" as key)])' '{  name : "Which is the cutiest pokemon?",dateFrom : ("2022-01-01t00:00:00Z" as timestamp),  dateTo : ("2022-03-01t00:00:00Z" as timestamp),  options : list(["Mew","Pikachu"]) ,  votes : (Map.empty as map<address, string>),  results : (Map.empty as map<string, int>) }' --now '2022-02-01T00:00:00Z'
+ligo run dry-run tezosTemplate3.jsligo 'Vote(["Pikachu",Crypto.hash_key("edpkuBknW28nW72KG6RoHtYW7p12T6GKc7nAbwYX5m8Wd9sDVC9yav" as key)])' '{  name : "Which is the cutiest pokemon?",votingPeriodIndex : (27 as nat),  options : list(["Mew","Pikachu"]) ,  votes : (Map.empty as map<address, string>),  results : (Map.empty as map<string, int>)  , votingPeriodOracle :  ("KT1GLuqbSEoaRb3GE4UtUgGkDukVS766V53A" as address)  ,   protocol : "hangzhounet"}' 
+```
+
+### Real run
+
+```
+tezos-client transfer 1 from tz1VApBuWHuaTfDHtKzU3NBtWFYsxJvvWhYk to KT1XHJzvYghgw9Y1FgtznLBMtkAu1FRWsTq8 -D --arg '(Left (Pair "Pikachu" "tz1KqTpEZ7Yob7QbPE4Hy4Wo8fHG8LhKxZSx"))'  --burn-cap 0.005 
 ```
 
 ### Unit tests
 
 ```
-ligo run test unit_tezosTemplate2.jsligo
+ligo run test unit_tezosTemplate3.jsligo
 ```
 
 
 ## Deploy 
 
 ```
-tezos-client originate contract tezosTemplate transferring 0 from tz1VApBuWHuaTfDHtKzU3NBtWFYsxJvvWhYk running tezosTemplate2.tz --init "$(cat tezosTemplateStorage2.tz)" --burn-cap 1
+tezos-client originate contract tezosTemplate transferring 0 from tz1VApBuWHuaTfDHtKzU3NBtWFYsxJvvWhYk running tezosTemplate3.tz --init "$(cat tezosTemplate3Storage.tz)" --burn-cap 1
 ```
 
 Can return a contract address : KT1PYJvdStoHsCsNoKTFigqCqjd5eWo1uMYd
@@ -116,3 +122,10 @@ Open https://localhost:3000 in your browser to see a sample application.
 docker run -d -p 3000:80 delegator-votes
 ```
 
+# TIPS
+
+Add one of my account **myFirstKey** as a baker
+
+```
+tezos-client register key myFirstKey as delegate
+```

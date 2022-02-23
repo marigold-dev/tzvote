@@ -1,12 +1,12 @@
-import React, { useState, Dispatch, SetStateAction, FormEvent, useEffect, ChangeEvent, useRef, FocusEvent } from "react";
-import { TezosToolkit } from "@taquito/taquito";
+import React, { useState, Dispatch, SetStateAction, FormEvent } from "react";
+import { MichelsonMap, TezosToolkit } from "@taquito/taquito";
 import { TezosVotingContract } from "../contractutils/TezosContractUtils";
-import { Box, Button, CardMedia, FormControl, FormControlLabel, FormLabel, Grid, Input, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Paper, Radio, RadioGroup, StepIcon, TextField, Tooltip, Typography } from "@mui/material";
+import { Backdrop, Box, Button, CardMedia, CircularProgress, FormControl, FormControlLabel, FormLabel, Grid, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Paper, Radio, RadioGroup, StepIcon, TextField, Tooltip, Typography } from "@mui/material";
 import { Account } from "@dipdup/tzkt-api";
 import { useSnackbar } from "notistack";
-import { TezosUtils } from "../contractutils/TezosUtils";
+import { STATUS, TezosUtils, TransactionInvalidBeaconError } from "../contractutils/TezosUtils";
 import RadioButtonUncheckedIcon from '@mui/icons-material/RadioButtonUnchecked';
-import { Delete, Label } from "@mui/icons-material";
+import { Delete } from "@mui/icons-material";
 import { BeaconWallet } from "@taquito/beacon-wallet";
 
 const jsonContractTemplate = require('../contracttemplates/tezosTemplate3.tz.json')
@@ -21,6 +21,9 @@ interface CreateProps {
 
 const Create = ({ Tezos, userAddress , votingPeriodOracle, wallet, setActiveTab }: CreateProps) => {
   
+ //TEZOS OPERATIONS
+ const [tezosLoading, setTezosLoading]  = React.useState(false);
+
   // MESSAGES
   
   const { enqueueSnackbar } = useSnackbar();
@@ -30,9 +33,12 @@ const Create = ({ Tezos, userAddress , votingPeriodOracle, wallet, setActiveTab 
   const [contract, setContract] = useState<TezosVotingContract>(new TezosVotingContract(
     '',
     0,
+    STATUS.LOCKED,
+    new Date(),
+    new Date(),
     [],
-    new Map<string,string>(),
-    new Map<string,number>(),
+    new Map(),
+    new Map(),
     votingPeriodOracle,
     wallet.client.preferredNetwork,
     {} as Account));
@@ -55,25 +61,9 @@ const Create = ({ Tezos, userAddress , votingPeriodOracle, wallet, setActiveTab 
     
     const createVoteContract = async(event: FormEvent<HTMLFormElement>, contract: TezosVotingContract) => {
       event.preventDefault();
-      
+      setTezosLoading(true);
       console.log(contract);
       
-      /*
-      type storage = {
-        name : string,
-        votingPeriodIndex : nat,
-        options : list<string>,
-        votes : map<address, string>, // votes by user
-        results : map<string, int>, // results by option
-        votingPeriodOracle : address, // address of the oracle
-        protocol : string  //deployed on this network protocol
-      }
-      */
-
-      //https://tezostaquito.io/docs/michelsonmap
-
-      //MichelsonMap.fromLiteral({  tz1VSUr8wwNhLAzempoch5d6hLRiTh8Cjcjb: new BigNumber(123),});
-
       Tezos.wallet
       .originate({
         code: jsonContractTemplate,
@@ -81,8 +71,8 @@ const Create = ({ Tezos, userAddress , votingPeriodOracle, wallet, setActiveTab 
           name : contract.name,
           votingPeriodIndex : contract.votingPeriodIndex,
           options : contract.options,
-          votes : contract.votes, //MichelsonMap<address, string>
-          results : contract.results, //MichelsonMap<string, int>
+          votes : MichelsonMap.fromLiteral(contract.votes) , //MichelsonMap<address, string>
+          results : MichelsonMap.fromLiteral(contract.results), //MichelsonMap<string, int>
           votingPeriodOracle : contract.votingPeriodOracle, 
           protocol : contract.protocol
         },
@@ -97,8 +87,11 @@ const Create = ({ Tezos, userAddress , votingPeriodOracle, wallet, setActiveTab 
         enqueueSnackbar(`Origination completed for ${contract.address}.`, { variant:"warning" , autoHideDuration:10000});
       })
       .catch((error) => {
-        console.log(`Error: ${JSON.stringify(error, null, 2)}`);
-        enqueueSnackbar(JSON.stringify(error, null, 2), { variant:"error" , autoHideDuration:10000});
+        console.table(`Error: ${JSON.stringify(error, null, 2)}`);
+        let tibe : TransactionInvalidBeaconError = new TransactionInvalidBeaconError(error);
+        enqueueSnackbar(tibe.data_message, { variant:"error" , autoHideDuration:10000});
+      }).finally(()=>{
+        setTezosLoading(false);
       });
     };
     
@@ -107,14 +100,15 @@ const Create = ({ Tezos, userAddress , votingPeriodOracle, wallet, setActiveTab 
       setContract({...contract});
     }
     
-    //TIP do not rerender the full object to avoid issue on typing
-    const updateOption = (e : FormEvent, index: number) => {
-      console.log("updateOption");
-      contract.options[index]=(""+(e.target as HTMLFormElement).value);
-      setContract({...contract});      
-    }
-    
     return <div style={{padding:"1em"}}>
+    
+    <Backdrop
+    sx={{ color: '#fff', zIndex: (theme : any) => theme.zIndex.drawer + 1 }}
+    open={tezosLoading}
+    >
+    <CircularProgress color="inherit" />
+    </Backdrop>
+    
     <form  onSubmit={(e)=>createVoteContract(e,contract)}>
     <FormControl fullWidth>
     <Grid container spacing={2}>

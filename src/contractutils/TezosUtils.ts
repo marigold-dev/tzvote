@@ -1,12 +1,36 @@
-import { DateRangeSharp } from "@mui/icons-material";
 import { TezosToolkit } from "@taquito/taquito";
 import BigNumber from 'bignumber.js';
-import { TezosVotingContract } from "./TezosContractUtils";
 
 export enum STATUS {
     ONGOING = "ONGOING",
-    FINISHED = "FINISHED"
+    LOCKED = "LOCKED"
 }
+
+export class TransactionInvalidBeaconError {
+    name: string;
+    title: string;
+    message: string;
+    description: string;
+    data_contract_handle: string;
+    data_with_string: string;
+    data_expected_form: string;
+    data_message:string;
+    
+    constructor(transactionInvalidBeaconError : any){
+        this.name=transactionInvalidBeaconError.name;
+        this.title=transactionInvalidBeaconError.title;
+        this.message=transactionInvalidBeaconError.message;
+        this.description=transactionInvalidBeaconError.description;
+        let dataArray = (Array.from<any>(new Map(Object.entries<any>(transactionInvalidBeaconError.data)).values()));
+        let contract_handle =dataArray.find((obj)=>obj.contract_handle != undefined);
+        this.data_contract_handle= contract_handle!= undefined ? contract_handle.contract_handle:"";
+        let withString = dataArray.find((obj)=>obj.with != undefined);
+        this.data_with_string= withString != undefined ? withString.with.string:"";
+        let expected_form =  dataArray.find((obj)=>obj.expected_form != undefined);
+        this.data_expected_form = expected_form!= undefined?(expected_form.expected_form + ":" +expected_form.wrong_expression.string):"";
+        this.data_message = (this.data_contract_handle?"Error on contract : "+this.data_contract_handle+" ":"")+(this.data_with_string? "error : "+this.data_with_string+" ":"")+(this.data_expected_form?"error : "+this.data_expected_form+" ":"");
+    }
+};
 
 export abstract class TezosUtils{
     
@@ -66,15 +90,6 @@ export abstract class TezosUtils{
         const blocks_per_voting_period = await (await Tezos.rpc.getConstants()).blocks_per_voting_period ;
         const time_between_blocks = await (await Tezos.rpc.getConstants()).time_between_blocks;
         return  new Date( (await this.getVotingPeriodStartDate(Tezos)).getTime() + (1000 * blocks_per_voting_period * ((time_between_blocks[0].toNumber() +  (  time_between_blocks[1].toNumber() * 1 ) + (delay_per_missing_endorsement?delay_per_missing_endorsement.toNumber():0) * (initial_endorsers?initial_endorsers*0.1:0)    )     )) );
-    }
-    
-    public static async getVotingPeriodStatus(Tezos: TezosToolkit,contract: TezosVotingContract) {
-        //fetch votingPeriodIndex
-        //getCurrentPeriod(options?: RPCOptions): Promise<>;
-        let votingPeriodBlockResult  = await Tezos.rpc.getCurrentPeriod();
-        if(contract.votingPeriodIndex == votingPeriodBlockResult.voting_period.index)
-        return STATUS.ONGOING; else
-        return STATUS.FINISHED;
     }
     
 }
