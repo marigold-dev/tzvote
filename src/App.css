@@ -13,14 +13,12 @@ body,
 
 #root {
   display: grid;
+  height: 100vh;
 }
 
 .main-box-login {
-  margin: auto;
-}
-
-.main-box {
-  margin: 0;
+  width: 100vw;
+  background-color: var(--main-color);
 }
 
 .title {
@@ -28,7 +26,36 @@ body,
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
+  height: 13vh;
 }
+
+#dialog-login{
+  height: 74vh;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--main-color);
+  background-color: white;
+}
+
+#footer-login {
+  height: 8vh;
+  display: flex;
+  justify-content: flex-end;
+  background-color: var(--main-color);
+  padding: 0.5em;
+  color: white;
+}
+
+
+
+
+
+
+.main-box {
+  margin: 0;
+}
+
+
 
 .main-box-login .title {
   text-align: left;
@@ -88,12 +115,7 @@ div#header h1{
 }
 
 
-#dialog-login{
-  display: flex;
-  flex-direction: column;
-  width: 500px;
-  border: 1px solid var(--main-color);
-}
+
 
 #dialog-login header{
   text-align: center;
@@ -104,24 +126,12 @@ div#header h1{
 #dialog{
   display: flex;
   flex-direction: column;
-  height: 86vh;
 }
 
 #content {
   display: flex;
   flex-direction: column;
   padding: 20px;
-}
-
-#footer-login {
-  display: flex;
-  justify-content: flex-end;
-  background-color: var(--main-color);
-  height: 7vh;
-  border-bottom-right-radius: 0.5em;
-  border-bottom-left-radius: 0.5em;
-  padding: 0.5em;
-  color: white;
 }
 
 
