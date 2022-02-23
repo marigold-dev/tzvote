@@ -97,7 +97,12 @@ const App = () => {
               
               <div className="main-box">
               <div id="header"> 
-              <div className="column">Marigold Voting app</div> 
+
+              
+              <div className="column-left"><img id="logo"
+                    src="https://uploads-ssl.webflow.com/616ab4741d375d1642c19027/61793ee65c891c190fcaa1d0_Vector(1).png"
+                    alt="marigold-button"
+                    /></div> 
               
               <div id="tabs" className="column">
               <div
@@ -174,8 +179,6 @@ const App = () => {
                   </div>
                   
                   </div>
-                  <div id="footer">
-                  </div>
                   </div>
                   
                   );
@@ -186,7 +189,7 @@ const App = () => {
                     <div className="title">
                     <div id="title">Marigold Voting App</div>
                     <a href="https://www.marigold.dev/">
-                    <img
+                    <img id="logo"
                     height={50}
                     src="https://uploads-ssl.webflow.com/616ab4741d375d1642c19027/61793ee65c891c190fcaa1d0_Vector(1).png"
                     alt="marigold-button"
