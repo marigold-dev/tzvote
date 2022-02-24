@@ -41,7 +41,8 @@ const Create = ({ Tezos, userAddress , votingPeriodOracle, wallet, setActiveTab 
     new Map(),
     votingPeriodOracle,
     wallet.client.preferredNetwork,
-    {} as Account));
+    {} as Account,
+    false));
     
     const [currentVotingPeriodIndex,setCurrentVotingPeriodIndex] =useState<number>(0);   
     const [periodDates,setPeriodDates] =useState<Array<Date>>([]);   

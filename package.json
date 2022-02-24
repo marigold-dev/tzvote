@@ -10,22 +10,25 @@
     "@mui/material": "^5.4.1",
     "@taquito/beacon-wallet": "^10.2.1",
     "@taquito/taquito": "^10.2.1",
+    "@types/moment-duration-format": "^2.2.3",
+    "autosuggest-highlight": "^3.2.0",
     "bignumber": "^1.1.0",
+    "moment": "^2.29.1",
+    "moment-duration-format": "^2.3.2",
     "notistack": "^2.0.3",
     "qrcode-generator": "^1.4.4",
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
-    "reactjs-popup": "^2.0.5",
-    "autosuggest-highlight": "^3.2.0"
+    "reactjs-popup": "^2.0.5"
   },
   "devDependencies": {
     "@testing-library/jest-dom": "^5.11.9",
     "@testing-library/react": "^11.2.5",
     "@testing-library/user-event": "^12.6.3",
+    "@types/autosuggest-highlight": "^3.2.0",
     "@types/jest": "^26.0.20",
     "@types/node": "^14.14.25",
     "@types/react": "^17.0.1",
-    "@types/autosuggest-highlight": "^3.2.0",
     "@types/react-dom": "^17.0.0",
     "react-scripts": "4.0.2",
     "typescript": "^4.1.4"
