@@ -16,6 +16,15 @@ body,
   height: 100vh;
 }
 
+#logo{
+  background-color:white;
+  padding: 0.2em;
+  border-radius: 2em;
+  height: 1.6em;
+}
+
+
+
 /* HOME */
 
 .main-box-login {
@@ -63,47 +72,50 @@ width: 100%;
 font-size: 2em;
 }
 
-.main-box-login .title a img{
-  background-color:white;
-  padding: 0.2em;
-  border-radius: 2em;
-}
+
 
 
 /* SPA */
 
 .main-box {
   margin: 0;
+  width: 100vw;
+  background-color: white;
 }
 
 
 div#header{
   display: flex;
   flex-direction:row;
-  
   margin: 0;
   background-color: var(--main-color);
-  height: 70px;
   color: white;
   text-align: center;
-  
+  font-size: 1.5em;
+  padding: 0.2em;
+}
+
+#dialog{
+  display: flex;
+  flex-direction: column;
 }
 
 .column {
-  flex: 1 1 0px;
+  width: 60%;
   border: none;
-  font-size: 2em;
-  padding: 0.2em;
-  margin: 0.2em;
 }
 
-.column.column-right {
+.column-right {
+  width: 20%;
   text-align: right;
 }
 
+.column-left {
+  width: 20%;
+}
+
 div.column-right{
-  font-size: 3em;
-  padding: 0.1em;
+  font-size: 2em;
   cursor: pointer;
 };
 
@@ -128,10 +140,7 @@ div#header h1{
   font-size: 2em;
 }
 
-#dialog{
-  display: flex;
-  flex-direction: column;
-}
+
 
 #content {
   display: flex;
@@ -204,6 +213,7 @@ a:hover {
   flex-direction: row;
   margin: 0px;
   transition: 0.3s;
+  font-size: 1.2em;
 }
 
 #tabs div {

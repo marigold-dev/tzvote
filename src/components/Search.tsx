@@ -1,15 +1,17 @@
 import React, { ChangeEvent, FormEvent, useState } from "react";
 import { TezosToolkit, WalletContract } from "@taquito/taquito";
 import { Contract, ContractsService } from '@dipdup/tzkt-api';
-import { Autocomplete, Avatar, Backdrop, Box, Button, Card, CardContent, CardMedia, Chip, CircularProgress, FormControl, FormControlLabel, FormHelperText, FormLabel, Grid, Paper, Popover, Radio, RadioGroup, Slider, Snackbar, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TableSortLabel, TextField, Typography } from "@mui/material";
-import { Block, EmojiEvents, Face, RunningWithErrors } from "@mui/icons-material";
-import { Mark } from "@mui/base";
+import { Autocomplete, Avatar, Backdrop, Box, Button, Card, CardContent, CardMedia, Chip, CircularProgress, FormControl, FormControlLabel, FormHelperText, FormLabel, Grid, Paper, Popover, Radio, RadioGroup, Slider, Snackbar, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TableSortLabel, TextField, Tooltip, Typography } from "@mui/material";
+import { BarChart, Block, EmojiEvents, Face, RunningWithErrors } from "@mui/icons-material";
 import { useSnackbar } from "notistack";
 import { TezosVotingContract,TezosVotingContractUtils } from "../contractutils/TezosContractUtils";
 import parse from 'autosuggest-highlight/parse';
 import match from 'autosuggest-highlight/match';
 import { STATUS, TransactionInvalidBeaconError } from "../contractutils/TezosUtils";
 import { ReactJSXElement } from "@emotion/react/types/jsx-namespace";
+import * as moment from 'moment';
+import momentDurationFormatSetup from 'moment-duration-format';
+momentDurationFormatSetup(moment);
 
 const Search = ({
   Tezos,
@@ -43,15 +45,20 @@ const Search = ({
   // MESSAGES
   const { enqueueSnackbar } = useSnackbar();
   
-  //EFFECTS
-  React.useEffect(() => {
+
+  const refreshData = () => {
     (async () => {
       let allContracts : Array<Contract>= (await contractsService.getSame({address:votingTemplateAddress , includeStorage:true, sort:{desc:"id"}}));
-      let allConvetertedContracts :Array<TezosVotingContract>= await Promise.all(allContracts.map( async(tzktObject:Contract) => await TezosVotingContractUtils.convertFromTZKTTezosContract(Tezos,tzktObject))); 
-      setAllContracts(allConvetertedContracts);
-      setOptions(allConvetertedContracts.map((c: TezosVotingContract) => c.name));
+      let allConvertertedContracts :Array<TezosVotingContract>= await Promise.all(allContracts.map( async(tzktObject:Contract) => await TezosVotingContractUtils.convertFromTZKTTezosContract(Tezos,tzktObject,userAddress))); 
+      setAllContracts(allConvertertedContracts);
+      setOptions(allConvertertedContracts.map((c: TezosVotingContract) => c.name));
     })();
-  }, []);
+  }
+
+  //EFFECTS
+  React.useEffect(refreshData, []);
+
+
   
   const filterOnNewInput = async(filterValue : string | null) => {
     if(filterValue == null || filterValue === '')setContracts([]);
@@ -64,18 +71,14 @@ const Search = ({
       
       const contractsService = new ContractsService( {baseUrl: "https://api.hangzhou2net.tzkt.io" , version : "", withCredentials : false});
       
-      const dateSliderToString = (value : number,index : number) : string =>{
-        return new Date(value*1000000000000).toLocaleString();
+      const dateSliderToString = (value : number, index : number) =>{
+        return new Date(value).toLocaleString();
       }
       
-      const fromToMarks = (contract : TezosVotingContract) : Mark[] =>{ 
-        const min :number =  contract.dateFrom.getTime() / 1000000000000;
-        const max :number = contract.dateTo.getTime() / 1000000000000;
-        return([
-          {value : min , label : dateSliderToString(min,0) },
-          {value :max, label : dateSliderToString(max,0) }
-        ]) ; 
+      const durationToString = (value : number) : string =>{
+        return moment.duration(value, "milliseconds").format('d [days] hh:mm:ss left');
       }
+      
       
       //BUTTON ACTION AREA
       //popupvote
@@ -109,7 +112,11 @@ const Search = ({
             const op = await c.methods.vote(voteValue,pkh).send();
             closeVote();
             await op.confirmation();
-            enqueueSnackbar("Your vote has been acccepted", {variant: "success", autoHideDuration:10000});
+
+           //refresh info on list
+            setTimeout(() => { console.log("the list will refresh soon");refreshData();filterOnNewInput(inputValue);}, 2000);
+          
+            enqueueSnackbar("Your vote has been accepted (wait a bit the refresh)", {variant: "success", autoHideDuration:10000});
           } catch (error : any) {
             console.table(`Error: ${JSON.stringify(error, null, 2)}`);
             let tibe : TransactionInvalidBeaconError = new TransactionInvalidBeaconError(error);
@@ -126,8 +133,9 @@ const Search = ({
       };
       
       const buttonChoices = (contract : TezosVotingContract) => {
-        if(STATUS.ONGOING == contract.status && TezosVotingContractUtils.userNotYetVoted(userAddress,contract) && userRolls!=0) 
-        return(<div><Button aria-describedby={"votePopupId"+selectedContract?.tzkt.address} variant="contained" onClick={(e)=>showVote(e,contract)}>VOTE</Button>
+        if(STATUS.ONGOING == contract.status) 
+        return(<div>
+        {(!contract.userYetVoted && userRolls>0)?<Button style={{margin: "0.2em"}} aria-describedby={"votePopupId"+selectedContract?.tzkt.address} variant="contained" onClick={(e)=>showVote(e,contract)}>VOTE</Button>:""}
         {selectedContract != null ?
           <Popover 
           id={"votePopupId"+selectedContract?.tzkt.address}
@@ -220,10 +228,10 @@ const Search = ({
               horizontal: 'right',
             }}
             >
-            <Paper elevation={3} sx={{minWidth:"40em",minHeight:"20em"}} >
-            <Grid container spacing={2} height={100}>
+            <Paper elevation={3} sx={{minWidth:"90vw",minHeight:"50vh"}} >
+            <Grid container height={100}>
             <Grid item xs={8}>
-            <div style={{padding:"1em"}}>
+            <div style={{padding:"0.2em"}}>
             <TableContainer component={Paper}>
             <Table aria-label="simple table">
             <TableHead>
@@ -253,18 +261,14 @@ const Search = ({
               </Grid>
               <Grid item xs={4}>
               <Grid item xs={4}>
-              
-              <div style={{padding:"1em"}}>
-              
-              <img height={100} width={100} src="https://peltiertech.com/images/2013-09/No3DCharts.png"/>
-              
+              <div style={{padding:"0.2em"}}>
+              <img height={90} width={90} src="https://peltiertech.com/images/2013-09/No3DCharts.png"/>
               </div>
-              
               </Grid>
               <Grid item xs={4}>
-              <div style={{padding:"1em"}}><Chip avatar={<Avatar>{selectedContract?.votes.size}</Avatar>} label="Bakers involved"/></div>
+              <div style={{padding:"0.2em"}}><Chip avatar={<Avatar>{selectedContract?.votes.size}</Avatar>} label="Bakers"/></div>
               </Grid>
-              <div style={{padding:"1em"}}><Chip avatar={<Avatar>{Array.from(selectedContract?.results.values()).reduce( ( value :number , acc : number) => value + acc, 0)   }</Avatar>} label="Rolls have been stacked"/></div>
+              <div style={{padding:"0.2em"}}><Chip avatar={<Avatar>{Array.from(selectedContract?.results.values()).reduce( ( value :number , acc : number) => value + acc, 0)   }</Avatar>} label="Rolls"/></div>
               </Grid>
               </Grid>
               </Paper>
@@ -274,18 +278,19 @@ const Search = ({
             
             // STATUS.ONGOING
             if(contract.status == STATUS.ONGOING){
-              return(<div><Chip aria-owns={open ? "resultPopupId"+contract.tzkt.address : undefined} aria-haspopup="true" onMouseEnter={(e) => showResults(e, contract)} onMouseLeave={closeResults} icon={<RunningWithErrors />} style={{marginBottom: "1em"}} color="success" label={contract.status} />
-              <Slider 
-              aria-label="Period"
+              return(<div><Chip aria-owns={open ? "resultPopupId"+contract.tzkt.address : undefined} aria-haspopup="true" onMouseEnter={(e) => showResults(e, contract)} onMouseLeave={closeResults} icon={<RunningWithErrors />} color="success" label={contract.status} />
+              <Slider      style={{width:"80%"}}
+              aria-label="Period" 
               key={`slider-${contract.tzkt.address}`}
-              value={(new Date()).getTime() / 1000000000000}
+              value={(new Date()).getTime() }
               getAriaValueText= {dateSliderToString}
               valueLabelFormat={dateSliderToString}
               valueLabelDisplay="auto"
-              min={contract.dateFrom.getTime() / 1000000000000}
-              max={contract.dateTo.getTime() / 1000000000000}
-              marks={fromToMarks(contract)}
+              min={contract.dateFrom.getTime() }
+              max={contract.dateTo.getTime() }
               />
+              <div>{(durationToString(contract.dateTo.getTime() - Date.now()))}</div>
+              
               {popover()}
               </div>);
             }else{
@@ -293,12 +298,12 @@ const Search = ({
               const winnerList = getWinner(contract);
               if(winnerList.length > 0 ){
                 const result : string = "Winner is : " + winnerList.join(' , ');
-                return(<div ><Chip aria-owns={open ? "resultPopupId"+contract.tzkt.address : undefined} aria-haspopup="true" onMouseEnter={(e) => showResults(e, contract)} onMouseLeave={closeResults} style={{marginBottom: "1em"}} color="error" label={contract.status+" (Period:"+contract.votingPeriodIndex+")"} />
-                <Chip icon={<EmojiEvents />} label={result} />
+                return(<div ><Chip icon={<BarChart />} aria-owns={open ? "resultPopupId"+contract.tzkt.address : undefined} aria-haspopup="true" onMouseEnter={(e) => showResults(e, contract)} onMouseLeave={closeResults} style={{margin: "0.2em"}} color="error" label={<span>{contract.status}<br />(Period : {contract.votingPeriodIndex})</span>} />
+                <Chip style={{margin: "0.2em"}} icon={<EmojiEvents />} label={result} />
                 {popover()}
                 </div>);
               }else {
-                return(<div ><Chip aria-owns={open ? "resultPopupId"+contract.tzkt.address : undefined} aria-haspopup="true" onMouseEnter={(e) => showResults(e, contract)} onMouseLeave={closeResults}  style={{marginBottom: "1em"}} color="warning" label={contract.status+" (Period : "+contract.votingPeriodIndex+")"} /><Chip icon={<Block />} label="NO WINNER" /></div>);
+                return(<div ><Chip icon={<BarChart />}  aria-owns={open ? "resultPopupId"+contract.tzkt.address : undefined} aria-haspopup="true" onMouseEnter={(e) => showResults(e, contract)} onMouseLeave={closeResults}  style={{margin: "0.2em"}} color="warning" label={<span>{contract.status}<br />(Period : {contract.votingPeriodIndex})</span>} /><Chip style={{margin: "0.2em"}} icon={<Block />} label="NO WINNER" /></div>);
               }
             }
             
@@ -322,7 +327,6 @@ const Search = ({
             autoComplete
             filterSelectedOptions
             value={searchValue}
-            sx={{ width: "90%" }}
             open={open}
             onOpen={() => {setOpen(true);}}
             onClose={() => {setOpen(false);}}
@@ -355,12 +359,16 @@ const Search = ({
                   );
                 }}  
                 />
+                
+                
+                
                 {contracts.map((contract, index) => (
-                  <Card key={contract.tzkt.address} sx={{ display: 'flex' }}>
-                  <Box width="70%" sx={{ display: 'flex', flexDirection: 'column' }}>
-                  <CardContent sx={{ flex: '1 0 auto' }}>
+                  <Card  key={contract.tzkt.address} sx={{ display: 'flex' , marginTop : "0.2em"}}>
                   
-                  <Typography component="div" variant="h5">
+                  
+                  <Box width="60%" sx={{ display: 'flex', flexDirection: 'column' }}>
+                  <CardContent sx={{ flex: '1 0 auto' , padding : "1vw"}}>
+                  <Typography component="div" variant="h6">
                   <a
                   href={`https://hangzhou2net.tzkt.io/${contract.tzkt.address}/info`}
                   target="_blank"
@@ -371,23 +379,19 @@ const Search = ({
                   </Typography>
                   
                   <Typography variant="subtitle1" color="text.secondary" component="div">
-                  <span>Created by </span><Chip icon={<Face />} label={contract.tzkt.creator?.address} clickable target="_blank" component="a" href={`https://hangzhou2net.tzkt.io/${contract.tzkt.creator?.address}/info`} />  
+                  <div>Created by </div>
+                  <Chip style={{maxWidth: "40vw"}} icon={<Face />} label={contract.tzkt.creator?.address} clickable target="_blank" component="a" href={`https://hangzhou2net.tzkt.io/${contract.tzkt.creator?.address}/info`} />  
                   </Typography>
                   
                   {buttonChoices(contract)}
                   </CardContent>
-                  
                   </Box>
-                  <Box paddingTop="1em" paddingRight="5em" paddingLeft="5em" width="20%">
+                  
+                  
+                  <Box width="40%" paddingTop="1em" >
                   {resultArea(contract)}
                   </Box>
-                  <Box padding="1em" height="auto" width="10%">
-                  <CardMedia
-                  component="img"
-                  height="auto"
-                  image="https://static8.depositphotos.com/1009634/988/v/950/depositphotos_9883921-stock-illustration-no-user-profile-picture.jpg"
-                  />
-                  </Box>
+                  
                   </Card>
                   ))}
                   

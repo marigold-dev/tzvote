@@ -6,7 +6,7 @@ import { Account } from "@dipdup/tzkt-api";
 import { useSnackbar } from "notistack";
 import { STATUS, TezosUtils, TransactionInvalidBeaconError } from "../contractutils/TezosUtils";
 import RadioButtonUncheckedIcon from '@mui/icons-material/RadioButtonUnchecked';
-import { Delete } from "@mui/icons-material";
+import { Add, Delete } from "@mui/icons-material";
 import { BeaconWallet } from "@taquito/beacon-wallet";
 
 const jsonContractTemplate = require('../contracttemplates/tezosTemplate3.tz.json')
@@ -41,7 +41,8 @@ const Create = ({ Tezos, userAddress , votingPeriodOracle, wallet, setActiveTab 
     new Map(),
     votingPeriodOracle,
     wallet.client.preferredNetwork,
-    {} as Account));
+    {} as Account,
+    false));
     
     const [currentVotingPeriodIndex,setCurrentVotingPeriodIndex] =useState<number>(0);   
     const [periodDates,setPeriodDates] =useState<Array<Date>>([]);   
@@ -116,8 +117,8 @@ const Create = ({ Tezos, userAddress , votingPeriodOracle, wallet, setActiveTab 
     
     <form  onSubmit={(e)=>createVoteContract(e,contract)}>
     <FormControl fullWidth>
-    <Grid container spacing={2}>
-    <Grid item xs={10}>
+    <Grid container >
+    <Grid item xs={12}>
     <Box>
     
     <TextField fullWidth
@@ -130,7 +131,7 @@ const Create = ({ Tezos, userAddress , votingPeriodOracle, wallet, setActiveTab 
     
     <div style={{paddingTop:"2em"}}>
     <FormLabel required id="demo-radio-buttons-group-label">Select a period</FormLabel>
-    <RadioGroup row
+    <RadioGroup row 
     aria-labelledby="demo-radio-buttons-group-label"
     defaultValue="25"
     name="radio-buttons-group"
@@ -142,7 +143,7 @@ const Create = ({ Tezos, userAddress , votingPeriodOracle, wallet, setActiveTab 
     ].map((value: undefined, index: number) => (
       <FormControlLabel key={currentVotingPeriodIndex+index} labelPlacement="top" value={currentVotingPeriodIndex+index} control={<Radio required/>} label={
         <React.Fragment >
-        <Paper style={{padding:"1em"}} elevation={3}>
+        <Paper style={{padding:"0.5em",fontSize: "0.8rem"}} elevation={3}>
         Period {currentVotingPeriodIndex+index}<br />
         From {(periodDates[index]?periodDates[index].toLocaleDateString():"")}<br />
         To {(periodDates[index+1]?periodDates[index+1].toLocaleDateString():"")}<br/>
@@ -154,21 +155,18 @@ const Create = ({ Tezos, userAddress , votingPeriodOracle, wallet, setActiveTab 
         
         </Box>
         </Grid>
-        <Grid item xs={2}>
-        <CardMedia
-        component="img"
-        height="auto"
-        image="https://static8.depositphotos.com/1009634/988/v/950/depositphotos_9883921-stock-illustration-no-user-profile-picture.jpg"
-        />
-        </Grid>
         <Grid item xs={12}>
+        
+
         <Tooltip open={contract.options.length==0} title="At least one option is needed" placement="top-end" aria-label="add"> 
         <FormLabel error={contract.options.length==0} required id="demo-radio-buttons-group-label">Options</FormLabel>
         </Tooltip>
-        <Box>
-        <TextField value={inputOption} sx={{ marginLeft: "1em" }} label="type your option here" onChange={(e) => setInputOption(e.target.value)} ></TextField>
-        <Button sx={{ marginLeft: "1em" }}  variant="outlined" onClick={()=>{setContract({...contract,options:contract.options.concat(inputOption)});setInputOption("")}}>Add option</Button>
+
+        <Box alignContent={"center"}>
+        <TextField value={inputOption} label="type your option here" onChange={(e) => setInputOption(e.target.value)} ></TextField>
+        <Button sx={{ marginLeft: "1em" }}  variant="outlined" onClick={()=>{setContract({...contract,options:contract.options.concat(inputOption)});setInputOption("")}}><Add style={{padding : "0.4em 0em"}}/></Button>
         </Box>
+        
         <List inputMode="text" >
         {
           contract.options.map((option: string, index: number) => (

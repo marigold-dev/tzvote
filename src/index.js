@@ -1,13 +1,24 @@
+import { ThemeProvider, createTheme } from "@mui/material/styles";
 import { SnackbarProvider } from "notistack";
 import React from "react";
 import ReactDOM from "react-dom";
 import App from "./App.tsx";
 import * as serviceWorker from "./serviceWorker";
 
+const themeLight = createTheme({
+  palette: {
+    primary: {
+      main : "#eb3448"
+    }
+  }
+});
+
 ReactDOM.render(
   <React.StrictMode>
     <SnackbarProvider maxSnack={3}>
+    <ThemeProvider theme={themeLight}>
     <App />
+    </ThemeProvider>
     </SnackbarProvider>
   </React.StrictMode>,
   document.getElementById("root")

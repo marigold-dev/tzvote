@@ -15,6 +15,7 @@ export class TezosVotingContract{
     votingPeriodOracle : string; // address of the oracle
     protocol : string;  //deployed on this network protocol
     tzkt : Contract;//transient
+    userYetVoted: boolean;
     
     constructor(
         name : string,  
@@ -27,7 +28,8 @@ export class TezosVotingContract{
         results : Map<string, number>,
         votingPeriodOracle : string,
         protocol : string,
-        tzkt : Contract){
+        tzkt : Contract,
+        userYetVoted : boolean){
             this.name=name;
             this.votingPeriodIndex=votingPeriodIndex;
             this.status=status;
@@ -38,17 +40,14 @@ export class TezosVotingContract{
             this.votes=votes;
             this.votingPeriodOracle=votingPeriodOracle;
             this.protocol=protocol;
-            this.tzkt=tzkt};
+            this.tzkt=tzkt;
+            this.userYetVoted = userYetVoted;
+        };
         }
         
         export abstract class TezosVotingContractUtils {
             
-            
-            public static userNotYetVoted(userAddress: string, selectedContract: TezosVotingContract) {
-                return !selectedContract.votes.has(userAddress);
-            }
-            
-            public static async convertFromTZKTTezosContract(Tezos:TezosToolkit,tzktContract : Contract) : Promise<TezosVotingContract> {
+            public static async convertFromTZKTTezosContract(Tezos:TezosToolkit,tzktContract : Contract, userAddress : string) : Promise<TezosVotingContract> {
                 let votingPeriodBlockResult  = await Tezos.rpc.getCurrentPeriod();
                 const currentPeriodStartBlock = votingPeriodBlockResult.voting_period.start_position;
                 let dateFrom = new Date (await (await Tezos.rpc.getBlockHeader({block:""+currentPeriodStartBlock})).timestamp) ;
@@ -56,6 +55,7 @@ export class TezosVotingContract{
                 const blocks_per_voting_period = constantsResponse.blocks_per_voting_period ;
                 const time_between_blocks = constantsResponse.time_between_blocks;
                 let dateTo =new Date(dateFrom.getTime() + (1000 * blocks_per_voting_period * time_between_blocks[0].toNumber()));
+                let votes = new Map<string,string>(Object.entries<string>(tzktContract.storage.votes));
                 return new TezosVotingContract(
                     tzktContract.storage.name,
                     tzktContract.storage.votingPeriodIndex,
@@ -63,11 +63,12 @@ export class TezosVotingContract{
                     dateFrom,
                     dateTo,
                     Array.from<string>(new Map(Object.entries<string>(tzktContract.storage.options)).values()),
-                    new Map<string,string>(Object.entries<string>(tzktContract.storage.votes)),
+                    votes,
                     new Map<string,number>(  Object.keys(tzktContract.storage.results).map((key,index)=>[key,Number(tzktContract.storage.results[key])])),
                     tzktContract.storage.votingPeriodOracle,
                     tzktContract.storage.protocol,
-                    tzktContract);
+                    tzktContract,
+                    votes.has(userAddress));
                 }
                 
             }
