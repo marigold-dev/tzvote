@@ -230,7 +230,7 @@ const Search = ({
                 
                 const RADIAN = Math.PI / 180;
                 const renderCustomizedLabel = ({ cx , cy, midAngle, innerRadius, outerRadius, percent, index }:any) => {
-                  const radius = innerRadius + (outerRadius - innerRadius) * 0.1;
+                  const radius = innerRadius + (outerRadius - innerRadius) * 0.3;
                   const x = cx + radius * Math.cos(-midAngle * RADIAN);
                   const y = cy + radius * Math.sin(-midAngle * RADIAN);
                   
@@ -240,7 +240,8 @@ const Search = ({
                     </text>
                     );
                   };
-                  
+                   
+
                   return <Popover 
                   id={"resultPopupId"+selectedContract?.tzkt.address}
                   sx={{
@@ -295,7 +296,7 @@ const Search = ({
                     <div style={{padding:"0.2em"}}>
                     
                     
-                    <PieChart width={80} height={80}>
+                    <PieChart width={window.innerWidth*0.3} height={window.innerHeight*0.3}>
                     <Pie
                     data={data}
                     cx="50%"
