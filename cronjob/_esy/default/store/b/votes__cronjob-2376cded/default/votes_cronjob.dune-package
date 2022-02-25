@@ -1,0 +1,4 @@
+(lang dune 3.0)
+(name votes_cronjob)
+(sections (lib .) (bin ../../bin))
+(files (lib (META dune-package opam)) (bin (votes_cronjob.exe)))

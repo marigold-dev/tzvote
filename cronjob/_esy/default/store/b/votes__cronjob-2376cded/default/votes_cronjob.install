@@ -1,0 +1,8 @@
+lib: [
+  "/Users/frai/workspace/marigold/delegator-votes/cronjob/_esy/default/store/b/votes__cronjob-2376cded/install/default/lib/votes_cronjob/META"
+  "/Users/frai/workspace/marigold/delegator-votes/cronjob/_esy/default/store/b/votes__cronjob-2376cded/install/default/lib/votes_cronjob/dune-package"
+  "/Users/frai/workspace/marigold/delegator-votes/cronjob/_esy/default/store/b/votes__cronjob-2376cded/install/default/lib/votes_cronjob/opam"
+]
+bin: [
+  "/Users/frai/workspace/marigold/delegator-votes/cronjob/_esy/default/store/b/votes__cronjob-2376cded/install/default/bin/votes_cronjob.exe"
+]

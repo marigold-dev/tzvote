@@ -1,0 +1,4 @@
+#!/bin/sh
+export ESY__NODE_BIN_PATH="/Users/frai/workspace/marigold/delegator-votes/cronjob/_esy/default/bin"
+exec "/usr/local/bin/node" -r "/Users/frai/workspace/marigold/delegator-votes/cronjob/_esy/default/pnp.js" "$@"
+              

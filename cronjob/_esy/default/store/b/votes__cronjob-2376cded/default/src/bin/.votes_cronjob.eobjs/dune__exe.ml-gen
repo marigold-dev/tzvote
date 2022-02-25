@@ -1,0 +1,6 @@
+(** @canonical Dune__exe.Get_envs *)
+module Get_envs = Dune__exe__Get_envs
+
+
+(** @canonical Dune__exe.Votes_cronjob *)
+module Votes_cronjob = Dune__exe__Votes_cronjob
