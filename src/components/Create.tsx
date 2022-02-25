@@ -40,7 +40,7 @@ const Create = ({ Tezos, userAddress , votingPeriodOracle, wallet, setActiveTab 
     new Map(),
     new Map(),
     votingPeriodOracle,
-    wallet.client.preferredNetwork,
+    wallet?.client?.preferredNetwork,
     {} as Account,
     false));
     
@@ -106,9 +106,7 @@ const Create = ({ Tezos, userAddress , votingPeriodOracle, wallet, setActiveTab 
       setContract({...contract});
     }
     
-    return <div style={{padding:"1em"}}>
-    
-    <Backdrop
+    return userAddress?<div style={{padding:"1em"}}><Backdrop
     sx={{ color: '#fff', zIndex: (theme : any) => theme.zIndex.drawer + 1 }}
     open={tezosLoading}
     >
@@ -192,12 +190,12 @@ const Create = ({ Tezos, userAddress , votingPeriodOracle, wallet, setActiveTab 
           </Box>
           </Grid>
           </Grid>  
-          
-          
+  
           </FormControl>   
           </form>    
           </div>
-        };
+          :
+          <span />        };
         
         
         export default Create;

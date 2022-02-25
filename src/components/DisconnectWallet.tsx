@@ -11,6 +11,7 @@ interface ButtonProps {
   setWallet: Dispatch<SetStateAction<any>>;
   setTezos: Dispatch<SetStateAction<TezosToolkit>>;
   setBeaconConnection: Dispatch<SetStateAction<boolean>>;
+  setActiveTab : Dispatch<SetStateAction<string>>;
 }
 
 const DisconnectButton = ({
@@ -21,7 +22,8 @@ const DisconnectButton = ({
   setUserRolls,
   setWallet,
   setTezos,
-  setBeaconConnection
+  setBeaconConnection,
+  setActiveTab
 }: ButtonProps): JSX.Element => {
   const disconnectWallet = async (): Promise<void> => {
     //window.localStorage.clear();
@@ -33,6 +35,7 @@ const DisconnectButton = ({
     setTezos(tezosTK);
     setBeaconConnection(false);
     setPublicToken(null);
+    setActiveTab("search");//only possible option
     console.log("disconnecting wallet");
     if (wallet) {
       await wallet.client.removeAllAccounts();
