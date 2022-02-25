@@ -17,6 +17,7 @@ type ButtonProps = {
   setBeaconConnection: Dispatch<SetStateAction<boolean>>;
   setPublicToken: Dispatch<SetStateAction<string | null>>;
   wallet: BeaconWallet;
+  setFirstTime: Dispatch<SetStateAction<boolean>>;
 };
 
 const ConnectButton = ({
@@ -26,7 +27,7 @@ const ConnectButton = ({
   setUserBalance,
   setUserRolls,
   setBeaconConnection,
-  setPublicToken,
+  setFirstTime,
   wallet
 }: ButtonProps): JSX.Element => {
 
@@ -61,6 +62,7 @@ const ConnectButton = ({
       const userAddress = await wallet.getPKH();
       await setup(userAddress);
       setBeaconConnection(true);
+      setFirstTime(false);
     } catch (error) {
       console.log(error);
     }
@@ -69,12 +71,11 @@ const ConnectButton = ({
 
   useEffect(() => {
     (async () => {
-      // creates a wallet instance
-      const wallet = new BeaconWallet({
+      // creates a wallet instance if not exists
+      if(!wallet){wallet = new BeaconWallet({
         name: "Marigold voting",
         preferredNetwork: NetworkType.HANGZHOUNET,
-        
-      });
+      });}
       Tezos.setWalletProvider(wallet);
       setWallet(wallet);
       // checks if wallet was connected before

@@ -18,12 +18,14 @@ const Search = ({
   Tezos,
   userAddress,
   votingTemplateAddress,
-  userRolls
+  userRolls,
+  beaconConnection
 }: {
   Tezos: TezosToolkit;
   userAddress: string;
   votingTemplateAddress: string;
   userRolls:number;
+  beaconConnection:boolean;
 }): JSX.Element => {
   
   //SEARCH
@@ -49,17 +51,15 @@ const Search = ({
   
   const refreshData = () => {
     (async () => {
-      let allContracts : Array<Contract>= (await contractsService.getSame({address:votingTemplateAddress , includeStorage:true, sort:{desc:"id"}}));
-      let allConvertertedContracts :Array<TezosVotingContract>= await Promise.all(allContracts.map( async(tzktObject:Contract) => await TezosVotingContractUtils.convertFromTZKTTezosContract(Tezos,tzktObject,userAddress))); 
+      let allContractFromTzkt : Array<Contract>= (await contractsService.getSame({address:votingTemplateAddress , includeStorage:true, sort:{desc:"id"}}));
+      console.log("refreshData",userAddress);
+      let allConvertertedContracts :Array<TezosVotingContract>= await Promise.all(allContractFromTzkt.map( async(tzktObject:Contract) => await TezosVotingContractUtils.convertFromTZKTTezosContract(Tezos,tzktObject,userAddress))); 
       setAllContracts(allConvertertedContracts);
-      setOptions(allConvertertedContracts.map((c: TezosVotingContract) => c.name));
+      setOptions(Array.from(new Set(allConvertertedContracts.map((c: TezosVotingContract) => c.name))));
     })();
   }
   
-  //EFFECTS
-  React.useEffect(refreshData, []);
-  
-  const filterOnNewInput = async(filterValue : string | null) => {
+  const filterOnNewInput = (filterValue : string | null) => {
     if(filterValue == null || filterValue === '')setContracts([]);
     else{
       let filteredContract = allContracts.filter((c: TezosVotingContract) => {
@@ -67,6 +67,11 @@ const Search = ({
         )
         setContracts(filteredContract); 
       }}
+
+  //EFFECTS
+  React.useEffect(refreshData, []); //init load
+  React.useEffect(refreshData, [beaconConnection]); //connection events
+  React.useEffect(() => filterOnNewInput(inputValue), [allContracts]); //if data refreshed, need to refresh the filtered list too
       
       const contractsService = new ContractsService( {baseUrl: "https://api.hangzhou2net.tzkt.io" , version : "", withCredentials : false});
       
@@ -450,5 +455,5 @@ const Search = ({
                           );
                         };
                         
-                        export default Search;
+export default Search;
                         
