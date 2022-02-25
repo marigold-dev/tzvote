@@ -16,7 +16,7 @@ enum BeaconConnection {
   PERMISSION_REQUEST_SUCCESS = "Wallet is connected"
 }
 
-const votingTemplateAddress : string = "KT1AYExp5VgnG1kQdkTa7mZmqHnj8cwVnZ7v";
+const votingTemplateAddress : string = "KT1QypT3YJHgVmxgQr2PVpSV74YGQbXiq1rL";
 const votingPeriodOracle : string = "KT1GLuqbSEoaRb3GE4UtUgGkDukVS766V53A";
 
 const App = () => {

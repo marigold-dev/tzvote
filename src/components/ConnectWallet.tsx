@@ -73,16 +73,7 @@ const ConnectButton = ({
       const wallet = new BeaconWallet({
         name: "Marigold voting",
         preferredNetwork: NetworkType.HANGZHOUNET,
-        disableDefaultEvents: true, // Disable all events / UI. This also disables the pairing alert.
-        eventHandlers: {
-          // To keep the pairing alert, we have to add the following default event handlers back
-          [BeaconEvent.PAIR_INIT]: {
-            handler: defaultEventCallbacks.PAIR_INIT
-          },
-          [BeaconEvent.PAIR_SUCCESS]: {
-            handler: data => setPublicToken(data.publicKey)
-          }
-        }
+        
       });
       Tezos.setWalletProvider(wallet);
       setWallet(wallet);
