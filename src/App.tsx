@@ -67,20 +67,15 @@ const App = () => {
     
     <div id="dialog-login">
     <header>Welcome</header>
-    <div id="content">
-    <p>This DApp allows Tz owners to create, edit and remove voting sessions.</p>
+    <div id="content-login">
+    <p>This DApp allows anyone to participate to vote election</p>
     
     <div>
     Voting session journey :
     <ol>
-    <li>Login : use below button to connect to your wallet</li>
-    <li>On Search page and select your voting session. Vote on it. See Result to display the chart and details</li>
-    <li>On Create page, create a new voting session : </li>
-    <ol>
-    <li>Choose your vote template (as of today only 1 template available : 1 Question, n Choices, 1 Answer)</li>
-    <li>Enter basic settings : title, dates,etc ...</li>
-    <li>Click on Create button to deploy the smartcontract on Tezos</li>
-    </ol>
+    <li>Login : connect to your wallet, or just skip and continue read only</li>
+    <li>On Search page and select your voting session. Vote on it. Click on status icon to display the chart and details</li>
+    <li>On Create page, create a new voting session : title, tezos voting period, options</li>
     </ol>
     
     </div>
