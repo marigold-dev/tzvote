@@ -1,6 +1,0 @@
-(executable
- (name votes_cronjob)
- (public_name votes_cronjob.exe)
- (libraries lwt lwt.unix)
- (preprocess
-  (pps lwt_ppx)))
