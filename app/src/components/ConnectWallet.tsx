@@ -2,9 +2,7 @@ import React, { Dispatch, SetStateAction, useState, useEffect } from "react";
 import { TezosToolkit } from "@taquito/taquito";
 import { BeaconWallet } from "@taquito/beacon-wallet";
 import {
-  NetworkType,
-  BeaconEvent,
-  defaultEventCallbacks
+  NetworkType
 } from "@airgap/beacon-sdk";
 import { DelegatesResponse } from "@taquito/rpc";
 
@@ -54,8 +52,8 @@ const ConnectButton = ({
     try {
       await wallet.requestPermissions({
         network: {
-          type: NetworkType.HANGZHOUNET,
-          rpcUrl: "https://hangzhounet.api.tez.ie"
+          type: process.env["NETWORK"]? NetworkType[process.env["NETWORK"].toUpperCase() as keyof typeof NetworkType]  : NetworkType.HANGZHOUNET,
+          rpcUrl: process.env["TEZOS_NODE"] ||"https://hangzhounet.api.tez.ie"
         }
       });
       // gets user's address
@@ -74,7 +72,7 @@ const ConnectButton = ({
       // creates a wallet instance if not exists
       if(!wallet){wallet = new BeaconWallet({
         name: "Marigold voting",
-        preferredNetwork: NetworkType.HANGZHOUNET,
+        preferredNetwork: process.env["NETWORK"]? NetworkType[process.env["NETWORK"].toUpperCase() as keyof typeof NetworkType]  : NetworkType.HANGZHOUNET,
       });}
       Tezos.setWalletProvider(wallet);
       setWallet(wallet);

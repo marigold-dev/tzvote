@@ -31,7 +31,7 @@ const DisconnectButton = ({
     setUserBalance(0);
     setUserRolls(0);
     setWallet(null);
-    const tezosTK = new TezosToolkit("https://hangzhounet.api.tez.ie");
+    const tezosTK = new TezosToolkit(process.env["TEZOS_NODE"] ||"https://hangzhounet.api.tez.ie");
     setTezos(tezosTK);
     setBeaconConnection(false);
     setPublicToken(null);

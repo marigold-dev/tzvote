@@ -7,21 +7,15 @@ import qrcode from "qrcode-generator";
 import Search from "./components/Search";
 import Create from "./components/Create";
 import Popup from 'reactjs-popup';
+import {  NetworkType} from "@airgap/beacon-sdk";
 
-enum BeaconConnection {
-  NONE = "",
-  LISTENING = "Listening to P2P channel",
-  CONNECTED = "Channel connected",
-  PERMISSION_REQUEST_SENT = "Permission request sent, waiting for response",
-  PERMISSION_REQUEST_SUCCESS = "Wallet is connected"
-}
 
-const votingTemplateAddress : string = "KT1QypT3YJHgVmxgQr2PVpSV74YGQbXiq1rL";
-const votingPeriodOracle : string = "KT1GLuqbSEoaRb3GE4UtUgGkDukVS766V53A";
+const votingTemplateAddress : string = process.env["TEMPLATE_ADDRESS"] || "KT1QypT3YJHgVmxgQr2PVpSV74YGQbXiq1rL";
+const votingPeriodOracle : string = process.env["ORACLE_ADDRESS"] || "KT1GLuqbSEoaRb3GE4UtUgGkDukVS766V53A";
 
 const App = () => {
   const [Tezos, setTezos] = useState<TezosToolkit>(
-    new TezosToolkit("https://hangzhounet.api.tez.ie")
+    new TezosToolkit(process.env["TEZOS_NODE"] ||"https://hangzhounet.api.tez.ie")
     );
     const [publicToken, setPublicToken] = useState<string | null>("");
     const [wallet, setWallet] = useState<any>(null);
@@ -48,10 +42,12 @@ const App = () => {
  * LANDING PAGE FIRST TIME
  *  */  
  //console.log("firstTime",firstTime,"publicToken",publicToken,"userAddress",userAddress,"userBalance",userBalance);
+ let network = process.env["NETWORK"]? NetworkType[process.env["NETWORK"].toUpperCase() as keyof typeof NetworkType]  : NetworkType.HANGZHOUNET;
 
   if (firstTime && (!publicToken || publicToken==null))
   return (
     <div className="main-box-login">
+    {(network != NetworkType.MAINNET)?<div className="banner">WARNING: TEST ONLY {network}</div>:<span />}
     <div className="title">
     <div id="title">Marigold Voting App</div>
     <a href="https://www.marigold.dev/">
@@ -114,6 +110,7 @@ const App = () => {
 else if (firstTime && publicToken && (!userAddress || isNaN(userBalance))) {
   return (
     <div className="main-box-login">
+    {(network != NetworkType.MAINNET)?<div className="banner">WARNING: TEST ONLY {network}</div>:<span />}
     <div className="title"><div id="title">Wallet connection</div></div>
     <div id="dialog-login">
     <header>Please connect</header>
@@ -168,6 +165,7 @@ else if (firstTime && publicToken && (!userAddress || isNaN(userBalance))) {
 else if(!firstTime){
   return (
     <div className="main-box">
+    {(network != NetworkType.MAINNET)?<div className="banner">WARNING: TEST ONLY {network}</div>:<span />}
     <div id="header"> 
     <div className="column-left"><img id="logo"
           src="https://uploads-ssl.webflow.com/616ab4741d375d1642c19027/61793ee65c891c190fcaa1d0_Vector(1).png"

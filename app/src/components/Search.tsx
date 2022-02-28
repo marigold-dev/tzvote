@@ -12,6 +12,7 @@ import { ReactJSXElement } from "@emotion/react/types/jsx-namespace";
 import { PieChart, Pie, Sector, Cell, ResponsiveContainer } from 'recharts';
 import * as moment from 'moment';
 import momentDurationFormatSetup from 'moment-duration-format';
+import {  NetworkType} from "@airgap/beacon-sdk";
 momentDurationFormatSetup(moment);
 
 const Search = ({
@@ -67,13 +68,13 @@ const Search = ({
         )
         setContracts(filteredContract); 
       }}
-
-  //EFFECTS
-  React.useEffect(refreshData, []); //init load
-  React.useEffect(refreshData, [beaconConnection]); //connection events
-  React.useEffect(() => filterOnNewInput(inputValue), [allContracts]); //if data refreshed, need to refresh the filtered list too
       
-      const contractsService = new ContractsService( {baseUrl: "https://api.hangzhou2net.tzkt.io" , version : "", withCredentials : false});
+      //EFFECTS
+      React.useEffect(refreshData, []); //init load
+      React.useEffect(refreshData, [beaconConnection]); //connection events
+      React.useEffect(() => filterOnNewInput(inputValue), [allContracts]); //if data refreshed, need to refresh the filtered list too
+      
+      const contractsService = new ContractsService( {baseUrl: "https://api."+(process.env["NETWORK"]? NetworkType[process.env["NETWORK"].toUpperCase() as keyof typeof NetworkType]  : NetworkType.HANGZHOUNET)+".tzkt.io" , version : "", withCredentials : false});
       
       const dateSliderToString = (value : number, index : number) =>{
         return new Date(value).toLocaleString();
@@ -222,15 +223,15 @@ const Search = ({
                 let getColorArray = (dataItems : Array<any>) : Map<string,string> => {
                   var result = new Map<string,string>();
                   for (let dataitem of dataItems) {
-                      var letters = '0123456789ABCDEF'.split('');
-                      var color = '#';
-                      for (var j = 0; j < 6; j += 1) {
-                          color += letters[Math.floor(Math.random() * 16)];
-                      }
-                      result.set(dataitem.name,color);
+                    var letters = '0123456789ABCDEF'.split('');
+                    var color = '#';
+                    for (var j = 0; j < 6; j += 1) {
+                      color += letters[Math.floor(Math.random() * 16)];
+                    }
+                    result.set(dataitem.name,color);
                   }
                   return result;
-              }
+                }
                 const COLORS = getColorArray(data);
                 
                 const RADIAN = Math.PI / 180;
@@ -245,8 +246,8 @@ const Search = ({
                     </text>
                     );
                   };
-                   
-
+                  
+                  
                   return <Popover 
                   id={"resultPopupId"+selectedContract?.tzkt.address}
                   sx={{
@@ -436,7 +437,7 @@ const Search = ({
                           
                           <Typography variant="subtitle1" color="text.secondary" component="div">
                           <div>Created by </div>
-                          <Chip style={{maxWidth: "40vw"}} icon={<Face />} label={contract.tzkt.creator?.address} clickable target="_blank" component="a" href={`https://hangzhou2net.tzkt.io/${contract.tzkt.creator?.address}/info`} />  
+                          <Chip style={{maxWidth: "40vw"}} icon={<Face />} label={contract.tzkt.creator?.address} clickable target="_blank" component="a" href={`https://`+(process.env["NETWORK"]? NetworkType[process.env["NETWORK"].toUpperCase() as keyof typeof NetworkType]  : NetworkType.HANGZHOUNET)+`.tzkt.io/${contract.tzkt.creator?.address}/info`} />  
                           </Typography>
                           
                           {buttonChoices(contract)}
@@ -455,5 +456,5 @@ const Search = ({
                           );
                         };
                         
-export default Search;
+                        export default Search;
                         
