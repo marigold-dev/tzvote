@@ -1,4 +1,4 @@
-name: Create Docker Image
+name: Create Cronjob Docker Image
 
 on:
   push:
@@ -23,15 +23,15 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build and push
-        id: docker_build_delegator-votes
+        id: docker_build_delegator-votes-cronjob
         uses: docker/build-push-action@v2
         with:
-          context: .
+          context: ./cronjob/
           platforms: linux/amd64
           cache-from: type=gha
           cache-to: type=gha,mode=max
           # Only push if on main branch
           push: ${{ github.ref == 'refs/heads/main' && github.event_name == 'push' }}
           tags: |
-            ghcr.io/marigold-dev/delegator-votes:latest
-            ghcr.io/marigold-dev/delegator-votes:${{ github.sha }}
+            ghcr.io/marigold-dev/delegator-votes-cronjob:latest
+            ghcr.io/marigold-dev/delegator-votes-cronjob:${{ github.sha }}
