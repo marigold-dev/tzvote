@@ -16,7 +16,7 @@ ligo compile contract votingPeriodOracle.jsligo --output-file votingPeriodOracle
 
 ligo compile storage votingPeriodOracle.jsligo '{votingPeriodIndexes:(Map.empty as map<string, nat>),admin:("tz1VApBuWHuaTfDHtKzU3NBtWFYsxJvvWhYk" as address)}' --output-file votingPeriodOracleStorage.tz --entry-point main
 
-ligo compile parameter votingPeriodOracle.jsligo 'UpdateCurrentVotingPeriod(["hangzhounet",(27 as nat)])' --output-file votingPeriodOracleParameter.tz --entry-point main
+ligo compile parameter votingPeriodOracle.jsligo 'UpdateCurrentVotingPeriod(["hangzhounet",(29 as nat)])' --output-file votingPeriodOracleParameter.tz --entry-point main
 
 ```
 
@@ -33,6 +33,13 @@ ligo run dry-run votingPeriodOracle.jsligo 'UpdateCurrentVotingPeriod(["hangzhou
 
 ```
 ligo run test unit_votingPeriodOracle.jsligo
+```
+
+
+## Deploy 
+
+```
+tezos-client originate contract oracle transferring 0 from tz1VApBuWHuaTfDHtKzU3NBtWFYsxJvvWhYk running votingPeriodOracle.tz --init "$(cat votingPeriodOracleStorage.tz)" --burn-cap 1 -D
 ```
 
 ### initialize some data
