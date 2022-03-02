@@ -42,7 +42,6 @@ body,
 /* HOME */
 
 .main-box-login {
-  width: 100vw;
   background-color: var(--main-color);
 }
 
@@ -67,7 +66,6 @@ body,
   display: flex;
   justify-content: flex-end;
   background-color: var(--main-color);
-  padding: 0.5em;
   color: white;
 }
 
