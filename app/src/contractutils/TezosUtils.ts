@@ -90,22 +90,24 @@ export abstract class TezosUtils{
     * Estimated best end of current voting period
     * dateFrom.getTime() + (1000 * blocks_per_voting_period * time_between_blocks[0].toNumber() 
     * @param startDate (optional) by default it is the current period
-    * */       
-    public static async getVotingPeriodBestEndDate(Tezos : TezosToolkit , startDate? : Date) : Promise<Date> {
-        const blocks_per_voting_period = await (await Tezos.rpc.getConstants()).blocks_per_voting_period ;
+    * @param remainingBlocks (optional) by default it is the number of block for a period, otherwise it should be the remining block until the end of the period
+    *      
+    public static async getVotingPeriodBestEndDate(Tezos : TezosToolkit , startDate? : Date, remainingBlocks? : number) : Promise<Date> {
+        const blocks_per_voting_period = remainingBlocks ? remainingBlocks : await (await Tezos.rpc.getConstants()).blocks_per_voting_period ;
         const time_between_blocks = await (await Tezos.rpc.getConstants()).time_between_blocks;
         return  new Date(  (startDate?startDate.getTime():(await this.getVotingPeriodStartDate(Tezos)).getTime())       + (1000 * blocks_per_voting_period * time_between_blocks[0].toNumber()));
     }
+    */
     
     /**
     * Estimated bad average end of current voting period. We suppose an average of 1 jump priority and 10% of missing endorsements
-    * dateFrom.getTime() + (1000 * blocks_per_voting_period * ((time_between_blocks[0].toNumber() +  (  time_between_blocks[1].toNumber() * 1 ) + (delay_per_missing_endorsement?delay_per_missing_endorsement.toNumber():0) * (initial_endorsers?initial_endorsers*0.1:0)    )     )) ) */       
+    * dateFrom.getTime() + (1000 * blocks_per_voting_period * ((time_between_blocks[0].toNumber() +  (  time_between_blocks[1].toNumber() * 1 ) + (delay_per_missing_endorsement?delay_per_missing_endorsement.toNumber():0) * (initial_endorsers?initial_endorsers*0.1:0)    )     )) )        
     public static async getVotingPeriodBadAverageEndDate(Tezos : TezosToolkit) : Promise<Date> {
         var delay_per_missing_endorsement :BigNumber | undefined=  await (await Tezos.rpc.getConstants()).delay_per_missing_endorsement ;
         var initial_endorsers : number | undefined =  await (await Tezos.rpc.getConstants()).initial_endorsers;
         const blocks_per_voting_period = await (await Tezos.rpc.getConstants()).blocks_per_voting_period ;
         const time_between_blocks = await (await Tezos.rpc.getConstants()).time_between_blocks;
         return  new Date( (await this.getVotingPeriodStartDate(Tezos)).getTime() + (1000 * blocks_per_voting_period * ((time_between_blocks[0].toNumber() +  (  time_between_blocks[1].toNumber() * 1 ) + (delay_per_missing_endorsement?delay_per_missing_endorsement.toNumber():0) * (initial_endorsers?initial_endorsers*0.1:0)    )     )) );
-    }
+    }*/
     
 }
