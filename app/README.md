@@ -1,4 +1,4 @@
-# Marigold voting app
+# TzVote
 
 [logo]: https://i.imgflip.com/r56sp.jpg?a456398 "Vote"
 

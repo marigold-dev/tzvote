@@ -49,16 +49,7 @@ const App = () => {
     <div className="main-box-login">
     {(network != NetworkType.MAINNET)?<div className="banner">WARNING: TEST ONLY {network}</div>:<span />}
     <div className="title">
-    <div id="title">Marigold Voting App</div>
-    <a href="https://www.marigold.dev/">
-    <img id="logo"
-    height={50}
-    src="https://uploads-ssl.webflow.com/616ab4741d375d1642c19027/61793ee65c891c190fcaa1d0_Vector(1).png"
-    alt="marigold-button"
-    />
-    </a>
-    
-    
+    <div id="title">TzVote</div>
     </div>
     
     <div id="dialog-login">

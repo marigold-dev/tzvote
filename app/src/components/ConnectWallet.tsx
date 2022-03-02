@@ -71,7 +71,7 @@ const ConnectButton = ({
     (async () => {
       // creates a wallet instance if not exists
       if(!wallet){wallet = new BeaconWallet({
-        name: "Marigold voting",
+        name: "TzVote",
         preferredNetwork: process.env["NETWORK"]? NetworkType[process.env["NETWORK"].toUpperCase() as keyof typeof NetworkType]  : NetworkType.HANGZHOUNET,
       });}
       Tezos.setWalletProvider(wallet);

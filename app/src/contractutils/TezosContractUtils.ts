@@ -52,9 +52,13 @@ export class TezosVotingContract{
                 const currentPeriodStartBlock = votingPeriodBlockResult.voting_period.start_position;
                 let dateFrom = new Date (await (await Tezos.rpc.getBlockHeader({block:""+currentPeriodStartBlock})).timestamp) ;
                 const constantsResponse = await Tezos.rpc.getConstants();
-                const blocks_per_voting_period = constantsResponse.blocks_per_voting_period ;
+                let blocksUntilTheEnd : number = constantsResponse.blocks_per_voting_period ;
                 const time_between_blocks = constantsResponse.time_between_blocks;
-                let dateTo =new Date(dateFrom.getTime() + (1000 * blocks_per_voting_period * time_between_blocks[0].toNumber()));
+                let dateTo =new Date(dateFrom.getTime() + (1000 * blocksUntilTheEnd * time_between_blocks[0].toNumber()));
+                if(tzktContract.storage.votingPeriodIndex == votingPeriodBlockResult.voting_period.index){ //if current, we can have more accurate thatns to remaining blocks data
+                    blocksUntilTheEnd = votingPeriodBlockResult.remaining;
+                    dateTo =new Date(Date.now() + (1000 * blocksUntilTheEnd * time_between_blocks[0].toNumber()));
+                }
                 let votes = new Map<string,string>(Object.entries<string>(tzktContract.storage.votes));
                 return new TezosVotingContract(
                     tzktContract.storage.name,
