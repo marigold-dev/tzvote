@@ -15,7 +15,7 @@ const votingPeriodOracle : string = process.env["ORACLE_ADDRESS"] || "KT1GLuqbSE
 
 const App = () => {
   const [Tezos, setTezos] = useState<TezosToolkit>(
-    new TezosToolkit(process.env["TEZOS_NODE"] ||"https://hangzhounet.api.tez.ie")
+    new TezosToolkit(process.env["TEZOS_NODE"] ||"https://hangzhounet.tezos.marigold.dev")
     );
     const [publicToken, setPublicToken] = useState<string | null>("");
     const [wallet, setWallet] = useState<any>(null);
