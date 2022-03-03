@@ -90,7 +90,7 @@ const Create = ({ Tezos, userAddress , votingPeriodOracle, wallet, setActiveTab 
       })
       .then((contract) => {
         setActiveTab("search");
-        enqueueSnackbar(`Origination completed for ${contract.address}.`, { variant:"warning" , autoHideDuration:10000});
+        enqueueSnackbar(`Origination completed for ${contract.address}.`, { variant:"success" , autoHideDuration:10000});
       })
       .catch((error) => {
         console.table(`Error: ${JSON.stringify(error, null, 2)}`);
