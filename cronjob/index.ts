@@ -16,8 +16,7 @@ const TEZOS_RPC_ADDRESS = process.env.TEZOS_RPC_ADDRESS!;
 const TEZOS_SECRET_KEY = process.env.TEZOS_SECRET_KEY!;
 const TEZOS_NETWORK = process.env.TEZOS_NETWORK || "mainnet"
 const TIME = parseInt(process.env.TIME) || 15000;
-const AMMOUNT = parseInt(process.env.AMMOUNT) || 1;
-const VALUE = parseInt(process.env.VALUE) || 27;
+const AMMOUNT = parseInt(process.env.AMMOUNT) || 0;
 const CONFIRMATION = parseInt(process.env.CONFIRMATION) || 1;
 
 const Tezos = new TezosToolkit(TEZOS_RPC_URL);
@@ -35,7 +34,7 @@ const job = async () => {
     console.log(`The current value (${currentValue.toString()}) is NOT the same that the voting period value (${period.toString()})!`);
     console.log(`Transfering ${AMMOUNT} ꜩ to ${TEZOS_RPC_ADDRESS}...`);
 
-    const transfer = contract.methods.updateCurrentVotingPeriod(TEZOS_NETWORK, VALUE)
+    const transfer = contract.methods.updateCurrentVotingPeriod(TEZOS_NETWORK, period)
       .toTransferParams({ amount: AMMOUNT });
 
     const op = await Tezos.contract.transfer(transfer)
