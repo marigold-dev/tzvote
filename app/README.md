@@ -45,7 +45,7 @@ tezos-client originate contract oracle transferring 0 from tz1VApBuWHuaTfDHtKzU3
 ### initialize some data
 
 ```
-tezos-client transfer 1 from tz1VApBuWHuaTfDHtKzU3NBtWFYsxJvvWhYk to KT1GLuqbSEoaRb3GE4UtUgGkDukVS766V53A  --arg '(Right (Pair "hangzhounet" 27))' --burn-cap 0.005
+tezos-client transfer 0 from tz1VApBuWHuaTfDHtKzU3NBtWFYsxJvvWhYk to KT1GLuqbSEoaRb3GE4UtUgGkDukVS766V53A  --arg '(Right (Pair "hangzhounet" 27))' --burn-cap 0.005
 ```
 
 # Smart contract
@@ -79,7 +79,7 @@ ligo run dry-run tezosTemplate3.jsligo 'Vote(["Pikachu",Crypto.hash_key("edpkuBk
 ### Real run
 
 ```
-tezos-client transfer 1 from tz1VApBuWHuaTfDHtKzU3NBtWFYsxJvvWhYk to KT1XHJzvYghgw9Y1FgtznLBMtkAu1FRWsTq8 -D --arg '(Left (Pair "Pikachu" "tz1KqTpEZ7Yob7QbPE4Hy4Wo8fHG8LhKxZSx"))'  --burn-cap 0.005 
+tezos-client transfer 0 from tz1VApBuWHuaTfDHtKzU3NBtWFYsxJvvWhYk to KT1XHJzvYghgw9Y1FgtznLBMtkAu1FRWsTq8 -D --arg '(Left (Pair "Pikachu" "tz1KqTpEZ7Yob7QbPE4Hy4Wo8fHG8LhKxZSx"))'  --burn-cap 0.005 
 ```
 
 ### Unit tests
