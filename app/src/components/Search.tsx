@@ -74,7 +74,7 @@ const Search = ({
       React.useEffect(refreshData, [beaconConnection]); //connection events
       React.useEffect(() => filterOnNewInput(inputValue), [allContracts]); //if data refreshed, need to refresh the filtered list too
       
-      const contractsService = new ContractsService( {baseUrl: "https://api."+(process.env["NETWORK"]? NetworkType[process.env["NETWORK"].toUpperCase() as keyof typeof NetworkType]  : NetworkType.HANGZHOUNET)+".tzkt.io" , version : "", withCredentials : false});
+      const contractsService = new ContractsService( {baseUrl: "https://api."+(process.env["REACT_APP_NETWORK"]? NetworkType[process.env["REACT_APP_NETWORK"].toUpperCase() as keyof typeof NetworkType]  : NetworkType.HANGZHOUNET)+".tzkt.io" , version : "", withCredentials : false});
       
       const dateSliderToString = (value : number, index : number) =>{
         return new Date(value).toLocaleString();
@@ -199,13 +199,13 @@ const Search = ({
           };
           
           const getWinner= (contract : TezosVotingContract) :  Array<string> => {
-            var winnerList : Array<string> = new Array();
+            var winnerList : Array<string> = [];
             var maxScore :number = 0;
             for (let [key ,value ] of contract.results){
               if(value == maxScore){
                 winnerList.push(key);
               }else if(value > maxScore){
-                winnerList= new Array(); winnerList.push(key);
+                winnerList= []; winnerList.push(key);
               }else{
                 //pass
               }
@@ -437,7 +437,7 @@ const Search = ({
                           
                           <Typography variant="subtitle1" color="text.secondary" component="div">
                           <div>Created by </div>
-                          <Chip style={{maxWidth: "40vw"}} icon={<Face />} label={contract.tzkt.creator?.address} clickable target="_blank" component="a" href={`https://`+(process.env["NETWORK"]? NetworkType[process.env["NETWORK"].toUpperCase() as keyof typeof NetworkType]  : NetworkType.HANGZHOUNET)+`.tzkt.io/${contract.tzkt.creator?.address}/info`} />  
+                          <Chip style={{maxWidth: "40vw"}} icon={<Face />} label={contract.tzkt.creator?.address} clickable target="_blank" component="a" href={`https://`+(process.env["REACT_APP_NETWORK"]? NetworkType[process.env["REACT_APP_NETWORK"].toUpperCase() as keyof typeof NetworkType]  : NetworkType.HANGZHOUNET)+`.tzkt.io/${contract.tzkt.creator?.address}/info`} />  
                           </Typography>
                           
                           {buttonChoices(contract)}

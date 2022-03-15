@@ -2,10 +2,10 @@
 # yarn lockfile v1
 
 
-"@airgap/beacon-sdk@^2.3.9":
-  version "2.3.9"
-  resolved "https://registry.yarnpkg.com/@airgap/beacon-sdk/-/beacon-sdk-2.3.9.tgz#1545acb040f851ea4e8d6c7b7883d571b014534b"
-  integrity sha512-vj7NxrwhGBkRQN+yxozisE2m/h1WduFJsMACBzm3g1ctvn9lik4unNjojPjbmkFLv9R2JD/OYyFkz2rYi81lVA==
+"@airgap/beacon-sdk@^2.3.10":
+  version "2.3.10"
+  resolved "https://registry.yarnpkg.com/@airgap/beacon-sdk/-/beacon-sdk-2.3.10.tgz#92cf94973889666011a3a54345d05b2b6159bccc"
+  integrity sha512-SfO+9nMZuETELzb6QWedp5Q0Egg1Id4ZM8+suVmnBUuySHGuJJ8TeWZWbSffJAJtavqpTPA6vM1i//Bj/nvW2Q==
   dependencies:
     "@types/chrome" "0.0.115"
     "@types/libsodium-wrappers" "0.7.7"
@@ -1850,7 +1850,7 @@
   resolved "https://registry.yarnpkg.com/@taquito/beacon-wallet/-/beacon-wallet-11.2.0.tgz#e05ee9fb3a0d14555a45f54d63ccbf5d6881d4e2"
   integrity sha512-/3TlNLacyzvseZxpagFDLfkM3BkOrEivFYKTAFspPIpRZhg4t+rQblkW9tNn9cEiAWPm1uhzA+J2qUDvShdE7w==
   dependencies:
-    "@airgap/beacon-sdk" "^2.3.9"
+    "@airgap/beacon-sdk" "^2.3.10"
     "@taquito/taquito" "^11.2.0"
 
 "@taquito/http-utils@^11.2.0":
