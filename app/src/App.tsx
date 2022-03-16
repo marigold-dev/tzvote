@@ -56,14 +56,14 @@ const App = () => {
     <header>Welcome</header>
     <div id="content-login">
     <p>This DApp allows anyone to participate to vote election</p>
-    
+    <br />
     <div>
     Voting session journey :
-    <ol>
-    <li>Login : connect to your wallet, or just skip and continue read only</li>
-    <li>On Search page and select your voting session. Vote on it. Click on status icon to display the chart and details</li>
-    <li>On Create page, create a new voting session : title, tezos voting period, options</li>
-    </ol>
+    <div>
+    <p>Login : connect to your wallet, or just skip and continue read only</p>
+    <p>On Search page and select your voting session. Vote on it. Click on status icon to display the chart and details</p>
+    <p>On Create page, create a new voting session : title, tezos voting period, options</p>
+    </div>
     
     </div>
     

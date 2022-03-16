@@ -427,7 +427,7 @@ const Search = ({
                           <CardContent sx={{ flex: '1 0 auto' , padding : "1vw"}}>
                           <Typography component="div" variant="h6">
                           <a
-                          href={`https://hangzhou2net.tzkt.io/${contract.tzkt.address}/info`}
+                          href={`https://${(process.env["REACT_APP_NETWORK"]? NetworkType[process.env["REACT_APP_NETWORK"].toUpperCase() as keyof typeof NetworkType]  : NetworkType.HANGZHOUNET)}.tzkt.io/${contract.tzkt.address}/info`}
                           target="_blank"
                           rel="noopener noreferrer"
                           >

@@ -38,6 +38,8 @@
   },
   "scripts": {
     "start": "HTTPS=true react-scripts start",
+    "start:hangzhounet": "HTTPS=true env-cmd -f .env.hangzhounet react-scripts start",
+    "start:ithacanet": "HTTPS=true env-cmd -f .env.ithacanet react-scripts start",
     "build": "react-scripts --max_old_space_size=2048 build",
     "build:hangzhounet": "env-cmd -f .env.hangzhounet react-scripts --max_old_space_size=2048 build",
     "build:ithacanet": "env-cmd -f .env.ithacanet react-scripts --max_old_space_size=2048 build",
