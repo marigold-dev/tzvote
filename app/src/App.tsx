@@ -7,15 +7,15 @@ import qrcode from "qrcode-generator";
 import Search from "./components/Search";
 import Create from "./components/Create";
 import Popup from 'reactjs-popup';
-import {  NetworkType} from "@airgap/beacon-sdk";
+import { NetworkType} from "@airgap/beacon-sdk";
 
 
-const votingTemplateAddress : string = process.env["TEMPLATE_ADDRESS"] || "KT1QypT3YJHgVmxgQr2PVpSV74YGQbXiq1rL";
-const votingPeriodOracle : string = process.env["ORACLE_ADDRESS"] || "KT1GLuqbSEoaRb3GE4UtUgGkDukVS766V53A";
+const votingTemplateAddress : string = process.env["REACT_APP_TEMPLATE_ADDRESS"] || "KT1QypT3YJHgVmxgQr2PVpSV74YGQbXiq1rL";
+const votingPeriodOracle : string = process.env["REACT_APP_ORACLE_ADDRESS"] || "KT1GLuqbSEoaRb3GE4UtUgGkDukVS766V53A";
 
 const App = () => {
   const [Tezos, setTezos] = useState<TezosToolkit>(
-    new TezosToolkit(process.env["TEZOS_NODE"] ||"https://hangzhounet.tezos.marigold.dev")
+    new TezosToolkit(process.env["REACT_APP_TEZOS_NODE"] ||"https://hangzhounet.tezos.marigold.dev")
     );
     const [publicToken, setPublicToken] = useState<string | null>("");
     const [wallet, setWallet] = useState<any>(null);
@@ -42,7 +42,7 @@ const App = () => {
  * LANDING PAGE FIRST TIME
  *  */  
  //console.log("firstTime",firstTime,"publicToken",publicToken,"userAddress",userAddress,"userBalance",userBalance);
- let network = process.env["NETWORK"]? NetworkType[process.env["NETWORK"].toUpperCase() as keyof typeof NetworkType]  : NetworkType.HANGZHOUNET;
+  let network = process.env["REACT_APP_NETWORK"]? NetworkType[process.env["REACT_APP_NETWORK"].toUpperCase() as keyof typeof NetworkType] : NetworkType.HANGZHOUNET;
 
   if (firstTime && (!publicToken || publicToken==null))
   return (
