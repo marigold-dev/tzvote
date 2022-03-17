@@ -8,9 +8,13 @@ import Search from "./components/Search";
 import Create from "./components/Create";
 import Popup from 'reactjs-popup';
 import { NetworkType} from "@airgap/beacon-sdk";
+import { VOTING_TEMPLATE } from "./contractutils/TezosContractUtils";
 
 
-const votingTemplateAddress : string = process.env["REACT_APP_TEMPLATE_ADDRESS"] || "KT1QypT3YJHgVmxgQr2PVpSV74YGQbXiq1rL";
+let votingTemplateAddresses : Map<VOTING_TEMPLATE,string> = new Map();
+if(process.env["REACT_APP_TEMPLATE_ADDRESS_TEZOSTEMPLATE"])votingTemplateAddresses.set(VOTING_TEMPLATE.TEZOSTEMPLATE, ""+process.env["REACT_APP_TEMPLATE_ADDRESS_TEZOSTEMPLATE"]);else new Error('Env var REACT_APP_TEMPLATE_ADDRESS_TEZOSTEMPLATE is mandatory'); 
+if(process.env["REACT_APP_TEMPLATE_ADDRESS_PERMISSIONEDSIMPLEPOLL"])votingTemplateAddresses.set(VOTING_TEMPLATE.PERMISSIONEDSIMPLEPOLL, ""+process.env["REACT_APP_TEMPLATE_ADDRESS_PERMISSIONEDSIMPLEPOLL"]);else new Error('Env var REACT_APP_TEMPLATE_ADDRESS_PERMISSIONEDSIMPLEPOLL is mandatory'); 
+
 const votingPeriodOracle : string = process.env["REACT_APP_ORACLE_ADDRESS"] || "KT1GLuqbSEoaRb3GE4UtUgGkDukVS766V53A";
 
 const App = () => {
@@ -62,7 +66,7 @@ const App = () => {
     <div>
     <p>Login : connect to your wallet, or just skip and continue read only</p>
     <p>On Search page and select your voting session. Vote on it. Click on status icon to display the chart and details</p>
-    <p>On Create page, create a new voting session : title, tezos voting period, options</p>
+    <p>On Create page, create a new voting session from one of the templates : title, tezos voting period or dates, options</p>
     </div>
     
     </div>
@@ -237,7 +241,7 @@ else if(!firstTime){
       Tezos={Tezos}
       userAddress={userAddress}
       userRolls={userRolls}
-      votingTemplateAddress={votingTemplateAddress}
+      votingTemplateAddresses={votingTemplateAddresses}
       beaconConnection={beaconConnection}
       />
       </div>

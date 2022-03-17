@@ -42,20 +42,6 @@ let concat : (xs : list<_a>, ys : list<_a>) => list<_a>
    return List.fold_right(f ,xs ,ys)
   };
 
-
-
-//redefining remove function
-/*
-let remove : (f : (x : _a) => bool, xs : list<_a>, acc : list<_a>) => list<_a> 
-= (f : (x : _a) => bool, xs : list<_a>, acc : list<_a>) : list<_a> =>
-match(xs ,list([
-  ([] : list<_a>) => list([]),
-  ([x,... xs] : list<_a>) => {
-    if(f(x)) { return concat(acc,xs); } else {return remove(f, xs, list([x,...acc])); } 
-  } 
-]));
-*/
-
 let remove : (f : (x : _a) => bool, xs : list<_a>, acc : list<_a>) => list<_a> 
 = (f : (x : _a) => bool, xs : list<_a>, acc : list<_a>) : list<_a> =>
 match(xs ,list([

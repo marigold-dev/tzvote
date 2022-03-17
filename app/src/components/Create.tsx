@@ -1,6 +1,6 @@
 import React, { useState, Dispatch, SetStateAction, FormEvent } from "react";
 import { MichelsonMap, TezosToolkit } from "@taquito/taquito";
-import { TezosVotingContract } from "../contractutils/TezosContractUtils";
+import { TezosTemplateVotingContract } from "../contractutils/TezosContractUtils";
 import { Backdrop, Box, Button, CardMedia, CircularProgress, FormControl, FormControlLabel, FormHelperText, FormLabel, Grid, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Paper, Radio, RadioGroup, StepIcon, TextField, Tooltip, Typography } from "@mui/material";
 import { Account } from "@dipdup/tzkt-api";
 import { useSnackbar } from "notistack";
@@ -30,7 +30,7 @@ const Create = ({ Tezos, userAddress , votingPeriodOracle, wallet, setActiveTab 
   
   // CURRRENT CONTRACT
   
-  const [contract, setContract] = useState<TezosVotingContract>(new TezosVotingContract(
+  const [contract, setContract] = useState<TezosTemplateVotingContract>(new TezosTemplateVotingContract(
     '',
     0,
     STATUS.LOCKED,
@@ -60,7 +60,7 @@ const Create = ({ Tezos, userAddress , votingPeriodOracle, wallet, setActiveTab 
     }, []);
     
     
-    const createVoteContract = async(event: FormEvent<HTMLFormElement>, contract: TezosVotingContract) => {
+    const createVoteContract = async(event: FormEvent<HTMLFormElement>, contract: TezosTemplateVotingContract) => {
 
       event.preventDefault();
 

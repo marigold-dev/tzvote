@@ -4,7 +4,7 @@ import { Contract, ContractsService } from '@dipdup/tzkt-api';
 import { Autocomplete, Avatar, Backdrop, Box, Button, Card, CardContent, CardMedia, Chip, CircularProgress, FormControl, FormControlLabel, FormHelperText, FormLabel, Grid, Paper, Popover, Radio, RadioGroup, Slider, Snackbar, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TableSortLabel, TextField, Tooltip, Typography } from "@mui/material";
 import { BarChart, Block, Circle, EmojiEvents, Face, RunningWithErrors } from "@mui/icons-material";
 import { useSnackbar } from "notistack";
-import { TezosVotingContract,TezosVotingContractUtils } from "../contractutils/TezosContractUtils";
+import { TezosTemplateVotingContract,VotingContractUtils, VOTING_TEMPLATE } from "../contractutils/TezosContractUtils";
 import parse from 'autosuggest-highlight/parse';
 import match from 'autosuggest-highlight/match';
 import { STATUS, TransactionInvalidBeaconError } from "../contractutils/TezosUtils";
@@ -18,13 +18,13 @@ momentDurationFormatSetup(moment);
 const Search = ({
   Tezos,
   userAddress,
-  votingTemplateAddress,
+  votingTemplateAddresses,
   userRolls,
   beaconConnection
 }: {
   Tezos: TezosToolkit;
   userAddress: string;
-  votingTemplateAddress: string;
+  votingTemplateAddresses: Map<VOTING_TEMPLATE,string>; 
   userRolls:number;
   beaconConnection:boolean;
 }): JSX.Element => {
@@ -37,11 +37,11 @@ const Search = ({
   const [searchValue, setSearchValue] = React.useState<string|null>(null);
   
   //LIST
-  const [allContracts, setAllContracts] = useState<Array<TezosVotingContract>>([]);
-  const [contracts, setContracts] = useState<Array<TezosVotingContract>>([]);
+  const [allContracts, setAllContracts] = useState<Array<TezosTemplateVotingContract>>([]);
+  const [contracts, setContracts] = useState<Array<TezosTemplateVotingContract>>([]);
   
   //SELECTED CONTRACT
-  const [selectedContract, setSelectedContract] = useState<TezosVotingContract|null>(null);
+  const [selectedContract, setSelectedContract] = useState<TezosTemplateVotingContract|null>(null);
   
   //TEZOS OPERATIONS
   const [tezosLoading, setTezosLoading]  = React.useState(false);
@@ -52,18 +52,18 @@ const Search = ({
   
   const refreshData = () => {
     (async () => {
-      let allContractFromTzkt : Array<Contract>= (await contractsService.getSame({address:votingTemplateAddress , includeStorage:true, sort:{desc:"id"}}));
+      let allContractFromTzkt : Array<Contract>= (await contractsService.getSame({address:votingTemplateAddresses.get(VOTING_TEMPLATE.TEZOSTEMPLATE)! , includeStorage:true, sort:{desc:"id"}}));
       console.log("refreshData",userAddress);
-      let allConvertertedContracts :Array<TezosVotingContract>= await Promise.all(allContractFromTzkt.map( async(tzktObject:Contract) => await TezosVotingContractUtils.convertFromTZKTTezosContract(Tezos,tzktObject,userAddress))); 
+      let allConvertertedContracts :Array<TezosTemplateVotingContract>= await Promise.all(allContractFromTzkt.map( async(tzktObject:Contract) => await VotingContractUtils.convertFromTZKTTezosContractToTezosTemplateVotingContract(Tezos,tzktObject,userAddress))); 
       setAllContracts(allConvertertedContracts);
-      setOptions(Array.from(new Set(allConvertertedContracts.map((c: TezosVotingContract) => c.name))));
+      setOptions(Array.from(new Set(allConvertertedContracts.map((c: TezosTemplateVotingContract) => c.name))));
     })();
   }
   
   const filterOnNewInput = (filterValue : string | null) => {
     if(filterValue == null || filterValue === '')setContracts([]);
     else{
-      let filteredContract = allContracts.filter((c: TezosVotingContract) => {
+      let filteredContract = allContracts.filter((c: TezosTemplateVotingContract) => {
         return c.name.search(new RegExp(""+filterValue, 'gi')) >= 0}
         )
         setContracts(filteredContract); 
@@ -88,7 +88,7 @@ const Search = ({
       //BUTTON ACTION AREA
       //popupvote
       const [votePopup, setVotePopup] = React.useState<null | HTMLElement>(null);
-      const showVote = (event: React.MouseEvent<HTMLButtonElement>, c : TezosVotingContract|null) => {
+      const showVote = (event: React.MouseEvent<HTMLButtonElement>, c : TezosTemplateVotingContract|null) => {
         setVotePopup(event.currentTarget);
         setSelectedContract(c);
       };
@@ -104,7 +104,7 @@ const Search = ({
         setVoteValue(event.target.value);
         setVoteHelperText(' ');
       };
-      const handleVoteSubmit = async (event : FormEvent<HTMLFormElement>, contract : TezosVotingContract) => {
+      const handleVoteSubmit = async (event : FormEvent<HTMLFormElement>, contract : TezosTemplateVotingContract) => {
         
         event.preventDefault();
         setTezosLoading(true);
@@ -137,7 +137,7 @@ const Search = ({
         setTezosLoading(false);
       };
       
-      const buttonChoices = (contract : TezosVotingContract) => {
+      const buttonChoices = (contract : TezosTemplateVotingContract) => {
         if(STATUS.ONGOING == contract.status) 
         return(<div>
           {(!contract.userYetVoted && userRolls>0)?<Button style={{margin: "0.2em"}} aria-describedby={"votePopupId"+selectedContract?.tzkt.address} variant="contained" onClick={(e)=>showVote(e,contract)}>VOTE</Button>:""}
@@ -189,7 +189,7 @@ const Search = ({
           
           //popupresults
           const [resultPopup, setResultPopup] = React.useState<null | HTMLElement>(null);
-          const showResults = (event: React.MouseEvent<HTMLDivElement>, c : TezosVotingContract) => {
+          const showResults = (event: React.MouseEvent<HTMLDivElement>, c : TezosTemplateVotingContract) => {
             setSelectedContract(c);
             setResultPopup(event.currentTarget);
           };
@@ -198,7 +198,7 @@ const Search = ({
             setResultPopup(null);
           };
           
-          const getWinner= (contract : TezosVotingContract) :  Array<string> => {
+          const getWinner= (contract : TezosTemplateVotingContract) :  Array<string> => {
             var winnerList : Array<string> = [];
             var maxScore :number = 0;
             for (let [key ,value ] of contract.results){
@@ -213,7 +213,7 @@ const Search = ({
             return winnerList;
           }
           
-          const resultArea = (contract : TezosVotingContract) => {
+          const resultArea = (contract : TezosTemplateVotingContract) => {
             
             const popover = () : ReactJSXElement =>{ 
               
@@ -433,6 +433,11 @@ const Search = ({
                           >
                           {contract.name}
                           </a>
+                          
+                          <Tooltip title={contract.type.description}>
+                          <Chip color="info" label={contract.type.name}/>
+                          </Tooltip>
+
                           </Typography>
                           
                           <Typography variant="subtitle1" color="text.secondary" component="div">
