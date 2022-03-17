@@ -12,28 +12,50 @@ export class VOTING_TEMPLATE {
 
 export abstract class VotingContract{
     type : VOTING_TEMPLATE;
-
-    constructor(type : VOTING_TEMPLATE){
-        this.type=type;
-    }
-}
-
-export class TezosTemplateVotingContract extends VotingContract{
     name : string;
-    votingPeriodIndex : number;
-    status : STATUS;//transient
-    dateFrom : Date; //transient
-    dateTo : Date; //transient
+    status : STATUS;
+    dateFrom : Date;
+    dateTo : Date; 
     options : Array<string>;
     votes : Map<string, string>; //transient
     results : Map<string, number>;//transient
+    userYetVoted: boolean;
+    tzkt : Contract;//transient
+
+    constructor(
+        type : VOTING_TEMPLATE,
+        name : string,
+        status : STATUS,
+        dateFrom : Date,
+        dateTo : Date,
+        options : Array<string>,
+        votes : Map<string, string>, 
+        results : Map<string, number>,
+        tzkt : Contract,
+        userYetVoted : boolean){
+        this.type=type;
+        this.name=name;
+        this.status=status;
+        this.dateFrom=dateFrom;
+        this.dateTo=dateTo;
+        this.options=options;
+        this.results=results;
+        this.votes=votes;
+        this.tzkt=tzkt;
+        this.userYetVoted = userYetVoted;
+    }
+}
+
+//TODO export class PermissionedSimplePollVotingContract extends VotingContract{
+
+
+export class TezosTemplateVotingContract extends VotingContract{
+    votingPeriodIndex : number;
     votingPeriodOracle : string; // address of the oracle
     protocol : string;  //deployed on this network protocol
-    tzkt : Contract;//transient
-    userYetVoted: boolean;
     
-    constructor(
-        name : string,  
+    constructor(  
+        name : string,
         votingPeriodIndex : number,  
         status : STATUS,
         dateFrom : Date,
@@ -45,19 +67,10 @@ export class TezosTemplateVotingContract extends VotingContract{
         protocol : string,
         tzkt : Contract,
         userYetVoted : boolean){
-            super(VOTING_TEMPLATE.TEZOSTEMPLATE);
-            this.name=name;
+            super(VOTING_TEMPLATE.TEZOSTEMPLATE,name,status,dateFrom,dateTo,options,votes,results,tzkt,userYetVoted);
             this.votingPeriodIndex=votingPeriodIndex;
-            this.status=status;
-            this.dateFrom=dateFrom;
-            this.dateTo=dateTo;
-            this.options=options;
-            this.results=results;
-            this.votes=votes;
             this.votingPeriodOracle=votingPeriodOracle;
             this.protocol=protocol;
-            this.tzkt=tzkt;
-            this.userYetVoted = userYetVoted;
         };
         }
         

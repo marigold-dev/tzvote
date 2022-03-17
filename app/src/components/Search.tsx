@@ -4,7 +4,7 @@ import { Contract, ContractsService } from '@dipdup/tzkt-api';
 import { Autocomplete, Avatar, Backdrop, Box, Button, Card, CardContent, CardMedia, Chip, CircularProgress, FormControl, FormControlLabel, FormHelperText, FormLabel, Grid, Paper, Popover, Radio, RadioGroup, Slider, Snackbar, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TableSortLabel, TextField, Tooltip, Typography } from "@mui/material";
 import { BarChart, Block, Circle, EmojiEvents, Face, RunningWithErrors } from "@mui/icons-material";
 import { useSnackbar } from "notistack";
-import { TezosTemplateVotingContract,VotingContractUtils, VOTING_TEMPLATE } from "../contractutils/TezosContractUtils";
+import { TezosTemplateVotingContract,VotingContract,VotingContractUtils, VOTING_TEMPLATE } from "../contractutils/TezosContractUtils";
 import parse from 'autosuggest-highlight/parse';
 import match from 'autosuggest-highlight/match';
 import { STATUS, TransactionInvalidBeaconError } from "../contractutils/TezosUtils";
@@ -37,11 +37,11 @@ const Search = ({
   const [searchValue, setSearchValue] = React.useState<string|null>(null);
   
   //LIST
-  const [allContracts, setAllContracts] = useState<Array<TezosTemplateVotingContract>>([]);
-  const [contracts, setContracts] = useState<Array<TezosTemplateVotingContract>>([]);
+  const [allContracts, setAllContracts] = useState<Array<VotingContract>>([]);
+  const [contracts, setContracts] = useState<Array<VotingContract>>([]);
   
   //SELECTED CONTRACT
-  const [selectedContract, setSelectedContract] = useState<TezosTemplateVotingContract|null>(null);
+  const [selectedContract, setSelectedContract] = useState<VotingContract|null>(null);
   
   //TEZOS OPERATIONS
   const [tezosLoading, setTezosLoading]  = React.useState(false);
@@ -52,18 +52,18 @@ const Search = ({
   
   const refreshData = () => {
     (async () => {
-      let allContractFromTzkt : Array<Contract>= (await contractsService.getSame({address:votingTemplateAddresses.get(VOTING_TEMPLATE.TEZOSTEMPLATE)! , includeStorage:true, sort:{desc:"id"}}));
-      console.log("refreshData",userAddress);
-      let allConvertertedContracts :Array<TezosTemplateVotingContract>= await Promise.all(allContractFromTzkt.map( async(tzktObject:Contract) => await VotingContractUtils.convertFromTZKTTezosContractToTezosTemplateVotingContract(Tezos,tzktObject,userAddress))); 
-      setAllContracts(allConvertertedContracts);
-      setOptions(Array.from(new Set(allConvertertedContracts.map((c: TezosTemplateVotingContract) => c.name))));
+      let allTEZOSTEMPLATEContractFromTzkt : Array<Contract>= (await contractsService.getSame({address:votingTemplateAddresses.get(VOTING_TEMPLATE.TEZOSTEMPLATE)! , includeStorage:true, sort:{desc:"id"}}));
+      let allPERMISSIONEDSIMPLEPOLLContractFromTzkt : Array<Contract>= (await contractsService.getSame({address:votingTemplateAddresses.get(VOTING_TEMPLATE.PERMISSIONEDSIMPLEPOLL)! , includeStorage:true, sort:{desc:"id"}}));
+      let allConvertertedTEZOSTEMPLATEContractContracts :Array<TezosTemplateVotingContract>= await Promise.all(allTEZOSTEMPLATEContractFromTzkt.map( async(tzktObject:Contract) => await VotingContractUtils.convertFromTZKTTezosContractToTezosTemplateVotingContract(Tezos,tzktObject,userAddress))); 
+      setAllContracts(allConvertertedTEZOSTEMPLATEContractContracts);
+      setOptions(Array.from(new Set(allConvertertedTEZOSTEMPLATEContractContracts.map((c: TezosTemplateVotingContract) => c.name))));
     })();
   }
   
   const filterOnNewInput = (filterValue : string | null) => {
     if(filterValue == null || filterValue === '')setContracts([]);
     else{
-      let filteredContract = allContracts.filter((c: TezosTemplateVotingContract) => {
+      let filteredContract = allContracts.filter((c: VotingContract) => {
         return c.name.search(new RegExp(""+filterValue, 'gi')) >= 0}
         )
         setContracts(filteredContract); 
@@ -88,7 +88,7 @@ const Search = ({
       //BUTTON ACTION AREA
       //popupvote
       const [votePopup, setVotePopup] = React.useState<null | HTMLElement>(null);
-      const showVote = (event: React.MouseEvent<HTMLButtonElement>, c : TezosTemplateVotingContract|null) => {
+      const showVote = (event: React.MouseEvent<HTMLButtonElement>, c : VotingContract|null) => {
         setVotePopup(event.currentTarget);
         setSelectedContract(c);
       };
@@ -104,7 +104,7 @@ const Search = ({
         setVoteValue(event.target.value);
         setVoteHelperText(' ');
       };
-      const handleVoteSubmit = async (event : FormEvent<HTMLFormElement>, contract : TezosTemplateVotingContract) => {
+      const handleVoteSubmit = async (event : FormEvent<HTMLFormElement>, contract : VotingContract) => {
         
         event.preventDefault();
         setTezosLoading(true);
@@ -137,7 +137,7 @@ const Search = ({
         setTezosLoading(false);
       };
       
-      const buttonChoices = (contract : TezosTemplateVotingContract) => {
+      const buttonChoices = (contract : VotingContract) => {
         if(STATUS.ONGOING == contract.status) 
         return(<div>
           {(!contract.userYetVoted && userRolls>0)?<Button style={{margin: "0.2em"}} aria-describedby={"votePopupId"+selectedContract?.tzkt.address} variant="contained" onClick={(e)=>showVote(e,contract)}>VOTE</Button>:""}
@@ -189,7 +189,7 @@ const Search = ({
           
           //popupresults
           const [resultPopup, setResultPopup] = React.useState<null | HTMLElement>(null);
-          const showResults = (event: React.MouseEvent<HTMLDivElement>, c : TezosTemplateVotingContract) => {
+          const showResults = (event: React.MouseEvent<HTMLDivElement>, c : VotingContract) => {
             setSelectedContract(c);
             setResultPopup(event.currentTarget);
           };
@@ -198,7 +198,7 @@ const Search = ({
             setResultPopup(null);
           };
           
-          const getWinner= (contract : TezosTemplateVotingContract) :  Array<string> => {
+          const getWinner= (contract : VotingContract) :  Array<string> => {
             var winnerList : Array<string> = [];
             var maxScore :number = 0;
             for (let [key ,value ] of contract.results){
@@ -213,7 +213,7 @@ const Search = ({
             return winnerList;
           }
           
-          const resultArea = (contract : TezosTemplateVotingContract) => {
+          const resultArea = (contract : VotingContract) => {
             
             const popover = () : ReactJSXElement =>{ 
               
@@ -355,12 +355,12 @@ const Search = ({
                       const winnerList = getWinner(contract);
                       if(winnerList.length > 0 ){
                         const result : string = "Winner is : " + winnerList.join(' , ');
-                        return(<div ><Chip icon={<BarChart />} aria-owns={open ? "resultPopupId"+contract.tzkt.address : undefined} aria-haspopup="true" onMouseEnter={(e) => showResults(e, contract)} onMouseLeave={closeResults} style={{margin: "0.2em"}} color="error" label={<span>{contract.status}<br />(Period : {contract.votingPeriodIndex})</span>} />
+                        return(<div ><Chip icon={<BarChart />} aria-owns={open ? "resultPopupId"+contract.tzkt.address : undefined} aria-haspopup="true" onMouseEnter={(e) => showResults(e, contract)} onMouseLeave={closeResults} style={{margin: "0.2em"}} color="error" label={<span>{contract.status}<br />(Period : {contract.type == VOTING_TEMPLATE.TEZOSTEMPLATE ?  (contract as TezosTemplateVotingContract).votingPeriodIndex : "TODO"})</span>} />
                         <Chip style={{margin: "0.2em"}} icon={<EmojiEvents />} label={result} />
                         {popover()}
                         </div>);
                       }else {
-                        return(<div ><Chip icon={<BarChart />}  aria-owns={open ? "resultPopupId"+contract.tzkt.address : undefined} aria-haspopup="true" onMouseEnter={(e) => showResults(e, contract)} onMouseLeave={closeResults}  style={{margin: "0.2em"}} color="warning" label={<span>{contract.status}<br />(Period : {contract.votingPeriodIndex})</span>} /><Chip style={{margin: "0.2em"}} icon={<Block />} label="NO WINNER" /></div>);
+                        return(<div ><Chip icon={<BarChart />}  aria-owns={open ? "resultPopupId"+contract.tzkt.address : undefined} aria-haspopup="true" onMouseEnter={(e) => showResults(e, contract)} onMouseLeave={closeResults}  style={{margin: "0.2em"}} color="warning" label={<span>{contract.status}<br />(Period : {contract.type == VOTING_TEMPLATE.TEZOSTEMPLATE ?  (contract as TezosTemplateVotingContract).votingPeriodIndex : "TODO"})</span>} /><Chip style={{margin: "0.2em"}} icon={<Block />} label="NO WINNER" /></div>);
                       }
                     }
                     
