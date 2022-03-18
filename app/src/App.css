@@ -6,9 +6,7 @@ body,
   margin: 0px;
   padding: 0px;
   font-size: 1rem;
-  --main-color: #eb3448;
   --main-bg-color: #eb3448;
-  color: var(--main-color);
 }
 
 #root {
@@ -42,7 +40,7 @@ body,
 /* HOME */
 
 .main-box-login {
-  background-color: var(--main-color);
+  background-color: var(--main-bg-color);
 }
 
 .title {
@@ -65,14 +63,14 @@ body,
   height: 8vh;
   display: flex;
   justify-content: flex-end;
-  background-color: var(--main-color);
+  background-color: var(--main-bg-color);
   color: white;
 }
 
 .main-box-login .title {
   text-align: left;
   color: white;
-  background-color: var(--main-color);
+  background-color: var(--main-bg-color);
   border-top-right-radius: 0.5em;
   border-top-left-radius: 0.5em;
   padding: 0.5em;
@@ -105,7 +103,7 @@ div#header{
   display: flex;
   flex-direction:row;
   margin: 0;
-  background-color: var(--main-color);
+  background-color: var(--main-bg-color);
   color: white;
   text-align: center;
   font-size: 1.5em;
@@ -232,14 +230,7 @@ a:hover {
   font-size: 1.2em;
 }
 
-#tabs div {
-  padding: 0.1em;
-  margin: 0.1em;
-  border: solid 3px white;
-  text-align: center;
-  border-radius: 5px;
-  cursor: pointer;
-}
+
 
 #tabs div.active {
   background-color: pink;

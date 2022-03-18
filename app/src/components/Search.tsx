@@ -339,10 +339,10 @@ const Search = ({
             </div>:""}
 
             {contract.type == VOTING_TEMPLATE.PERMISSIONEDSIMPLEPOLL?
-            <Tooltip title={ <TableContainer   >
+            <Tooltip enterTouchDelay={0}  title={ <TableContainer   >
                                 <Table>  
                                   <TableHead>
-                                    <TableRow><TableCell sx={{margin:0,padding:0,color:"white"}}>Registered user</TableCell></TableRow>
+                                    <TableRow><TableCell sx={{margin:0,padding:0,color:"white"}}>Registered users</TableCell></TableRow>
                                   </TableHead>
                                   <TableBody>
                                     {(contract as PermissionedSimplePollVotingContract).registeredVoters.map((c) => (
@@ -351,7 +351,7 @@ const Search = ({
                                   </TableBody>  
                                 </Table>
                              </TableContainer>}>
-             <Button color="info"><BallotIcon /></Button>
+             <BallotIcon color="info" sx={{ height:"1.75em", width:"1.75em" }}/>
             </Tooltip>:""
             }
 
@@ -616,7 +616,7 @@ const Search = ({
                           {contract.name}
                           </a>
                           
-                          <Tooltip title={contract.type.description}>
+                          <Tooltip enterTouchDelay={0} title={contract.type.description}>
                           <Chip color="info" label={contract.type.name}/>
                           </Tooltip>
 

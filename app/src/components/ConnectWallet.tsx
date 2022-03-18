@@ -5,6 +5,7 @@ import {
   NetworkType
 } from "@airgap/beacon-sdk";
 import { DelegatesResponse } from "@taquito/rpc";
+import { Button } from "@mui/material";
 
 type ButtonProps = {
   Tezos: TezosToolkit;
@@ -87,13 +88,9 @@ const ConnectButton = ({
   }, []);
 
   return (
-    <div className="buttons">
-      <button className="button" onClick={connectWallet}>
-        <span>
+      <Button variant="contained" onClick={connectWallet}>
           <i className="fas fa-wallet"></i>&nbsp; Connect with wallet
-        </span>
-      </button>
-    </div>
+      </Button>
   );
 };
 
