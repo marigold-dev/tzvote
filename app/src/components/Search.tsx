@@ -1,18 +1,20 @@
 import React, { ChangeEvent, FormEvent, useState } from "react";
 import { TezosToolkit, WalletContract } from "@taquito/taquito";
 import { Contract, ContractsService } from '@dipdup/tzkt-api';
-import { Autocomplete, Avatar, Backdrop, Box, Button, Card, CardContent, CardMedia, Chip, CircularProgress, FormControl, FormControlLabel, FormHelperText, FormLabel, Grid, Paper, Popover, Radio, RadioGroup, Slider, Snackbar, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TableSortLabel, TextField, Tooltip, Typography } from "@mui/material";
+import BallotIcon from '@mui/icons-material/Ballot';
+import { Autocomplete, Avatar, Backdrop, Box, Button, Card, CardContent, Input, Chip, CircularProgress, FormControl, FormControlLabel, FormHelperText, FormLabel, Grid, Paper, Popover, Radio, RadioGroup, Slider, Snackbar, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TableSortLabel, TextField, Tooltip, Typography } from "@mui/material";
 import { BarChart, Block, Circle, EmojiEvents, Face, RunningWithErrors } from "@mui/icons-material";
 import { useSnackbar } from "notistack";
-import { TezosTemplateVotingContract,VotingContract,VotingContractUtils, VOTING_TEMPLATE } from "../contractutils/TezosContractUtils";
+import { PermissionedSimplePollVotingContract, TezosTemplateVotingContract,VotingContract,VotingContractUtils, VOTING_TEMPLATE } from "../contractutils/TezosContractUtils";
 import parse from 'autosuggest-highlight/parse';
 import match from 'autosuggest-highlight/match';
 import { STATUS, TransactionInvalidBeaconError } from "../contractutils/TezosUtils";
-import { ReactJSXElement } from "@emotion/react/types/jsx-namespace";
-import { PieChart, Pie, Sector, Cell, ResponsiveContainer } from 'recharts';
+import { PieChart, Pie, Cell } from 'recharts';
 import * as moment from 'moment';
 import momentDurationFormatSetup from 'moment-duration-format';
 import {  NetworkType} from "@airgap/beacon-sdk";
+import { ReactJSXElement } from "@emotion/react/types/jsx-namespace";
+import { padding } from "@mui/system";
 momentDurationFormatSetup(moment);
 
 const Search = ({
@@ -54,9 +56,10 @@ const Search = ({
     (async () => {
       let allTEZOSTEMPLATEContractFromTzkt : Array<Contract>= (await contractsService.getSame({address:votingTemplateAddresses.get(VOTING_TEMPLATE.TEZOSTEMPLATE)! , includeStorage:true, sort:{desc:"id"}}));
       let allPERMISSIONEDSIMPLEPOLLContractFromTzkt : Array<Contract>= (await contractsService.getSame({address:votingTemplateAddresses.get(VOTING_TEMPLATE.PERMISSIONEDSIMPLEPOLL)! , includeStorage:true, sort:{desc:"id"}}));
-      let allConvertertedTEZOSTEMPLATEContractContracts :Array<TezosTemplateVotingContract>= await Promise.all(allTEZOSTEMPLATEContractFromTzkt.map( async(tzktObject:Contract) => await VotingContractUtils.convertFromTZKTTezosContractToTezosTemplateVotingContract(Tezos,tzktObject,userAddress))); 
-      setAllContracts(allConvertertedTEZOSTEMPLATEContractContracts);
-      setOptions(Array.from(new Set(allConvertertedTEZOSTEMPLATEContractContracts.map((c: TezosTemplateVotingContract) => c.name))));
+      let allConvertertedTEZOSTEMPLATEContractContracts :Array<TezosTemplateVotingContract>= await Promise.all(allTEZOSTEMPLATEContractFromTzkt.map( async(tzktObject:Contract) => await VotingContractUtils.convertFromTZKTTezosContractToTezosTemplateVotingContract(Tezos,tzktObject))); 
+      let allConvertertedPERMISSIONEDSIMPLEPOLLContractContracts :Array<PermissionedSimplePollVotingContract>= allPERMISSIONEDSIMPLEPOLLContractFromTzkt.map( (tzktObject:Contract) => new PermissionedSimplePollVotingContract(undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,tzktObject)); 
+      setAllContracts([...allConvertertedTEZOSTEMPLATEContractContracts,...allConvertertedPERMISSIONEDSIMPLEPOLLContractContracts]);
+      setOptions(Array.from(new Set([...allConvertertedTEZOSTEMPLATEContractContracts,...allConvertertedPERMISSIONEDSIMPLEPOLLContractContracts].map((c: VotingContract) => c.name))));
     })();
   }
   
@@ -84,9 +87,11 @@ const Search = ({
         return moment.duration(value, "milliseconds").format('d [days] hh:mm:ss left');
       }
       
-      
-      //BUTTON ACTION AREA
-      //popupvote
+      /*************************************/
+      // *********** BUTTON ACTION AREA ******
+      /*************************************/
+
+      //vote popup
       const [votePopup, setVotePopup] = React.useState<null | HTMLElement>(null);
       const showVote = (event: React.MouseEvent<HTMLButtonElement>, c : VotingContract|null) => {
         setVotePopup(event.currentTarget);
@@ -97,7 +102,7 @@ const Search = ({
         setSelectedContract(null);
       };
       
-      //buttons
+      //vote button
       const [voteHelperText, setVoteHelperText] = React.useState('');
       const [voteValue, setVoteValue] = React.useState('');
       const handleVoteRadioChange = (event : ChangeEvent<HTMLInputElement>) => {
@@ -109,7 +114,7 @@ const Search = ({
         event.preventDefault();
         setTezosLoading(true);
         
-        let c : WalletContract = await Tezos.wallet.at(""+contract.tzkt.address);
+        let c : WalletContract = await Tezos.wallet.at(""+contract.tzkt!.address);
         if (voteValue !== '') {
           
           try {
@@ -137,13 +142,97 @@ const Search = ({
         setTezosLoading(false);
       };
       
+      //membership popup
+      const [AddVoterPopup, setAddVoterPopup] = React.useState<null | HTMLElement>(null);
+      const [RemoveVoterPopup, setRemoveVoterPopup] = React.useState<null | HTMLElement>(null);
+      const showAddVoter = (event: React.MouseEvent<HTMLButtonElement>, c : VotingContract|null) => {
+        setAddVoterPopup(event.currentTarget);
+        setSelectedContract(c);
+      };
+      const showRemoveVoter = (event: React.MouseEvent<HTMLButtonElement>, c : VotingContract|null) => {
+        setRemoveVoterPopup(event.currentTarget);
+        setSelectedContract(c);
+      };
+      const closeAddVoter = () => {
+        setAddVoterPopup(null);
+        setSelectedContract(null);
+      };
+      const closeRemoveVoter = () => {
+        setRemoveVoterPopup(null);
+        setSelectedContract(null);
+      };
+      //add,remove member button
+      const [voterAddress, setVoterAddress] = React.useState<string>('');
+
+      const handleAddVoter = async (event : FormEvent<HTMLFormElement>, contract : VotingContract) => {
+      event.preventDefault();
+      setTezosLoading(true);
+      let c : WalletContract = await Tezos.wallet.at(""+contract.tzkt!.address);
+      if (voterAddress !== '') {
+        try {
+          const op = await c.methods.addVoter(voterAddress).send();
+          closeAddVoter();
+          await op.confirmation();
+          //refresh info on list
+          setTimeout(() => { console.log("the list will refresh soon");refreshData();filterOnNewInput(inputValue);}, 2000);
+          enqueueSnackbar("You have added a new voter (wait a bit the refresh)", {variant: "success", autoHideDuration:10000});
+        } catch (error : any) {
+          console.table(`Error: ${JSON.stringify(error, null, 2)}`);
+          let tibe : TransactionInvalidBeaconError = new TransactionInvalidBeaconError(error);
+          enqueueSnackbar(tibe.data_message, { variant:"error" , autoHideDuration:10000});
+          closeAddVoter();
+        } finally {
+          setTezosLoading(false);
+        }
+        
+        } else {
+          setVoteHelperText('Please, enter an address.');
+        }
+        setTezosLoading(false);
+      };
+
+      const handleRemoveVoter = async (event : FormEvent<HTMLFormElement>, contract : VotingContract) => {
+        event.preventDefault();
+        setTezosLoading(true);
+        let c : WalletContract = await Tezos.wallet.at(contract.tzkt!.address!);
+        if (voterAddress !== '') {
+          try {
+            const op = await c.methods.removeVoter(voterAddress).send();
+            closeRemoveVoter();
+            await op.confirmation();
+            //refresh info on list
+            setTimeout(() => { console.log("the list will refresh soon");refreshData();filterOnNewInput(inputValue);}, 2000);
+            enqueueSnackbar("You have removed a voter (wait a bit the refresh)", {variant: "success", autoHideDuration:10000});
+          } catch (error : any) {
+            console.table(`Error: ${JSON.stringify(error, null, 2)}`);
+            let tibe : TransactionInvalidBeaconError = new TransactionInvalidBeaconError(error);
+            enqueueSnackbar(tibe.data_message, { variant:"error" , autoHideDuration:10000});
+            closeRemoveVoter();
+          } finally {
+            setTezosLoading(false);
+          }
+          
+          } else {
+            setVoteHelperText('Please, enter an address.');
+          }
+          setTezosLoading(false);
+        };
+
+      
       const buttonChoices = (contract : VotingContract) => {
-        if(STATUS.ONGOING == contract.status) 
-        return(<div>
-          {(!contract.userYetVoted && userRolls>0)?<Button style={{margin: "0.2em"}} aria-describedby={"votePopupId"+selectedContract?.tzkt.address} variant="contained" onClick={(e)=>showVote(e,contract)}>VOTE</Button>:""}
+        let canVote = false;
+        switch(contract.type){
+        case VOTING_TEMPLATE.TEZOSTEMPLATE : canVote = (contract as TezosTemplateVotingContract).userCanVoteNow(userAddress,userRolls);break; 
+        case VOTING_TEMPLATE.PERMISSIONEDSIMPLEPOLL : canVote = (contract as PermissionedSimplePollVotingContract).userCanVoteNow(userAddress);break;
+        }
+        return(
+        <Box display="flex">
+          
+          {canVote?<Button style={{margin: "0.2em"}} aria-describedby={"votePopupId"+selectedContract?.tzkt!.address} variant="contained" onClick={(e)=>showVote(e,contract)}>VOTE</Button>:""}
+          
           {selectedContract != null ?
             <Popover 
-            id={"votePopupId"+selectedContract?.tzkt.address}
+            id={"votePopupId"+selectedContract?.tzkt!.address}
             anchorEl={votePopup}
             open={Boolean(votePopup)}
             onClose={closeVote}
@@ -179,7 +268,96 @@ const Search = ({
             </Paper>
             </Popover>
             : <div/>}
-            </div> );
+            
+            {contract.type == VOTING_TEMPLATE.PERMISSIONEDSIMPLEPOLL && (contract as PermissionedSimplePollVotingContract).owner == userAddress?
+            <div>
+            <Button style={{margin: "0.2em"}} aria-describedby={"addVoterPopupId"+selectedContract?.tzkt!.address} variant="contained" onClick={(e)=>showAddVoter(e,contract)}>Add voter</Button>
+            <Button style={{margin: "0.2em"}} aria-describedby={"removeVoterPopupId"+selectedContract?.tzkt!.address} variant="contained" onClick={(e)=>showRemoveVoter(e,contract)}>Remove voter</Button>
+            </div>:""}
+
+            {selectedContract != null ?
+            <div>
+            <Popover 
+            id={"addVoterPopupId"+selectedContract?.tzkt!.address}
+            anchorEl={AddVoterPopup}
+            open={Boolean(AddVoterPopup)}
+            onClose={closeAddVoter}
+            anchorOrigin={{
+              vertical: 'top',
+              horizontal: 'right',
+            }}
+            transformOrigin={{
+              vertical: 'bottom',
+              horizontal: 'left',
+            }}
+            >
+            <Paper elevation={3} sx={{minWidth:"20em",minHeight:"10em"}} >
+            <div style={{padding:"1em"}}>
+            <form onSubmit={(e)=>handleAddVoter(e,selectedContract!)}>
+            <FormControl>
+            <FormLabel id="demo-radio-buttons-group-label">Enter an address</FormLabel>
+            <Input type="text" placeholder="tz..." required value={voterAddress} onChange={e => setVoterAddress(e.target.value)}/>
+            <Button sx={{ mt: 1, mr: 1 }} type="submit" variant="outlined">
+            Add voter
+            </Button>
+            </FormControl>   
+            </form>    
+            </div>
+            </Paper>
+            </Popover>
+
+            <Popover 
+            id={"removeVoterPopupId"+selectedContract?.tzkt!.address}
+            anchorEl={RemoveVoterPopup}
+            open={Boolean(RemoveVoterPopup)}
+            onClose={closeRemoveVoter}
+            anchorOrigin={{
+              vertical: 'top',
+              horizontal: 'right',
+            }}
+            transformOrigin={{
+              vertical: 'bottom',
+              horizontal: 'left',
+            }}
+            >
+            <Paper elevation={3} sx={{minWidth:"20em",minHeight:"10em"}} >
+            <div style={{padding:"1em"}}>
+            <form onSubmit={(e)=>handleRemoveVoter(e,selectedContract)}>
+            <FormControl>
+            
+            <FormLabel id="demo-radio-buttons-group-label">Enter an address</FormLabel>
+            <Input type="text" placeholder="tz..." required value={voterAddress} onChange={e => setVoterAddress(e.target.value)}/>
+            
+            <Button sx={{ mt: 1, mr: 1 }} type="submit" variant="outlined">
+            Remove voter
+            </Button>
+            </FormControl>   
+            </form>    
+            </div>
+            </Paper>
+            </Popover>
+            </div>:""}
+
+            {contract.type == VOTING_TEMPLATE.PERMISSIONEDSIMPLEPOLL?
+            <Tooltip title={ <TableContainer   >
+                                <Table>  
+                                  <TableHead>
+                                    <TableRow><TableCell sx={{margin:0,padding:0,color:"white"}}>Registered user</TableCell></TableRow>
+                                  </TableHead>
+                                  <TableBody>
+                                    {(contract as PermissionedSimplePollVotingContract).registeredVoters.map((c) => (
+                                      <TableRow key={c}><TableCell sx={{margin:0,padding:0,color:"white"}} component="th" scope="row">{c}</TableCell></TableRow>
+                                     ))}
+                                  </TableBody>  
+                                </Table>
+                             </TableContainer>}>
+             <Button color="info"><BallotIcon /></Button>
+            </Tooltip>:""
+            }
+
+            </Box>
+
+            );
           }
           
           
@@ -213,6 +391,7 @@ const Search = ({
             return winnerList;
           }
           
+
           const resultArea = (contract : VotingContract) => {
             
             const popover = () : ReactJSXElement =>{ 
@@ -249,7 +428,7 @@ const Search = ({
                   
                   
                   return <Popover 
-                  id={"resultPopupId"+selectedContract?.tzkt.address}
+                  id={"resultPopupId"+selectedContract?.tzkt!.address}
                   sx={{
                     pointerEvents: 'none',
                   }}
@@ -323,9 +502,11 @@ const Search = ({
                       </div>
                       </Grid>
                       <Grid item xs={4}>
-                      <div style={{padding:"0.2em"}}><Chip avatar={<Avatar>{selectedContract?.votes.size}</Avatar>} label="Bakers"/></div>
+                      <div style={{padding:"0.2em"}}><Chip avatar={<Avatar>{selectedContract?.votes.size}</Avatar>} label="Voters"/></div>
                       </Grid>
+                      {selectedContract.type == VOTING_TEMPLATE.TEZOSTEMPLATE?
                       <div style={{padding:"0.2em"}}><Chip avatar={<Avatar>{Array.from(selectedContract?.results.values()).reduce( ( value :number , acc : number) => value + acc, 0)   }</Avatar>} label="Rolls"/></div>
+                      :""}
                       </Grid>
                       </Grid>
                       </Paper>
@@ -334,11 +515,12 @@ const Search = ({
                     };
                     
                     // STATUS.ONGOING
-                    if(contract.status == STATUS.ONGOING){
-                      return(<div><Chip aria-owns={open ? "resultPopupId"+contract.tzkt.address : undefined} aria-haspopup="true" onMouseEnter={(e) => showResults(e, contract)} onMouseLeave={closeResults} icon={<RunningWithErrors />} color="success" label={contract.status} />
+                    let status = contract.status;
+                    if(status == STATUS.ONGOING){
+                      return(<div><Chip aria-owns={open ? "resultPopupId"+contract.tzkt!.address : undefined} aria-haspopup="true" onMouseEnter={(e) => showResults(e, contract)} onMouseLeave={closeResults} icon={<RunningWithErrors />} color="success" label={status} />
                       <Slider  component="div"    style={{width:"90%"}}
                       aria-label="Period" 
-                      key={`slider-${contract.tzkt.address}`}
+                      key={`slider-${contract.tzkt!.address}`}
                       value={(new Date()).getTime() }
                       getAriaValueText= {dateSliderToString}
                       valueLabelFormat={dateSliderToString}
@@ -355,12 +537,12 @@ const Search = ({
                       const winnerList = getWinner(contract);
                       if(winnerList.length > 0 ){
                         const result : string = "Winner is : " + winnerList.join(' , ');
-                        return(<div ><Chip icon={<BarChart />} aria-owns={open ? "resultPopupId"+contract.tzkt.address : undefined} aria-haspopup="true" onMouseEnter={(e) => showResults(e, contract)} onMouseLeave={closeResults} style={{margin: "0.2em"}} color="error" label={<span>{contract.status}<br />(Period : {contract.type == VOTING_TEMPLATE.TEZOSTEMPLATE ?  (contract as TezosTemplateVotingContract).votingPeriodIndex : "TODO"})</span>} />
+                        return(<div ><Chip icon={<BarChart />} aria-owns={open ? "resultPopupId"+contract.tzkt!.address : undefined} aria-haspopup="true" onMouseEnter={(e) => showResults(e, contract)} onMouseLeave={closeResults} style={{margin: "0.2em"}} color="error" label={<span>{status}<br />(Period : {contract.type == VOTING_TEMPLATE.TEZOSTEMPLATE ?  (contract as TezosTemplateVotingContract).votingPeriodIndex : "TODO"})</span>} />
                         <Chip style={{margin: "0.2em"}} icon={<EmojiEvents />} label={result} />
                         {popover()}
                         </div>);
                       }else {
-                        return(<div ><Chip icon={<BarChart />}  aria-owns={open ? "resultPopupId"+contract.tzkt.address : undefined} aria-haspopup="true" onMouseEnter={(e) => showResults(e, contract)} onMouseLeave={closeResults}  style={{margin: "0.2em"}} color="warning" label={<span>{contract.status}<br />(Period : {contract.type == VOTING_TEMPLATE.TEZOSTEMPLATE ?  (contract as TezosTemplateVotingContract).votingPeriodIndex : "TODO"})</span>} /><Chip style={{margin: "0.2em"}} icon={<Block />} label="NO WINNER" /></div>);
+                        return(<div ><Chip icon={<BarChart />}  aria-owns={open ? "resultPopupId"+contract.tzkt!.address : undefined} aria-haspopup="true" onMouseEnter={(e) => showResults(e, contract)} onMouseLeave={closeResults}  style={{margin: "0.2em"}} color="warning" label={<span>{status}<br />(Period : {contract.type == VOTING_TEMPLATE.TEZOSTEMPLATE ?  (contract as TezosTemplateVotingContract).votingPeriodIndex : "TODO"})</span>} /><Chip style={{margin: "0.2em"}} icon={<Block />} label="NO WINNER" /></div>);
                       }
                     }
                     
@@ -420,14 +602,14 @@ const Search = ({
                         
                         
                         {contracts.map((contract, index) => (
-                          <Card  key={contract.tzkt.address} sx={{ display: 'flex' , marginTop : "0.2em"}}>
+                          <Card  key={contract.tzkt!.address} sx={{ display: 'flex' , marginTop : "0.2em"}}>
                           
                           
                           <Box width="60%" sx={{ display: 'flex', flexDirection: 'column' }}>
                           <CardContent sx={{ flex: '1 0 auto' , padding : "1vw"}}>
                           <Typography component="div" variant="h6">
                           <a
-                          href={`https://${(process.env["REACT_APP_NETWORK"]? NetworkType[process.env["REACT_APP_NETWORK"].toUpperCase() as keyof typeof NetworkType]  : NetworkType.HANGZHOUNET)}.tzkt.io/${contract.tzkt.address}/info`}
+                          href={`https://${(process.env["REACT_APP_NETWORK"]? NetworkType[process.env["REACT_APP_NETWORK"].toUpperCase() as keyof typeof NetworkType]  : NetworkType.HANGZHOUNET)}.tzkt.io/${contract.tzkt!.address}/info`}
                           target="_blank"
                           rel="noopener noreferrer"
                           >
@@ -442,7 +624,7 @@ const Search = ({
                           
                           <Typography variant="subtitle1" color="text.secondary" component="div">
                           <div>Created by </div>
-                          <Chip style={{maxWidth: "40vw"}} icon={<Face />} label={contract.tzkt.creator?.address} clickable target="_blank" component="a" href={`https://`+(process.env["REACT_APP_NETWORK"]? NetworkType[process.env["REACT_APP_NETWORK"].toUpperCase() as keyof typeof NetworkType]  : NetworkType.HANGZHOUNET)+`.tzkt.io/${contract.tzkt.creator?.address}/info`} />  
+                          <Chip style={{maxWidth: "40vw"}} icon={<Face />} label={contract.tzkt!.creator?.address} clickable target="_blank" component="a" href={`https://`+(process.env["REACT_APP_NETWORK"]? NetworkType[process.env["REACT_APP_NETWORK"].toUpperCase() as keyof typeof NetworkType]  : NetworkType.HANGZHOUNET)+`.tzkt.io/${contract.tzkt!.creator?.address}/info`} />  
                           </Typography>
                           
                           {buttonChoices(contract)}
