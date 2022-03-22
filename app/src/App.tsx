@@ -190,7 +190,7 @@ const App = () => {
                 {(network != NetworkType.MAINNET)?<div className="banner">WARNING: TEST ONLY {network}</div>:<span />}
                 <Box sx={{ display: 'flex' ,backgroundColor : "var(--main-bg-color)" , color : "white", justifyContent: 'space-between', textAlign: "center",  fontSize: "1.5em",  padding: "0.2em"}}>               
                 <img className="logo"
-                src="https://uploads-ssl.webflow.com/616ab4741d375d1642c19027/61793ee65c891c190fcaa1d0_Vector(1).png"
+                src="/logo_white.png"
                 alt="marigold-button"
                 />
                 
