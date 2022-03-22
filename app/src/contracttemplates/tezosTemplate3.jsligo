@@ -1,4 +1,4 @@
-#include "./shared/types.jsligo"
+#include "./shared/tezosTemplate3Types.jsligo"
 
 //redefining find_opt function
 let find_opt : (f : (x : _a) => bool, xs : list<_a>) => option<_a> 
