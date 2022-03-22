@@ -76,12 +76,6 @@ ligo compile contract tezosTemplate3.jsligo --output-file ./tezosTemplate3.tz.js
 ligo run dry-run tezosTemplate3.jsligo 'Vote(["Pikachu",Crypto.hash_key("edpkuBknW28nW72KG6RoHtYW7p12T6GKc7nAbwYX5m8Wd9sDVC9yav" as key)])' '{  name : "Which is the cutiest pokemon?",votingPeriodIndex : (27 as nat),  options : list(["Mew","Pikachu"]) ,  votes : (Map.empty as map<address, string>),  results : (Map.empty as map<string, int>)  , votingPeriodOracle :  ("KT1GLuqbSEoaRb3GE4UtUgGkDukVS766V53A" as address)  ,   protocol : "hangzhounet"}' 
 ```
 
-### Real run
-
-```
-tezos-client transfer 0 from tz1VApBuWHuaTfDHtKzU3NBtWFYsxJvvWhYk to KT1XHJzvYghgw9Y1FgtznLBMtkAu1FRWsTq8 -D --arg '(Left (Pair "Pikachu" "tz1KqTpEZ7Yob7QbPE4Hy4Wo8fHG8LhKxZSx"))'  --burn-cap 0.005 
-```
-
 ### Unit tests
 
 ```
@@ -96,6 +90,12 @@ tezos-client originate contract tezosTemplate transferring 0 from tz1VApBuWHuaTf
 ```
 
 Can return a contract address : KT1PYJvdStoHsCsNoKTFigqCqjd5eWo1uMYd
+
+### Real run
+
+```
+tezos-client transfer 0 from tz1VApBuWHuaTfDHtKzU3NBtWFYsxJvvWhYk to KT1XHJzvYghgw9Y1FgtznLBMtkAu1FRWsTq8 -D --arg '(Left (Pair "Pikachu" "tz1KqTpEZ7Yob7QbPE4Hy4Wo8fHG8LhKxZSx"))'  --burn-cap 0.01 
+```
 
 # App
 

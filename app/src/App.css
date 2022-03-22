@@ -6,9 +6,7 @@ body,
   margin: 0px;
   padding: 0px;
   font-size: 1rem;
-  --main-color: #eb3448;
   --main-bg-color: #eb3448;
-  color: var(--main-color);
 }
 
 #root {
@@ -16,9 +14,8 @@ body,
   height: 100vh;
 }
 
-#logo{
+.logo{
   background-color:white;
-  padding: 0.2em;
   border-radius: 2em;
   height: 1.6em;
 }
@@ -42,7 +39,7 @@ body,
 /* HOME */
 
 .main-box-login {
-  background-color: var(--main-color);
+  background-color: var(--main-bg-color);
 }
 
 .title {
@@ -65,14 +62,15 @@ body,
   height: 8vh;
   display: flex;
   justify-content: flex-end;
-  background-color: var(--main-color);
+  background-color: var(--main-bg-color);
   color: white;
+  padding-right: 0.5em;
 }
 
 .main-box-login .title {
   text-align: left;
   color: white;
-  background-color: var(--main-color);
+  background-color: var(--main-bg-color);
   border-top-right-radius: 0.5em;
   border-top-left-radius: 0.5em;
   padding: 0.5em;
@@ -105,7 +103,7 @@ div#header{
   display: flex;
   flex-direction:row;
   margin: 0;
-  background-color: var(--main-color);
+  background-color: var(--main-bg-color);
   color: white;
   text-align: center;
   font-size: 1.5em;
@@ -123,7 +121,6 @@ div#header{
 }
 
 .column-right {
-  width: 20%;
   text-align: right;
 }
 
@@ -232,14 +229,7 @@ a:hover {
   font-size: 1.2em;
 }
 
-#tabs div {
-  padding: 0.1em;
-  margin: 0.1em;
-  border: solid 3px white;
-  text-align: center;
-  border-radius: 5px;
-  cursor: pointer;
-}
+
 
 #tabs div.active {
   background-color: pink;
@@ -277,3 +267,4 @@ input::-webkit-inner-spin-button {
 input[type="number"] {
   -moz-appearance: textfield;
 }
+

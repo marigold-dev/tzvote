@@ -5,6 +5,7 @@ import {
   NetworkType
 } from "@airgap/beacon-sdk";
 import { DelegatesResponse } from "@taquito/rpc";
+import { Button } from "@mui/material";
 
 type ButtonProps = {
   Tezos: TezosToolkit;
@@ -53,7 +54,7 @@ const ConnectButton = ({
       await wallet.requestPermissions({
         network: {
           type: process.env["REACT_APP_NETWORK"]? NetworkType[process.env["REACT_APP_NETWORK"].toUpperCase() as keyof typeof NetworkType]  : NetworkType.HANGZHOUNET,
-          rpcUrl: process.env["REACT_APP_TEZOS_NODE"] ||"https://hangzhounet.tezos.marigold.dev"
+          rpcUrl: process.env["REACT_APP_TEZOS_NODE"]
         }
       });
       // gets user's address
@@ -87,13 +88,9 @@ const ConnectButton = ({
   }, []);
 
   return (
-    <div className="buttons">
-      <button className="button" onClick={connectWallet}>
-        <span>
+      <Button variant="contained" onClick={connectWallet}>
           <i className="fas fa-wallet"></i>&nbsp; Connect with wallet
-        </span>
-      </button>
-    </div>
+      </Button>
   );
 };
 

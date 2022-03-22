@@ -1,4 +1,4 @@
-#include "./shared/types.jsligo"
+#include "./shared/tezosTemplate3Types.jsligo"
 
 
 let getCurrentVotingPeriod = ([protocol,opt,senderHashkey, contract_callback , store]: [string,string, key_hash, contract<returned_val>, oracleStorage]): oracle_return_ => { 
