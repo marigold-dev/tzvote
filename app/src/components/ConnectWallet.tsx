@@ -54,7 +54,7 @@ const ConnectButton = ({
       await wallet.requestPermissions({
         network: {
           type: process.env["REACT_APP_NETWORK"]? NetworkType[process.env["REACT_APP_NETWORK"].toUpperCase() as keyof typeof NetworkType]  : NetworkType.HANGZHOUNET,
-          rpcUrl: process.env["REACT_APP_TEZOS_NODE"] ||"https://hangzhounet.tezos.marigold.dev"
+          rpcUrl: process.env["REACT_APP_TEZOS_NODE"]
         }
       });
       // gets user's address

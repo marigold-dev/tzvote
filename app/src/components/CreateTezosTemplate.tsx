@@ -19,7 +19,7 @@ interface CreateProps {
   setActiveTab : Dispatch<SetStateAction<string>>;
 }
 
-const Create = ({ Tezos, userAddress , votingPeriodOracle, wallet, setActiveTab }: CreateProps) => {
+const CreateTezosTemplate = ({ Tezos, userAddress , votingPeriodOracle, wallet, setActiveTab }: CreateProps) => {
   
  //TEZOS OPERATIONS
  const [tezosLoading, setTezosLoading]  = React.useState(false);
@@ -97,11 +97,7 @@ const Create = ({ Tezos, userAddress , votingPeriodOracle, wallet, setActiveTab 
         setTezosLoading(false);
       });
     };
-    
-    const removeOption = (index: number) => {
-      contract.options.splice(index, 1);
-      setContract(contract);
-    }
+
     
     return userAddress?<div style={{padding:"1em"}}><Backdrop
     sx={{ color: '#fff', zIndex: (theme : any) => theme.zIndex.drawer + 1 }}
@@ -121,7 +117,7 @@ const Create = ({ Tezos, userAddress , votingPeriodOracle, wallet, setActiveTab 
     id="name"
     label="Question"
     value={contract.name}
-    onChange={(e) => {contract.name = e.target.value;setContract(contract)}}
+    onChange={(e) => {setContract({...contract, name : e.target.value!} as TezosTemplateVotingContract)}}
     />
     
     <div style={{paddingTop:"2em"}}>
@@ -159,7 +155,7 @@ const Create = ({ Tezos, userAddress , votingPeriodOracle, wallet, setActiveTab 
 
         <Box alignContent={"center"}>
         <TextField value={inputOption} label="type your option here" onChange={(e) => setInputOption(e.target.value)} ></TextField>
-        <Button sx={{ marginLeft: "1em" }}  variant="outlined" onClick={()=>{contract.options=contract.options.concat(inputOption);setContract(contract);setInputOption("")}}><Add style={{padding : "0.4em 0em"}}/></Button>
+        <Button sx={{ marginLeft: "1em" }}  variant="outlined" onClick={()=>{setContract({...contract, options : contract.options.concat(inputOption)} as TezosTemplateVotingContract);setInputOption("");}}><Add style={{padding : "0.4em 0em"}}/></Button>
         </Box>
         
         <List inputMode="text" >
@@ -171,7 +167,7 @@ const Create = ({ Tezos, userAddress , votingPeriodOracle, wallet, setActiveTab 
             <RadioButtonUncheckedIcon   />
             </ListItemIcon>
             <FormLabel>{option}</FormLabel> 
-            <Delete onClick={() => removeOption(index)}/>
+            <Delete onClick={()=>{contract.options.splice(index, 1);setContract({...contract, options : contract.options} as TezosTemplateVotingContract)}}/>
             </ListItemButton>
             </ListItem>
             ))
@@ -195,7 +191,7 @@ const Create = ({ Tezos, userAddress , votingPeriodOracle, wallet, setActiveTab 
           <span />        };
         
         
-        export default Create;
+        export default CreateTezosTemplate;
         
         
         

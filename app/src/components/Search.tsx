@@ -477,36 +477,38 @@ const Search = ({
                     </div>
                     </Grid>
                     <Grid item xs={4}>
-                    <Grid item xs={4}>
-                    <div style={{padding:"0.2em"}}>
-                    
-                    
-                    <PieChart width={window.innerWidth*0.3} height={window.innerHeight*0.3}>
-                    <Pie
-                    data={data}
-                    cx="50%"
-                    cy="50%"
-                    labelLine={false}
-                    label={renderCustomizedLabel}
-                    outerRadius="100%"
-                    fill="#8884d8"
-                    dataKey="value"
-                    nameKey="name"
-                    >
-                    {data.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={COLORS.get(entry.name)} />
-                      ))}
-                      </Pie>
-                      </PieChart>
-                      
-                      </div>
-                      </Grid>
                       <Grid item xs={4}>
-                      <div style={{padding:"0.2em"}}><Chip avatar={<Avatar>{selectedContract?.votes.size}</Avatar>} label="Voters"/></div>
-                      </Grid>
-                      {selectedContract.type == VOTING_TEMPLATE.TEZOSTEMPLATE?
-                      <div style={{padding:"0.2em"}}><Chip avatar={<Avatar>{Array.from(selectedContract?.results.values()).reduce( ( value :number , acc : number) => value + acc, 0)   }</Avatar>} label="Rolls"/></div>
-                      :""}
+                      <div style={{padding:"0.2em"}}>
+                      
+                      
+                      <PieChart width={window.innerWidth*0.3} height={window.innerHeight*0.3}>
+                      <Pie
+                      data={data}
+                      cx="50%"
+                      cy="50%"
+                      labelLine={false}
+                      label={renderCustomizedLabel}
+                      outerRadius="100%"
+                      fill="#8884d8"
+                      dataKey="value"
+                      nameKey="name"
+                      >
+                      {data.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={COLORS.get(entry.name)} />
+                        ))}
+                        </Pie>
+                        </PieChart>
+                        
+                        </div>
+                        </Grid>
+
+                        <Grid>
+                        <div style={{padding:"0.2em"}}><Chip avatar={<Avatar>{selectedContract?.votes.size}</Avatar>} label="Voters"/></div>
+                        
+                        {selectedContract.type == VOTING_TEMPLATE.TEZOSTEMPLATE?
+                        <div style={{padding:"0.2em"}}><Chip avatar={<Avatar>{Array.from(selectedContract?.results.values()).reduce( ( value :number , acc : number) => value + acc, 0)   }</Avatar>} label="Rolls"/></div>
+                        :""}
+                        </Grid>
                       </Grid>
                       </Grid>
                       </Paper>

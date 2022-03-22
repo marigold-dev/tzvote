@@ -14,9 +14,8 @@ body,
   height: 100vh;
 }
 
-#logo{
+.logo{
   background-color:white;
-  padding: 0.2em;
   border-radius: 2em;
   height: 1.6em;
 }
@@ -65,6 +64,7 @@ body,
   justify-content: flex-end;
   background-color: var(--main-bg-color);
   color: white;
+  padding-right: 0.5em;
 }
 
 .main-box-login .title {
@@ -121,7 +121,6 @@ div#header{
 }
 
 .column-right {
-  width: 20%;
   text-align: right;
 }
 
@@ -268,3 +267,4 @@ input::-webkit-inner-spin-button {
 input[type="number"] {
   -moz-appearance: textfield;
 }
+

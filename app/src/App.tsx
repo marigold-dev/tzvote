@@ -1,16 +1,17 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { TezosToolkit } from "@taquito/taquito";
 import "./App.css";
 import ConnectButton from "./components/ConnectWallet";
 import DisconnectButton from "./components/DisconnectWallet";
 import qrcode from "qrcode-generator";
 import Search from "./components/Search";
-import Create from "./components/Create";
+import CreateTezosTemplate from "./components/CreateTezosTemplate";
 import Popup from 'reactjs-popup';
 import { NetworkType} from "@airgap/beacon-sdk";
 import { VOTING_TEMPLATE } from "./contractutils/TezosContractUtils";
-import { Button, ButtonGroup, ClickAwayListener, Grow, MenuItem, MenuList, Paper, Popper } from "@mui/material";
-import { ArrowDropDownCircleRounded } from "@mui/icons-material";
+import { Box , Button, ButtonGroup, ClickAwayListener, Grow, MenuItem, MenuList, Paper, Popper } from "@mui/material";
+import { AccountCircle, ArrowDropDownCircleRounded } from "@mui/icons-material";
+import CreatePermissionedSimplePoll from "./components/CreatePermissionedSimplePoll";
 
 
 let votingTemplateAddresses : Map<VOTING_TEMPLATE,string> = new Map();
@@ -21,7 +22,7 @@ const votingPeriodOracle : string = process.env["REACT_APP_ORACLE_ADDRESS"] || "
 
 const App = () => {
   const [Tezos, setTezos] = useState<TezosToolkit>(
-    new TezosToolkit(process.env["REACT_APP_TEZOS_NODE"] ||"https://hangzhounet.tezos.marigold.dev")
+    new TezosToolkit(process.env["REACT_APP_TEZOS_NODE"]!)
     );
     const [publicToken, setPublicToken] = useState<string | null>("");
     const [wallet, setWallet] = useState<any>(null);
@@ -43,26 +44,26 @@ const App = () => {
     };
     
     /**CREATE BUTTON SECTION */
-    const createOptions = [VOTING_TEMPLATE.PERMISSIONEDSIMPLEPOLL.name,VOTING_TEMPLATE.TEZOSTEMPLATE.name];
-    const [open, setOpen] = React.useState(false);
-    const anchorRef = React.useRef<HTMLDivElement>(null);
-    const [selectedIndex, setSelectedIndex] = React.useState(1);
+    const votingTemplateOptions = [VOTING_TEMPLATE.PERMISSIONEDSIMPLEPOLL.name,VOTING_TEMPLATE.TEZOSTEMPLATE.name];
+    const [openVotingTemplateOptions, setOpenVotingTemplateOptions] = React.useState(false);
+    const anchorRefVotingOptionsComboBox = React.useRef<HTMLDivElement>(null);
+    const [selectedIndexVotingTemplateOption, setSelectedIndexVotingTemplateOption] = React.useState(0);
     
-    const handleMenuItemClick = (index : number) => {
-      setSelectedIndex(index);
-      setOpen(false);
+    const handleMenuItemVotingTemplateOptionsClick = (index : number) => {
+      setSelectedIndexVotingTemplateOption(index);
+      setOpenVotingTemplateOptions(false);
     };
     
-    const handleToggle = () => {
-      setOpen((prevOpen) => !prevOpen);
+    const handleToggleMenuItemVotingTemplateOptions = () => {
+      setOpenVotingTemplateOptions((prevOpen) => !prevOpen);
     };
     
-    const handleClose = (event : MouseEvent | TouchEvent) => {
-      if (anchorRef.current && anchorRef.current.contains(event.target as Node)) {
+    const handleCloseMenuItemVotingTemplateOptions = (event : MouseEvent | TouchEvent) => {
+      if (anchorRefVotingOptionsComboBox.current && anchorRefVotingOptionsComboBox.current.contains(event.target as Node)) {
         return;
       }
       
-      setOpen(false);
+      setOpenVotingTemplateOptions(false);
     };
     /** END OF CREATE BUTTON SECTION */
     
@@ -187,13 +188,14 @@ const App = () => {
               return (
                 <div className="main-box">
                 {(network != NetworkType.MAINNET)?<div className="banner">WARNING: TEST ONLY {network}</div>:<span />}
-                <div id="header"> 
-                <div className="column-left"><img id="logo"
+                <Box sx={{ display: 'flex' ,backgroundColor : "var(--main-bg-color)" , color : "white", justifyContent: 'space-between', textAlign: "center",  fontSize: "1.5em",  padding: "0.2em"}}>               
+                <img className="logo"
                 src="https://uploads-ssl.webflow.com/616ab4741d375d1642c19027/61793ee65c891c190fcaa1d0_Vector(1).png"
                 alt="marigold-button"
-                /></div> 
-                <div id="tabs" className="column">
-                <Button  variant="contained" sx={{marginRight:2}}
+                />
+                
+                
+                <Button  variant="contained" sx={{marginRight:0.5}}
                 id="search"
                 onClick={() => setActiveTab("search")}
                 >
@@ -202,22 +204,22 @@ const App = () => {
                 
                 {userAddress?
                   <React.Fragment>
-                  <ButtonGroup variant="contained" ref={anchorRef} aria-label="split button">
-                  <Button className={activeTab === "create" ? "active" : ""} onClick={() => setActiveTab("create")}>{createOptions[selectedIndex]}</Button>
+                  <ButtonGroup variant="contained" ref={anchorRefVotingOptionsComboBox} aria-label="split button">
+                  <Button onClick={() => setActiveTab(votingTemplateOptions[selectedIndexVotingTemplateOption])}>{votingTemplateOptions[selectedIndexVotingTemplateOption]}</Button>
                   <Button
                   size="small"
-                  aria-controls={open ? 'split-button-menu' : undefined}
-                  aria-expanded={open ? 'true' : undefined}
+                  aria-controls={openVotingTemplateOptions ? 'split-button-menu' : undefined}
+                  aria-expanded={openVotingTemplateOptions ? 'true' : undefined}
                   aria-label="select merge strategy"
                   aria-haspopup="menu"
-                  onClick={handleToggle}
+                  onClick={handleToggleMenuItemVotingTemplateOptions}
                   >
                   <ArrowDropDownCircleRounded />
                   </Button>
                   </ButtonGroup>
                   <Popper
-                  open={open}
-                  anchorEl={anchorRef.current}
+                  open={openVotingTemplateOptions}
+                  anchorEl={anchorRefVotingOptionsComboBox.current}
                   role={undefined}
                   transition
                   disablePortal
@@ -231,14 +233,14 @@ const App = () => {
                     }}
                     >
                     <Paper>
-                    <ClickAwayListener  onClickAway={handleClose}>
+                    <ClickAwayListener  onClickAway={handleCloseMenuItemVotingTemplateOptions}>
                     <MenuList id="split-button-menu">
-                    {createOptions.map((option, index) => (
+                    {votingTemplateOptions.map((option, index) => (
                       <MenuItem
                       key={option}
                       disabled={index === 2}
-                      selected={index === selectedIndex}
-                      onClick={(event) => handleMenuItemClick(index)}
+                      selected={index === selectedIndexVotingTemplateOption}
+                      onClick={(event) => handleMenuItemVotingTemplateOptionsClick(index)}
                       >
                       Create {option} voting template
                       </MenuItem>
@@ -252,12 +254,9 @@ const App = () => {
                       </React.Fragment>
                       : ""
                     }
+
                     
-                    </div>
-                    
-                    <div className="column-right"> 
-                    
-                    { userAddress ? <Popup trigger={<i className="far fa-user"></i>} position="bottom right">
+                    { userAddress ? <Popup trigger={<AccountCircle fontSize="large"/>} position="bottom right">
                     <p>
                     <i className="far fa-address-card"></i>&nbsp; {userAddress}
                     </p>
@@ -296,12 +295,12 @@ const App = () => {
                     />
                   }
                   
-                  </div>
                   
-                  </div>
+                  
+                  </Box>
                   <div id="dialog">
                   <div id="content">
-                  {activeTab === "search" ? (
+                  {activeTab === "search"? (
                     <div id="search">
                     <h3 className="text-align-center">Search voting sessions</h3>
                     <Search
@@ -312,12 +311,12 @@ const App = () => {
                     beaconConnection={beaconConnection}
                     />
                     </div>
-                    ) : (
-                      <div id="increment-decrement">
+                    ) : activeTab == VOTING_TEMPLATE.TEZOSTEMPLATE.name ? (
+                      <div>
                       <h3 className="text-align-center">
-                      Create new voting session
+                      Create new {VOTING_TEMPLATE.TEZOSTEMPLATE.name} voting session 
                       </h3>
-                      <Create
+                      <CreateTezosTemplate
                       Tezos={Tezos}
                       userAddress={userAddress}
                       votingPeriodOracle={votingPeriodOracle}
@@ -325,7 +324,19 @@ const App = () => {
                       setActiveTab={setActiveTab}
                       />
                       </div>
-                      )}
+                      ) : 
+                      (
+                        <div>
+                        <h3 className="text-align-center">
+                        Create new {VOTING_TEMPLATE.PERMISSIONEDSIMPLEPOLL.name} voting session 
+                        </h3>
+                        <CreatePermissionedSimplePoll
+                        Tezos={Tezos}
+                        userAddress={userAddress}
+                        setActiveTab={setActiveTab}
+                        />
+                        </div>)
+                      }
                       </div>
                       
                       </div>
