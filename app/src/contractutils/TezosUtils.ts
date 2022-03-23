@@ -61,9 +61,11 @@ export abstract class TezosUtils{
             var startDate : Date = await this.getVotingPeriodStartDate(Tezos);
             dates.push(startDate);
             const blocks_per_voting_period = await(await Tezos.rpc.getConstants()).blocks_per_voting_period ;
-            const time_between_blocks = await(await Tezos.rpc.getConstants()).time_between_blocks;
+
+            //Provided that at least two thirds of the total active stake participates honestly in consensus, then a decision is eventually taken.2 In the current implementation of Tenderbake the duration of each round increments by 15 seconds, starting from 30 seconds: thus the deadline for participation in round 0 is 30 seconds, that for round 1 is 45 seconds after that, and so on. So in normal conditions, when consensus is reached promptly at round 0 every time, we can expect Tenderbake to add one block every 30 seconds. Note that: Tenderbake has deterministic finality after just two blocks. In normal conditions, when the network is healthy, decisions are made at round 0, after 30 seconds. This means that in normal conditions the time to finality is about one minute.
+            const block_estimated_duration = 30;
             for(let i = 0 ; i< count;i++){
-                let endDate : Date = new Date(  startDate.getTime()  + (1000 * blocks_per_voting_period * time_between_blocks[0].toNumber()))
+                let endDate : Date = new Date(  startDate.getTime()  + (1000 * blocks_per_voting_period * block_estimated_duration))
                 dates.push(endDate);
                 startDate = endDate;
             }
@@ -85,29 +87,5 @@ export abstract class TezosUtils{
         const currentPeriodStartBlock = await (await Tezos.rpc.getCurrentPeriod()).voting_period.start_position;
         return new Date (await (await Tezos.rpc.getBlockHeader({block:""+currentPeriodStartBlock})).timestamp) ;
     }
-    
-    /**
-    * Estimated best end of current voting period
-    * dateFrom.getTime() + (1000 * blocks_per_voting_period * time_between_blocks[0].toNumber() 
-    * @param startDate (optional) by default it is the current period
-    * @param remainingBlocks (optional) by default it is the number of block for a period, otherwise it should be the remining block until the end of the period
-    *      
-    public static async getVotingPeriodBestEndDate(Tezos : TezosToolkit , startDate? : Date, remainingBlocks? : number) : Promise<Date> {
-        const blocks_per_voting_period = remainingBlocks ? remainingBlocks : await (await Tezos.rpc.getConstants()).blocks_per_voting_period ;
-        const time_between_blocks = await (await Tezos.rpc.getConstants()).time_between_blocks;
-        return  new Date(  (startDate?startDate.getTime():(await this.getVotingPeriodStartDate(Tezos)).getTime())       + (1000 * blocks_per_voting_period * time_between_blocks[0].toNumber()));
-    }
-    */
-    
-    /**
-    * Estimated bad average end of current voting period. We suppose an average of 1 jump priority and 10% of missing endorsements
-    * dateFrom.getTime() + (1000 * blocks_per_voting_period * ((time_between_blocks[0].toNumber() +  (  time_between_blocks[1].toNumber() * 1 ) + (delay_per_missing_endorsement?delay_per_missing_endorsement.toNumber():0) * (initial_endorsers?initial_endorsers*0.1:0)    )     )) )        
-    public static async getVotingPeriodBadAverageEndDate(Tezos : TezosToolkit) : Promise<Date> {
-        var delay_per_missing_endorsement :BigNumber | undefined=  await (await Tezos.rpc.getConstants()).delay_per_missing_endorsement ;
-        var initial_endorsers : number | undefined =  await (await Tezos.rpc.getConstants()).initial_endorsers;
-        const blocks_per_voting_period = await (await Tezos.rpc.getConstants()).blocks_per_voting_period ;
-        const time_between_blocks = await (await Tezos.rpc.getConstants()).time_between_blocks;
-        return  new Date( (await this.getVotingPeriodStartDate(Tezos)).getTime() + (1000 * blocks_per_voting_period * ((time_between_blocks[0].toNumber() +  (  time_between_blocks[1].toNumber() * 1 ) + (delay_per_missing_endorsement?delay_per_missing_endorsement.toNumber():0) * (initial_endorsers?initial_endorsers*0.1:0)    )     )) );
-    }*/
     
 }
