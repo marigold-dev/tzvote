@@ -54,8 +54,8 @@ const Search = ({
   
   const refreshData = () => {
     (async () => {
-      let allTEZOSTEMPLATEContractFromTzkt : Array<Contract>= (await contractsService.getSame({address:votingTemplateAddresses.get(VOTING_TEMPLATE.TEZOSTEMPLATE)! , includeStorage:true, sort:{desc:"id"}}));
-      let allPERMISSIONEDSIMPLEPOLLContractFromTzkt : Array<Contract>= (await contractsService.getSame({address:votingTemplateAddresses.get(VOTING_TEMPLATE.PERMISSIONEDSIMPLEPOLL)! , includeStorage:true, sort:{desc:"id"}}));
+      let allTEZOSTEMPLATEContractFromTzkt : Array<Contract>= votingTemplateAddresses.get(VOTING_TEMPLATE.TEZOSTEMPLATE) ? (await contractsService.getSame({address:votingTemplateAddresses.get(VOTING_TEMPLATE.TEZOSTEMPLATE)! , includeStorage:true, sort:{desc:"id"}})): new Array<Contract>();
+      let allPERMISSIONEDSIMPLEPOLLContractFromTzkt : Array<Contract>= votingTemplateAddresses.get(VOTING_TEMPLATE.PERMISSIONEDSIMPLEPOLL) ? (await contractsService.getSame({address:votingTemplateAddresses.get(VOTING_TEMPLATE.PERMISSIONEDSIMPLEPOLL)! , includeStorage:true, sort:{desc:"id"}})) : new Array<Contract>();
       let allConvertertedTEZOSTEMPLATEContractContracts :Array<TezosTemplateVotingContract>= await Promise.all(allTEZOSTEMPLATEContractFromTzkt.map( async(tzktObject:Contract) => await VotingContractUtils.convertFromTZKTTezosContractToTezosTemplateVotingContract(Tezos,tzktObject))); 
       let allConvertertedPERMISSIONEDSIMPLEPOLLContractContracts :Array<PermissionedSimplePollVotingContract>= allPERMISSIONEDSIMPLEPOLLContractFromTzkt.map( (tzktObject:Contract) => new PermissionedSimplePollVotingContract(undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,tzktObject)); 
       setAllContracts([...allConvertertedTEZOSTEMPLATEContractContracts,...allConvertertedPERMISSIONEDSIMPLEPOLLContractContracts]);

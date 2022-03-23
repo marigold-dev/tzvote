@@ -133,11 +133,12 @@ export abstract class VotingContract{
                         let dateFrom = new Date (await (await Tezos.rpc.getBlockHeader({block:""+currentPeriodStartBlock})).timestamp) ;
                         const constantsResponse = await Tezos.rpc.getConstants();
                         let blocksUntilTheEnd : number = constantsResponse.blocks_per_voting_period ;
-                        const time_between_blocks = constantsResponse.time_between_blocks;
-                        let dateTo =new Date(dateFrom.getTime() + (1000 * blocksUntilTheEnd * time_between_blocks[0].toNumber()));
+                        //Provided that at least two thirds of the total active stake participates honestly in consensus, then a decision is eventually taken.2 In the current implementation of Tenderbake the duration of each round increments by 15 seconds, starting from 30 seconds: thus the deadline for participation in round 0 is 30 seconds, that for round 1 is 45 seconds after that, and so on. So in normal conditions, when consensus is reached promptly at round 0 every time, we can expect Tenderbake to add one block every 30 seconds. Note that: Tenderbake has deterministic finality after just two blocks. In normal conditions, when the network is healthy, decisions are made at round 0, after 30 seconds. This means that in normal conditions the time to finality is about one minute.
+                        const block_estimated_duration = 30;
+                        let dateTo =new Date(dateFrom.getTime() + (1000 * blocksUntilTheEnd * block_estimated_duration));
                         if(tzktContract.storage.votingPeriodIndex == votingPeriodBlockResult.voting_period.index){ //if current, we can have more accurate thatns to remaining blocks data
                             blocksUntilTheEnd = votingPeriodBlockResult.remaining;
-                            dateTo =new Date(Date.now() + (1000 * blocksUntilTheEnd * time_between_blocks[0].toNumber()));
+                            dateTo =new Date(Date.now() + (1000 * blocksUntilTheEnd * block_estimated_duration));
                         }
                         let votes = new Map<string,string>(Object.entries<string>(tzktContract.storage.votes));
                         let tezosTemplateVotingContract = new TezosTemplateVotingContract(

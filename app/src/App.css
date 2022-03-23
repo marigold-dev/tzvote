@@ -15,9 +15,8 @@ body,
 }
 
 .logo{
-  background-color:white;
-  border-radius: 2em;
   height: 1.6em;
+  width: 1.6em;
 }
 
 .banner{
