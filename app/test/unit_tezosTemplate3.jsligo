@@ -33,17 +33,17 @@ let assert_failure = ([result,message] : [test_exec_result,string]) : bool => {
   
   // account list
   let senderKey1 : [string,key] = Test.new_account();
-  let _1 = Test.baker_account(senderKey1, Some ((8000 as tez)));
+  let _ = Test.baker_account(senderKey1, Some ((8000 as tez)));
   let senderKey2 : [string,key] = Test.new_account();
-  let _2 = Test.baker_account(senderKey2 , Some ((16000 as tez)));
+  let _ = Test.baker_account(senderKey2 , Some ((16000 as tez)));
   let senderKey3 : [string,key] = Test.new_account();
-  let _3 = Test.baker_account(senderKey3 , Some ((24000 as tez)));
+  let _ = Test.baker_account(senderKey3 , Some ((24000 as tez)));
   let johndoeKey : [string,key] = Test.new_account();
   
   let keys : list<[string,key]> = list([senderKey1,senderKey2,senderKey3,johndoeKey]);
 
   // reset state
-  let _reset = Test.reset_state ( 10 as nat, list([]) as list <tez> );
+  let _ = Test.reset_state ( 10 as nat, list([]) as list <tez> );
   let faucet = Test.nth_bootstrap_account(0);
   
   let addresses : list<address> = List.fold(initAccount, keys, list([]) as list<address>);
@@ -53,8 +53,8 @@ let assert_failure = ([result,message] : [test_exec_result,string]) : bool => {
   let sender3 : address = Option.unopt ( List.head_opt(Option.unopt( List.tail_opt( Option.unopt(List.tail_opt(addresses))))));                         
   let johndoe : address = Option.unopt ( List.head_opt(Option.unopt ( List.tail_opt(Option.unopt( List.tail_opt( Option.unopt(List.tail_opt(addresses))))))));     
   
-  let _setbaker = Test.set_baker(faucet);
-  let _setsource = Test.set_source(sender1);
+  let _ = Test.set_baker(faucet);
+  let _ = Test.set_source(sender1);
 
   /**
   * PREPARE ORACLE
