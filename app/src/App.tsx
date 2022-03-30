@@ -186,7 +186,7 @@ const App = () => {
     return (
       <div className="main-box">
       {(network != NetworkType.MAINNET)?<div className="banner">WARNING: TEST ONLY {network}</div>:<span />}
-      <Box sx={{ display: 'flex' ,backgroundColor : "var(--main-bg-color)" , color : "white", justifyContent: 'space-between', textAlign: "center",  fontSize: "1.5em",  padding: "0.2em"}}>               
+      <Box sx={{ height:"6vh", display: 'flex' ,backgroundColor : "var(--main-bg-color)" , color : "white", justifyContent: 'space-between', textAlign: "center",  fontSize: "1.5em",  padding: "0.2em"}}>               
       <img className="logo"
       src="/logo_white.png"
       alt="marigold-button"
@@ -337,7 +337,16 @@ const App = () => {
             </div>
             
             </div>
+            
+            <div id="footer-phantom" />
+            <div id="footer-login"><Box sx={{justifyContent: 'space-between', textAlign: "center",display : "flex"}}>
+         <a href="https://github.com/marigold-dev/tzvote"><img height={15} src="https://github.githubassets.com/images/modules/logos_page/Octocat.png"/><img height={15} src="https://github.githubassets.com/images/modules/logos_page/GitHub-Logo.png"/></a>
+         Marigold 2022
+      </Box>
+      </div>
+            
             </div>
+            
             
             );
           } 

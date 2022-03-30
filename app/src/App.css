@@ -1,18 +1,15 @@
-html,
-body,
-#root {
+html, body {
+  margin: 0;
   height: 100%;
   width: 100%;
-  margin: 0px;
-  padding: 0px;
-  font-size: 1rem;
-  --main-bg-color: #eb3448;
 }
 
 #root {
-  display: grid;
-  height: 100vh;
+  --main-bg-color: #eb3448;
+  font-size: 1rem;
 }
+
+
 
 .logo{
   height: 1.6em;
@@ -20,6 +17,7 @@ body,
 }
 
 .banner{
+  height: 3vh;
   text-align: center;
     color: #fff;
     text-shadow:
@@ -50,21 +48,13 @@ body,
 }
 
 #dialog-login{
-  height: 74vh;
   display: flex;
   flex-direction: column;
   border: 1px solid var(--main-color);
   background-color: white;
 }
 
-#footer-login {
-  height: 8vh;
-  display: flex;
-  justify-content: flex-end;
-  background-color: var(--main-bg-color);
-  color: white;
-  padding-right: 0.5em;
-}
+
 
 .main-box-login .title {
   text-align: left;
@@ -93,7 +83,6 @@ font-size: 2em;
 
 .main-box {
   margin: 0;
-  width: 100vw;
   background-color: white;
 }
 
@@ -112,6 +101,28 @@ div#header{
 #dialog{
   display: flex;
   flex-direction: column;
+}
+
+#dialog:after {
+  content: "";
+  display: block;
+}
+
+#footer-phantom {
+  display: block;
+  padding: 0.2em;
+  height: 2.5vh;
+}
+
+#footer-login {
+  height: 2.5vh;
+  background-color: var(--main-bg-color);
+  color: white;
+  padding: 0.5em;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: calc(100vw - 1em);
 }
 
 .column {
