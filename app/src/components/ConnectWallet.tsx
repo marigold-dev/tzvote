@@ -16,7 +16,6 @@ type ButtonProps = {
   setBeaconConnection: Dispatch<SetStateAction<boolean>>;
   setPublicToken: Dispatch<SetStateAction<string | null>>;
   wallet: BeaconWallet;
-  setFirstTime: Dispatch<SetStateAction<boolean>>;
 };
 
 const ConnectButton = ({
@@ -26,7 +25,6 @@ const ConnectButton = ({
   setUserBalance,
   setUserRolls,
   setBeaconConnection,
-  setFirstTime,
   wallet
 }: ButtonProps): JSX.Element => {
 
@@ -61,7 +59,6 @@ const ConnectButton = ({
       const userAddress = await wallet.getPKH();
       await setup(userAddress);
       setBeaconConnection(true);
-      setFirstTime(false);
     } catch (error) {
       console.log(error);
     }

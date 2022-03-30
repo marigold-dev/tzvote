@@ -32,7 +32,6 @@ const App = () => {
     const [copiedPublicToken, setCopiedPublicToken] = useState<boolean>(false);
     const [beaconConnection, setBeaconConnection] = useState<boolean>(false);
     const [activeTab, setActiveTab] = useState<string>("search");
-    const [firstTime, setFirstTime] = useState<boolean>(true);
     
     
     const generateQrCode = (): { __html: string } => {
@@ -75,7 +74,7 @@ const App = () => {
     //console.log("firstTime",firstTime,"publicToken",publicToken,"userAddress",userAddress,"userBalance",userBalance);
     let network = process.env["REACT_APP_NETWORK"]? NetworkType[process.env["REACT_APP_NETWORK"].toUpperCase() as keyof typeof NetworkType] : NetworkType.HANGZHOUNET;
     
-    if (firstTime && (!publicToken || publicToken==null))
+    if (false && !userAddress && (!publicToken || publicToken==null))
     return (
       <div className="main-box-login">
       {(network != NetworkType.MAINNET)?<div className="banner">WARNING: TEST ONLY {network}</div>:<span />}
@@ -108,12 +107,11 @@ const App = () => {
       setUserRolls={setUserRolls}
       setBeaconConnection={setBeaconConnection}
       wallet={wallet}
-      setFirstTime={setFirstTime}
       />
       </div>
       
       <div className="buttons">
-      <Button sx={{marginTop:1}} variant="contained" onClick={()=>setFirstTime(false)}>
+      <Button sx={{marginTop:1}} variant="contained" >
       Continue without wallet
       </Button>
       </div>
@@ -128,227 +126,226 @@ const App = () => {
       /**
       * CONNECTION PAGE
       *  */      
-      else if (firstTime && publicToken && (!userAddress || isNaN(userBalance))) {
-        return (
-          <div className="main-box-login">
-          {(network != NetworkType.MAINNET)?<div className="banner">WARNING: TEST ONLY {network}</div>:<span />}
-          <div className="title"><div id="title">Wallet connection</div></div>
-          <div id="dialog-login">
-          <header>Please connect</header>
-          <div id="content">
-          <p className="text-align-center">
-          <i className="fas fa-broadcast-tower"></i>&nbsp; Connecting to
-          your wallet
-          </p>
-          <div
-          dangerouslySetInnerHTML={generateQrCode()}
-          className="text-align-center"
-          ></div>
-          <p id="public-token">
-          {copiedPublicToken ? (
-            <span id="public-token-copy__copied">
-            <i className="far fa-thumbs-up"></i>
-            </span>
-            ) : (
-              <span
-              id="public-token-copy"
-              onClick={() => {
-                if (publicToken) {
-                  navigator.clipboard.writeText(publicToken);
-                  setCopiedPublicToken(true);
-                  setTimeout(() => setCopiedPublicToken(false), 2000);
-                }
-              }}
-              >
-              <i className="far fa-copy"></i>
-              </span>
-              )}
-              
-              <span>
-              Public token: <span>{publicToken}</span>
-              </span>
-              </p>
-              <p className="text-align-center">
-              Status: {beaconConnection ? "Connected" : "Disconnected"}
-              </p>
-              </div>
-              </div>
-              <div id="footer-login">
-              <img src="built-with-taquito.png" alt="Built with Taquito" />
-              </div>
-              </div>
-              );
+  else if (publicToken && (!userAddress || isNaN(userBalance))) {
+    return (
+      <div className="main-box-login">
+      {(network != NetworkType.MAINNET)?<div className="banner">WARNING: TEST ONLY {network}</div>:<span />}
+      <div className="title"><div id="title">Wallet connection</div></div>
+      <div id="dialog-login">
+      <header>Please connect</header>
+      <div id="content">
+      <p className="text-align-center">
+      <i className="fas fa-broadcast-tower"></i>&nbsp; Connecting to
+      your wallet
+      </p>
+      <div
+      dangerouslySetInnerHTML={generateQrCode()}
+      className="text-align-center"
+      ></div>
+      <p id="public-token">
+      {copiedPublicToken ? (
+        <span id="public-token-copy__copied">
+        <i className="far fa-thumbs-up"></i>
+        </span>
+        ) : (
+          <span
+          id="public-token-copy"
+          onClick={() => {
+            if (publicToken) {
+              navigator.clipboard.writeText(publicToken);
+              setCopiedPublicToken(true);
+              setTimeout(() => setCopiedPublicToken(false), 2000);
             }
-            
+          }}
+          >
+          <i className="far fa-copy"></i>
+          </span>
+          )}
+          
+          <span>
+          Public token: <span>{publicToken}</span>
+          </span>
+          </p>
+          <p className="text-align-center">
+          Status: {beaconConnection ? "Connected" : "Disconnected"}
+          </p>
+          </div>
+          </div>
+          <div id="footer-login">
+          <img src="built-with-taquito.png" alt="Built with Taquito" />
+          </div>
+          </div>
+          );
+        }
+        
             /**
             * HOME MAIN PAGE
             *  */       
-            else if(!firstTime){
-              
-              return (
-                <div className="main-box">
-                {(network != NetworkType.MAINNET)?<div className="banner">WARNING: TEST ONLY {network}</div>:<span />}
-                <Box sx={{ display: 'flex' ,backgroundColor : "var(--main-bg-color)" , color : "white", justifyContent: 'space-between', textAlign: "center",  fontSize: "1.5em",  padding: "0.2em"}}>               
-                <img className="logo"
-                src="/logo_white.png"
-                alt="marigold-button"
-                />
-                
-                
-                <Button  variant="contained" sx={{marginRight:0.5}}
-                id="search"
-                onClick={() => setActiveTab("search")}
-                >
-                Search
-                </Button>
-                
-                {userAddress?
-                  <React.Fragment>
-                  <ButtonGroup variant="contained" ref={anchorRefVotingOptionsComboBox} aria-label="split button">
-                  <Button onClick={() => setActiveTab(votingTemplateOptions[selectedIndexVotingTemplateOption])}>{votingTemplateOptions[selectedIndexVotingTemplateOption]}</Button>
-                  <Button
-                  size="small"
-                  aria-controls={openVotingTemplateOptions ? 'split-button-menu' : undefined}
-                  aria-expanded={openVotingTemplateOptions ? 'true' : undefined}
-                  aria-label="select merge strategy"
-                  aria-haspopup="menu"
-                  onClick={handleToggleMenuItemVotingTemplateOptions}
-                  >
-                  <ArrowDropDownCircleRounded />
-                  </Button>
-                  </ButtonGroup>
-                  <Popper
-                  open={openVotingTemplateOptions}
-                  anchorEl={anchorRefVotingOptionsComboBox.current}
-                  role={undefined}
-                  transition
-                  disablePortal
-                  >
-                  {({ TransitionProps, placement }) => (
-                    <Grow
-                    {...TransitionProps}
-                    style={{
-                      transformOrigin:
-                      placement === 'bottom' ? 'center top' : 'center bottom',
-                    }}
-                    >
-                    <Paper>
-                    <ClickAwayListener  onClickAway={handleCloseMenuItemVotingTemplateOptions}>
-                    <MenuList id="split-button-menu">
-                    {votingTemplateOptions.map((option, index) => (
-                      <MenuItem
-                      key={option}
-                      disabled={index === 2}
-                      selected={index === selectedIndexVotingTemplateOption}
-                      onClick={(event) => handleMenuItemVotingTemplateOptionsClick(index)}
-                      >
-                      Create {option} voting template
-                      </MenuItem>
-                      ))}
-                      </MenuList>
-                      </ClickAwayListener>
-                      </Paper>
-                      </Grow>
-                      )}
-                      </Popper>
-                      </React.Fragment>
-                      : ""
-                    }
+  else if(true || userAddress){
+    
+    return (
+      <div className="main-box">
+      {(network != NetworkType.MAINNET)?<div className="banner">WARNING: TEST ONLY {network}</div>:<span />}
+      <Box sx={{ display: 'flex' ,backgroundColor : "var(--main-bg-color)" , color : "white", justifyContent: 'space-between', textAlign: "center",  fontSize: "1.5em",  padding: "0.2em"}}>               
+      <img className="logo"
+      src="/logo_white.png"
+      alt="marigold-button"
+      />
+      
+      
+      <Button  variant="contained" sx={{marginRight:0.5}}
+      id="search"
+      onClick={() => setActiveTab("search")}
+      >
+      Search
+      </Button>
+      
+      {userAddress?
+        <React.Fragment>
+        <ButtonGroup variant="contained" ref={anchorRefVotingOptionsComboBox} aria-label="split button">
+        <Button onClick={() => setActiveTab(votingTemplateOptions[selectedIndexVotingTemplateOption])}>{votingTemplateOptions[selectedIndexVotingTemplateOption]}</Button>
+        <Button
+        size="small"
+        aria-controls={openVotingTemplateOptions ? 'split-button-menu' : undefined}
+        aria-expanded={openVotingTemplateOptions ? 'true' : undefined}
+        aria-label="select merge strategy"
+        aria-haspopup="menu"
+        onClick={handleToggleMenuItemVotingTemplateOptions}
+        >
+        <ArrowDropDownCircleRounded />
+        </Button>
+        </ButtonGroup>
+        <Popper
+        open={openVotingTemplateOptions}
+        anchorEl={anchorRefVotingOptionsComboBox.current}
+        role={undefined}
+        transition
+        disablePortal
+        >
+        {({ TransitionProps, placement }) => (
+          <Grow
+          {...TransitionProps}
+          style={{
+            transformOrigin:
+            placement === 'bottom' ? 'center top' : 'center bottom',
+          }}
+          >
+          <Paper>
+          <ClickAwayListener  onClickAway={handleCloseMenuItemVotingTemplateOptions}>
+          <MenuList id="split-button-menu">
+          {votingTemplateOptions.map((option, index) => (
+            <MenuItem
+            key={option}
+            disabled={index === 2}
+            selected={index === selectedIndexVotingTemplateOption}
+            onClick={(event) => handleMenuItemVotingTemplateOptionsClick(index)}
+            >
+            Create {option} voting template
+            </MenuItem>
+            ))}
+            </MenuList>
+            </ClickAwayListener>
+            </Paper>
+            </Grow>
+            )}
+            </Popper>
+            </React.Fragment>
+            : ""
+          }
 
+          
+          { userAddress ? <Popup trigger={<AccountCircle fontSize="large"/>} position="bottom right">
+          <p>
+          <i className="far fa-address-card"></i>&nbsp; {userAddress}
+          </p>
+          <p>
+          <i className="fas fa-piggy-bank"></i>&nbsp;
+          {(userBalance / 1000000).toLocaleString("en-US")} ꜩ
+          </p>
+          <p>
+          <i className="fas fa-bolt"></i>&nbsp;
+          {userRolls} rolls
+          </p>
+          <hr></hr>
+          <DisconnectButton
+          wallet={wallet}
+          setPublicToken={setPublicToken}
+          setUserAddress={setUserAddress}
+          setUserBalance={setUserBalance}
+          setUserRolls={setUserRolls}
+          setWallet={setWallet}
+          setTezos={setTezos}
+          setBeaconConnection={setBeaconConnection}
+          setActiveTab={setActiveTab}
+          />
+          </Popup>
+          :
+          <ConnectButton
+          Tezos={Tezos}
+          setPublicToken={setPublicToken}
+          setWallet={setWallet}
+          setUserAddress={setUserAddress}
+          setUserBalance={setUserBalance}
+          setUserRolls={setUserRolls}
+          setBeaconConnection={setBeaconConnection}
+          wallet={wallet}
+          />
+        }
+        
+        
+        
+        </Box>
+        <div id="dialog">
+        <div id="content">
+        {activeTab === "search"? (
+          <div id="search">
+          <h3 className="text-align-center">Search voting sessions</h3>
+          <Search
+          Tezos={Tezos}
+          userAddress={userAddress}
+          userRolls={userRolls}
+          votingTemplateAddresses={votingTemplateAddresses}
+          beaconConnection={beaconConnection}
+          />
+          </div>
+          ) : activeTab == VOTING_TEMPLATE.TEZOSTEMPLATE.name ? (
+            <div>
+            <h3 className="text-align-center">
+            Create new {VOTING_TEMPLATE.TEZOSTEMPLATE.name} voting session 
+            </h3>
+            <CreateTezosTemplate
+            Tezos={Tezos}
+            userAddress={userAddress}
+            votingPeriodOracle={votingPeriodOracle}
+            wallet={wallet}
+            setActiveTab={setActiveTab}
+            />
+            </div>
+            ) : 
+            (
+              <div>
+              <h3 className="text-align-center">
+              Create new {VOTING_TEMPLATE.PERMISSIONEDSIMPLEPOLL.name} voting session 
+              </h3>
+              <CreatePermissionedSimplePoll
+              Tezos={Tezos}
+              userAddress={userAddress}
+              setActiveTab={setActiveTab}
+              />
+              </div>)
+            }
+            </div>
+            
+            </div>
+            </div>
+            
+            );
+          } 
                     
-                    { userAddress ? <Popup trigger={<AccountCircle fontSize="large"/>} position="bottom right">
-                    <p>
-                    <i className="far fa-address-card"></i>&nbsp; {userAddress}
-                    </p>
-                    <p>
-                    <i className="fas fa-piggy-bank"></i>&nbsp;
-                    {(userBalance / 1000000).toLocaleString("en-US")} ꜩ
-                    </p>
-                    <p>
-                    <i className="fas fa-bolt"></i>&nbsp;
-                    {userRolls} rolls
-                    </p>
-                    <hr></hr>
-                    <DisconnectButton
-                    wallet={wallet}
-                    setPublicToken={setPublicToken}
-                    setUserAddress={setUserAddress}
-                    setUserBalance={setUserBalance}
-                    setUserRolls={setUserRolls}
-                    setWallet={setWallet}
-                    setTezos={setTezos}
-                    setBeaconConnection={setBeaconConnection}
-                    setActiveTab={setActiveTab}
-                    />
-                    </Popup>
-                    :
-                    <ConnectButton
-                    Tezos={Tezos}
-                    setPublicToken={setPublicToken}
-                    setWallet={setWallet}
-                    setUserAddress={setUserAddress}
-                    setUserBalance={setUserBalance}
-                    setUserRolls={setUserRolls}
-                    setBeaconConnection={setBeaconConnection}
-                    wallet={wallet}
-                    setFirstTime={setFirstTime}
-                    />
-                  }
-                  
-                  
-                  
-                  </Box>
-                  <div id="dialog">
-                  <div id="content">
-                  {activeTab === "search"? (
-                    <div id="search">
-                    <h3 className="text-align-center">Search voting sessions</h3>
-                    <Search
-                    Tezos={Tezos}
-                    userAddress={userAddress}
-                    userRolls={userRolls}
-                    votingTemplateAddresses={votingTemplateAddresses}
-                    beaconConnection={beaconConnection}
-                    />
-                    </div>
-                    ) : activeTab == VOTING_TEMPLATE.TEZOSTEMPLATE.name ? (
-                      <div>
-                      <h3 className="text-align-center">
-                      Create new {VOTING_TEMPLATE.TEZOSTEMPLATE.name} voting session 
-                      </h3>
-                      <CreateTezosTemplate
-                      Tezos={Tezos}
-                      userAddress={userAddress}
-                      votingPeriodOracle={votingPeriodOracle}
-                      wallet={wallet}
-                      setActiveTab={setActiveTab}
-                      />
-                      </div>
-                      ) : 
-                      (
-                        <div>
-                        <h3 className="text-align-center">
-                        Create new {VOTING_TEMPLATE.PERMISSIONEDSIMPLEPOLL.name} voting session 
-                        </h3>
-                        <CreatePermissionedSimplePoll
-                        Tezos={Tezos}
-                        userAddress={userAddress}
-                        setActiveTab={setActiveTab}
-                        />
-                        </div>)
-                      }
-                      </div>
-                      
-                      </div>
-                      </div>
-                      
-                      );
-                    } 
-                    
-                    else {
-                      console.log("firstTime",firstTime,"publicToken",publicToken,"userAddress",userAddress,"userBalance",userBalance);
-                      return "An error occured !"
-                    }
+  else {
+    console.log("publicToken",publicToken,"userAddress",userAddress,"userBalance",userBalance);
+    return "An error occured !"
+  }
                     
                   };
                   
