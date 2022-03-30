@@ -12,15 +12,15 @@ let assert_failure = ([result,message] : [test_exec_result,string]) : bool => {
   };
   
   // reset state
-  let _reset = Test.reset_state ( 10 as nat, list([]) as list <tez> );
+  let _ = Test.reset_state ( 10 as nat, list([]) as list <tez> );
   let faucet = Test.nth_bootstrap_account(0);
   let sender1 : address = Test.nth_bootstrap_account(1);
   let sender2 : address = Test.nth_bootstrap_account(2);
   let sender3 : address = Test.nth_bootstrap_account(3);                        
   let johndoe : address = Test.nth_bootstrap_account(4);           
   
-  let _setbaker = Test.set_baker(faucet);
-  let _setsource = Test.set_source(sender1);
+  let _ = Test.set_baker(faucet);
+  let _ = Test.set_source(sender1);
 
   
   let initial_storage = 
@@ -37,8 +37,8 @@ let assert_failure = ([result,message] : [test_exec_result,string]) : bool => {
 
 let [taddr, _, _] = Test.originate(main, initial_storage, (0 as tez));
 let contr = Test.to_contract(taddr);
-let log_2 = Test.log("voteContract");
-let log_3 = Test.log(contr);
+let _ = Test.log("voteContract");
+let _ = Test.log(contr);
 
 let _testOriginate = () : bool => {
   assert((Test.get_storage(taddr) as storage).name  == "Which is the cutiest pokemon?");
@@ -104,7 +104,7 @@ let _testRemoveVoterFail = ( [s1,s2,message] : [address,address,string]) : bool 
 
 let testOriginate = _testOriginate();
 
-let _currentTime = Test.set_now("2022-03-01T00:00:00Z" as timestamp);
+let _ = Test.set_now("2022-03-01T00:00:00Z" as timestamp);
 //votes
 let testSender1VoteUnknownOption = _testVoteFail(sender1, "Batman","Option does not exist");
 let testSender1VotePikachu = _testVote(sender1,"Pikachu",1);
@@ -122,5 +122,5 @@ let testSender1Removejohndoe = _testRemoveVoter(sender1,johndoe);
 let testSender1RemovejohndoeAgainAndFail = _testRemoveVoterFail(sender1,johndoe,"User not found");
 
 //test out of time period for voting
-let _oldTime = Test.set_now("2024-02-01T00:00:00Z" as timestamp);
+let _ = Test.set_now("2024-02-01T00:00:00Z" as timestamp);
 let testVoteOutOfDate = _testVoteFailOutOfDate(sender1,"Pikachu","Not yet the time to vote");

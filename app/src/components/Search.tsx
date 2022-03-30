@@ -601,6 +601,22 @@ const Search = ({
                         }}  
                         />
                         
+                        {contracts.length == 0? 
+                                                <div id="dialog-login">
+                                                <header>Free voting Dapp</header>
+                                                <div id="content-login">
+                                                <div>
+                                                Voting session journey
+                                                <div>
+                                                 <hr /> 
+                                                <div>Login : Connect to your wallet to enable blockchain interactions, or just skip and continue read only</div>
+                                                <br />
+                                                <div>Search : See voting session details, vote and display results on status icon</div>
+                                                <br />
+                                                <div>Create : Create new voting sessions from templates <Tooltip enterTouchDelay={0} title={VOTING_TEMPLATE.PERMISSIONEDSIMPLEPOLL.description}><Chip color="info" label={VOTING_TEMPLATE.PERMISSIONEDSIMPLEPOLL.name}/></Tooltip> or <Tooltip enterTouchDelay={0} title={VOTING_TEMPLATE.TEZOSTEMPLATE.description}><Chip color="info" label={VOTING_TEMPLATE.TEZOSTEMPLATE.name}/></Tooltip></div>
+                                                </div>
+                                                </div>
+                                                </div></div> :""}
                         
                         
                         {contracts.map((contract, index) => (

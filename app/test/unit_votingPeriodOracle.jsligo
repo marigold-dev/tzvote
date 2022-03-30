@@ -34,7 +34,7 @@ let assert_failure = ([result,message] : [test_exec_result,string]) : bool => {
   };
   
   
-  let _1 = Test.reset_state ( 3 as nat, list([]) as list <tez> );
+  let _ = Test.reset_state ( 3 as nat, list([]) as list <tez> );
   let baker1 = Test.nth_bootstrap_account(0);
   let admin = Test.nth_bootstrap_account(1);
   
@@ -44,8 +44,8 @@ let assert_failure = ([result,message] : [test_exec_result,string]) : bool => {
   
   
   
-  let _2 = Test.set_source(admin);
-  let _3 = Test.set_baker(baker1);
+  let _ = Test.set_source(admin);
+  let _ = Test.set_baker(baker1);
   
   
   let initial_storage = {
