@@ -216,6 +216,7 @@ const App = () => {
         </Button>
         </ButtonGroup>
         <Popper
+        sx={{zIndex:"99999"}}
         open={openVotingTemplateOptions}
         anchorEl={anchorRefVotingOptionsComboBox.current}
         role={undefined}
