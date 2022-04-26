@@ -28,7 +28,8 @@ const App = () => {
     const [wallet, setWallet] = useState<any>(null);
     const [userAddress, setUserAddress] = useState<string>("");
     const [userBalance, setUserBalance] = useState<number>(0);
-    const [userRolls, setUserRolls] = useState<number>(0);
+    const [bakerDelegators, setBakerDelegators] = useState<string[]>(new Array<string>());
+    const [bakerPower, setBakerPower] =  useState<number>(0);
     const [copiedPublicToken, setCopiedPublicToken] = useState<boolean>(false);
     const [beaconConnection, setBeaconConnection] = useState<boolean>(false);
     const [activeTab, setActiveTab] = useState<string>("search");
@@ -104,7 +105,8 @@ const App = () => {
       setWallet={setWallet}
       setUserAddress={setUserAddress}
       setUserBalance={setUserBalance}
-      setUserRolls={setUserRolls}
+      setBakerDelegators={setBakerDelegators}
+      setBakerPower={setBakerPower}
       setBeaconConnection={setBeaconConnection}
       wallet={wallet}
       />
@@ -263,17 +265,21 @@ const App = () => {
           <i className="fas fa-piggy-bank"></i>&nbsp;
           {(userBalance / 1000000).toLocaleString("en-US")} ꜩ
           </p>
+          
+          {bakerDelegators.length>0?
           <p>
           <i className="fas fa-bolt"></i>&nbsp;
-          {userRolls} rolls
+          {bakerPower} from {bakerDelegators.length} delegators
           </p>
+          :""}
+
           <hr></hr>
           <DisconnectButton
           wallet={wallet}
           setPublicToken={setPublicToken}
           setUserAddress={setUserAddress}
           setUserBalance={setUserBalance}
-          setUserRolls={setUserRolls}
+          setBakerDelegators={setBakerDelegators}
           setWallet={setWallet}
           setTezos={setTezos}
           setBeaconConnection={setBeaconConnection}
@@ -287,7 +293,8 @@ const App = () => {
           setWallet={setWallet}
           setUserAddress={setUserAddress}
           setUserBalance={setUserBalance}
-          setUserRolls={setUserRolls}
+          setBakerDelegators={setBakerDelegators}
+          setBakerPower={setBakerPower}
           setBeaconConnection={setBeaconConnection}
           wallet={wallet}
           />
@@ -304,7 +311,7 @@ const App = () => {
           <Search
           Tezos={Tezos}
           userAddress={userAddress}
-          userRolls={userRolls}
+          bakerPower={bakerPower}
           votingTemplateAddresses={votingTemplateAddresses}
           beaconConnection={beaconConnection}
           />
@@ -331,6 +338,7 @@ const App = () => {
               <CreatePermissionedSimplePoll
               Tezos={Tezos}
               userAddress={userAddress}
+              bakerDelegators={bakerDelegators}
               setActiveTab={setActiveTab}
               />
               </div>)
