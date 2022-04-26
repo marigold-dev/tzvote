@@ -41,7 +41,7 @@ const ConnectButton = ({
       if(delegatesResponse !== undefined && delegatesResponse.delegated_contracts !== undefined && delegatesResponse.delegated_balance !== undefined){
         console.log("We have a baker");
         setBakerDelegators(delegatesResponse.delegated_contracts);
-        setBakerPower(Number(delegatesResponse.delegated_balance));
+        setBakerPower(Number(delegatesResponse.voting_power));
       }else{
         setBakerPower(0);
         console.log("We have a baker with no power");

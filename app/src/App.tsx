@@ -336,7 +336,7 @@ const App = () => {
               Create new {VOTING_TEMPLATE.PERMISSIONEDSIMPLEPOLL.name} voting session 
               </h3>
               <CreatePermissionedSimplePoll
-              Tezos={Tezos}
+              Tezos={Tezos} 
               userAddress={userAddress}
               bakerDelegators={bakerDelegators}
               setActiveTab={setActiveTab}
