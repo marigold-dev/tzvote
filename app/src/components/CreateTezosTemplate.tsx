@@ -149,13 +149,13 @@ const CreateTezosTemplate = ({ Tezos, userAddress , votingPeriodOracle, wallet, 
         <Grid item xs={12}>
         
 
-        <Tooltip open={contract.options.length==0} title="At least one option is needed" placement="top-end" aria-label="add"> 
         <FormLabel error={contract.options.length==0} required id="demo-radio-buttons-group-label">Options</FormLabel>
-        </Tooltip>
 
         <Box alignContent={"center"}>
         <TextField value={inputOption} label="type your option here" onChange={(e) => setInputOption(e.target.value)} ></TextField>
+        <Tooltip open={contract.options.length==0} title="At least one option is needed" placement="top-end" aria-label="add"> 
         <Button sx={{ marginLeft: "1em" }}  variant="outlined" onClick={()=>{setContract({...contract, options : contract.options.concat(inputOption)} as TezosTemplateVotingContract);setInputOption("");}}><Add style={{padding : "0.4em 0em"}}/></Button>
+        </Tooltip>
         </Box>
         
         <List inputMode="text" >
@@ -177,7 +177,7 @@ const CreateTezosTemplate = ({ Tezos, userAddress , votingPeriodOracle, wallet, 
           </Grid>
           <Grid item xs={12}>
           <Box textAlign='center'>
-          <Button sx={{ mt: 1, mr: 1 }} type="submit" variant="contained">
+          <Button sx={{ mt: 1, mr: 1 }} type="submit" variant="contained" disabled={!contract.name || !contract.votingPeriodIndex || contract.options.length == 0}>
           CREATE
           </Button>
           </Box>

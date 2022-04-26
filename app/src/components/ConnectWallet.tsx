@@ -12,7 +12,8 @@ type ButtonProps = {
   setWallet: Dispatch<SetStateAction<any>>;
   setUserAddress: Dispatch<SetStateAction<string>>;
   setUserBalance: Dispatch<SetStateAction<number>>;
-  setUserRolls: Dispatch<SetStateAction<number>>;
+  setBakerDelegators: Dispatch<SetStateAction<string[]>>;
+  setBakerPower: Dispatch<SetStateAction<number>>;
   setBeaconConnection: Dispatch<SetStateAction<boolean>>;
   setPublicToken: Dispatch<SetStateAction<string | null>>;
   wallet: BeaconWallet;
@@ -23,7 +24,8 @@ const ConnectButton = ({
   setWallet,
   setUserAddress,
   setUserBalance,
-  setUserRolls,
+  setBakerDelegators,
+  setBakerPower,
   setBeaconConnection,
   wallet
 }: ButtonProps): JSX.Element => {
@@ -33,17 +35,19 @@ const ConnectButton = ({
     // updates balance
     const balance = await Tezos.tz.getBalance(userAddress);
     setUserBalance(balance.toNumber());
-    //update rolls
+    //update baker power
     try {
       const delegatesResponse : DelegatesResponse = await Tezos.rpc.getDelegates(userAddress);
-      if(delegatesResponse != undefined && delegatesResponse.voting_power != undefined){
-        console.log("Pricing power found : "+delegatesResponse.voting_power);
-        setUserRolls(delegatesResponse.voting_power);
+      if(delegatesResponse !== undefined && delegatesResponse.delegated_contracts !== undefined && delegatesResponse.delegated_balance !== undefined){
+        console.log("We have a baker");
+        setBakerDelegators(delegatesResponse.delegated_contracts);
+        setBakerPower(Number(delegatesResponse.voting_power));
       }else{
-        console.log("No Pricing power found");
+        setBakerPower(0);
+        console.log("We have a baker with no power");
       }
     } catch (error) {
-      console.log("No delegate found");
+      console.log("We have a simple user");
     }
   };
 

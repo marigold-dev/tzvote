@@ -6,13 +6,14 @@ let assert_failure = ([result,message] : [test_exec_result,string]) : bool => {
     Success: (_ : nat) => false,
     Fail: ( tee : test_exec_error ) => 
       match(tee,{
-        Other: () => false, 
+        Other: (msg : string) => {Test.log("ERROR Other : "+msg) ; return false}, 
+        Balance_too_low : (record : [ address ,  tez , tez ]) => {Test.log("ERROR Balance_too_low") ; return false}, 
         Rejected: (s:[michelson_program , address])=>{  Test.log (["expected error : ", message, " Actual : "]) ; Test.log(s[0]) ; return ((Test.eval(message)) == s[0]) } }) 
     })
   };
   
   // reset state
-  let _ = Test.reset_state ( 10 as nat, list([]) as list <tez> );
+  let _ = Test.reset_state ( 5 as nat, list([]) as list <tez> );
   let faucet = Test.nth_bootstrap_account(0);
   let sender1 : address = Test.nth_bootstrap_account(1);
   let sender2 : address = Test.nth_bootstrap_account(2);
@@ -104,9 +105,14 @@ let _testRemoveVoterFail = ( [s1,s2,message] : [address,address,string]) : bool 
 
 let testOriginate = _testOriginate();
 
-let _ = Test.set_now("2022-03-01T00:00:00Z" as timestamp);
+
+//FIXME 
+//val bake_until_n_cycle_end : nat -> unit
+//It bakes until a number of cycles pass, so that an account registered as delegate can effectively act as a baker.
+
 //votes
 let testSender1VoteUnknownOption = _testVoteFail(sender1, "Batman","Option does not exist");
+
 let testSender1VotePikachu = _testVote(sender1,"Pikachu",1);
 let testSender1VotePikachuAgainAndFail = _testVoteFail(sender1,"Pikachu","A vote with option Pikachu  already exists for this user");
 let testSender2VotePikachu = _testVote(sender2,"Pikachu",2);
@@ -122,5 +128,5 @@ let testSender1Removejohndoe = _testRemoveVoter(sender1,johndoe);
 let testSender1RemovejohndoeAgainAndFail = _testRemoveVoterFail(sender1,johndoe,"User not found");
 
 //test out of time period for voting
-let _ = Test.set_now("2024-02-01T00:00:00Z" as timestamp);
+let _ = Test.bake_until_n_cycle_end(100 as nat);
 let testVoteOutOfDate = _testVoteFailOutOfDate(sender1,"Pikachu","Not yet the time to vote");

@@ -14,20 +14,19 @@ import * as moment from 'moment';
 import momentDurationFormatSetup from 'moment-duration-format';
 import {  NetworkType} from "@airgap/beacon-sdk";
 import { ReactJSXElement } from "@emotion/react/types/jsx-namespace";
-import { padding } from "@mui/system";
 momentDurationFormatSetup(moment);
 
 const Search = ({
   Tezos,
   userAddress,
   votingTemplateAddresses,
-  userRolls,
+  bakerPower,
   beaconConnection
 }: {
   Tezos: TezosToolkit;
   userAddress: string;
   votingTemplateAddresses: Map<VOTING_TEMPLATE,string>; 
-  userRolls:number;
+  bakerPower:number;
   beaconConnection:boolean;
 }): JSX.Element => {
   
@@ -222,7 +221,7 @@ const Search = ({
       const buttonChoices = (contract : VotingContract) => {
         let canVote = false;
         switch(contract.type){
-        case VOTING_TEMPLATE.TEZOSTEMPLATE : canVote = (contract as TezosTemplateVotingContract).userCanVoteNow(userAddress,userRolls);break; 
+        case VOTING_TEMPLATE.TEZOSTEMPLATE : canVote = (contract as TezosTemplateVotingContract).userCanVoteNow(userAddress,bakerPower);break; 
         case VOTING_TEMPLATE.PERMISSIONEDSIMPLEPOLL : canVote = (contract as PermissionedSimplePollVotingContract).userCanVoteNow(userAddress);break;
         }
         return(
@@ -506,7 +505,7 @@ const Search = ({
                         <div style={{padding:"0.2em"}}><Chip avatar={<Avatar>{selectedContract?.votes.size}</Avatar>} label="Voters"/></div>
                         
                         {selectedContract.type == VOTING_TEMPLATE.TEZOSTEMPLATE?
-                        <div style={{padding:"0.2em"}}><Chip avatar={<Avatar>{Array.from(selectedContract?.results.values()).reduce( ( value :number , acc : number) => value + acc, 0)   }</Avatar>} label="Rolls"/></div>
+                        <div style={{padding:"0.2em"}}><Chip avatar={<Avatar>{Array.from(selectedContract?.results.values()).reduce( ( value :number , acc : number) => value + acc, 0)   }</Avatar>} label="Baker power"/></div>
                         :""}
                         </Grid>
                       </Grid>

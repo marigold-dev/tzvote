@@ -6,7 +6,8 @@ let assert_failure = ([result,message] : [test_exec_result,string]) : bool => {
     Success: (_ : nat) => false,
     Fail: ( tee : test_exec_error ) => 
       match(tee,{
-        Other: () => false, 
+        Other: (msg : string) => {Test.log("ERROR Other : "+msg) ; return false}, 
+        Balance_too_low : (record : [ address ,  tez , tez ]) => {Test.log("ERROR Balance_too_low") ; return false}, 
         Rejected: (s:[michelson_program , address])=>{  Test.log (["expected error : ", message, " Actual : "]) ; Test.log(s[0]) ; return ((Test.eval(message)) == s[0]) } }) 
     })
   };
@@ -33,25 +34,25 @@ let assert_failure = ([result,message] : [test_exec_result,string]) : bool => {
   
   // account list
   let senderKey1 : [string,key] = Test.new_account();
-  let _ = Test.baker_account(senderKey1, Some ((8000 as tez)));
+  let _ = Test.baker_account(senderKey1, Some ((6500 as tez)));
   let senderKey2 : [string,key] = Test.new_account();
-  let _ = Test.baker_account(senderKey2 , Some ((16000 as tez)));
+  let _ = Test.baker_account(senderKey2 , Some ((12500 as tez)));
   let senderKey3 : [string,key] = Test.new_account();
-  let _ = Test.baker_account(senderKey3 , Some ((24000 as tez)));
+  let _ = Test.baker_account(senderKey3 , Some ((18500 as tez)));
   let johndoeKey : [string,key] = Test.new_account();
   
   let keys : list<[string,key]> = list([senderKey1,senderKey2,senderKey3,johndoeKey]);
 
   // reset state
-  let _ = Test.reset_state ( 10 as nat, list([]) as list <tez> );
+  let _ = Test.reset_state ( 2 as nat, list([]) as list <tez> );
   let faucet = Test.nth_bootstrap_account(0);
-  
+
   let addresses : list<address> = List.fold(initAccount, keys, list([]) as list<address>);
   
-  let sender1 : address = Option.unopt ( List.head_opt(addresses));
-  let sender2 : address = Option.unopt ( List.head_opt(Option.unopt( List.tail_opt(addresses))));
-  let sender3 : address = Option.unopt ( List.head_opt(Option.unopt( List.tail_opt( Option.unopt(List.tail_opt(addresses))))));                         
-  let johndoe : address = Option.unopt ( List.head_opt(Option.unopt ( List.tail_opt(Option.unopt( List.tail_opt( Option.unopt(List.tail_opt(addresses))))))));     
+  let johndoe : address = Option.unopt ( List.head_opt(addresses));
+  let sender3 : address = Option.unopt ( List.head_opt(Option.unopt( List.tail_opt(addresses))));
+  let sender2 : address = Option.unopt ( List.head_opt(Option.unopt( List.tail_opt( Option.unopt(List.tail_opt(addresses))))));                         
+  let sender1 : address = Option.unopt ( List.head_opt(Option.unopt ( List.tail_opt(Option.unopt( List.tail_opt( Option.unopt(List.tail_opt(addresses))))))));     
   
   let _ = Test.set_baker(faucet);
   let _ = Test.set_source(sender1);
@@ -65,7 +66,7 @@ let assert_failure = ([result,message] : [test_exec_result,string]) : bool => {
     votingPeriodIndexes: Map.literal(list([["ithacanet",25 as nat],["granadanet",254 as nat]]))
   };
   let mStorage = Test.compile_value(oracleInitialStorage);
-  let [oracletaddr, _, _] = Test.originate_from_file("../src/contracttemplates/votingPeriodOracle.jsligo" ,"main", mStorage, 0 as tez);  
+  let [oracletaddr, _, _] = Test.originate_from_file("../src/contracttemplates/votingPeriodOracle.jsligo" ,"main", list([]) as list<string>,mStorage, 0 as tez);  
   let toracletaddr : typed_address<[list<operation>, oracleStorage],oracleStorage> = Test.cast_address(oracletaddr) ;
   let oracleContract = Test.to_contract(toracletaddr);
   let log_ = Test.log("oracleContract");
@@ -99,8 +100,19 @@ let _testOriginate = () : bool => {
 
 let _testVote = ([s,o,k,voteCount] : [address,string,key_hash,int]) : bool => {
   Test.set_source(s);
+
+  Test.log("BEFORE RUN");
+  Test.log(s);
+  Test.log(Test.get_balance(s));
+
   let status = Test.transfer_to_contract(contr, (Vote([o,k])), 1 as mutez);
   Test.log(status);
+
+
+  Test.log("AFTER RUN");
+  Test.log(Test.get_balance(s));
+
+
   let st = (Test.get_storage(taddr) as storage);
   Test.log(st);
   assert(Option.unopt(Map.find_opt(s,st.votes))  == o);

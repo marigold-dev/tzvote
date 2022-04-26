@@ -43,10 +43,10 @@ export abstract class VotingContract{
         /**
         * Return if user can vote now
         * @param userAddress the user address
-        * @param userRolls (optional) user roll number 
+        * @param bakerPower (optional) baker power number 
         * @returns boolean
         */
-        abstract userCanVoteNow(userAddress : string, userRolls? : number) : boolean;
+        abstract userCanVoteNow(userAddress : string, bakerPower? : number) : boolean;
         
     }
     
@@ -89,7 +89,7 @@ export abstract class VotingContract{
                     this.status = (new Date > this.dateFrom && new Date() < this.dateTo )?STATUS.ONGOING:STATUS.LOCKED;
                 }; 
                 
-                userCanVoteNow(userAddress: string, userRolls?: number, Tezos?:TezosToolkit): boolean {
+                userCanVoteNow(userAddress: string, bakerPower?: number, Tezos?:TezosToolkit): boolean {
                     return !this.votes.has(userAddress!) && (this.status == STATUS.ONGOING ) && this.registeredVoters.indexOf(userAddress) >=0; 
                 }    
                 
@@ -119,8 +119,8 @@ export abstract class VotingContract{
                         this.protocol=protocol;
                     };
                     
-                    userCanVoteNow(userAddress: string, userRolls?: number): boolean {
-                        return !this.votes.has(userAddress!) && ( this.status == STATUS.ONGOING ) && userRolls! > 0; 
+                    userCanVoteNow(userAddress: string, bakerPower?: number): boolean {
+                        return !this.votes.has(userAddress!) && ( this.status == STATUS.ONGOING ) && bakerPower! > 0; 
                     } 
                     
                 }

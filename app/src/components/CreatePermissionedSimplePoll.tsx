@@ -15,10 +15,11 @@ const jsonContractTemplate = require('../contracttemplates/permissionedSimplePol
 interface CreateProps {
   Tezos: TezosToolkit;
   userAddress: string;
+  bakerDelegators: string[];
   setActiveTab : Dispatch<SetStateAction<string>>;
 }
 
-const CreatePermissionedSimplePoll = ({ Tezos, userAddress , setActiveTab }: CreateProps) => {
+const CreatePermissionedSimplePoll = ({ Tezos, userAddress ,bakerDelegators, setActiveTab }: CreateProps) => {
   
   //TEZOS OPERATIONS
   const [tezosLoading, setTezosLoading]  = React.useState(false);
@@ -137,13 +138,13 @@ const CreatePermissionedSimplePoll = ({ Tezos, userAddress , setActiveTab }: Cre
     <Grid item xs={12}>
     
     
-    <Tooltip open={contract.options.length==0} title="At least one option is needed" placement="top-end" aria-label="add"> 
     <FormLabel error={contract.options.length==0} required id="demo-radio-buttons-group-label">Options</FormLabel>
-    </Tooltip>
     
     <Box alignContent={"center"}>
     <TextField value={inputOption} label="type your option here" onChange={(e) => setInputOption(e.target.value)} ></TextField>
+    <Tooltip open={contract.options.length==0} title="At least one option is needed" placement="top-end" aria-label="add"> 
     <Button sx={{ marginLeft: "1em" }}  variant="outlined" onClick={()=>{setContract({...contract, options : contract.options.concat(inputOption)} as PermissionedSimplePollVotingContract);setInputOption("");}}><Add style={{padding : "0.4em 0em"}}/></Button>
+    </Tooltip>
     </Box>
     
     <List inputMode="text" >
@@ -165,6 +166,11 @@ const CreatePermissionedSimplePoll = ({ Tezos, userAddress , setActiveTab }: Cre
 
     <FormLabel >Registered voters</FormLabel>
       <Box alignContent={"center"}>
+
+    {bakerDelegators.length>0?
+    <Button sx={{ marginRight: "1em" , marginBottom : "0.2em"}}  variant="outlined" onClick={()=>{setContract({...contract, registeredVoters : bakerDelegators} as PermissionedSimplePollVotingContract)}}>Add all delegators</Button>
+    :""}
+
     <TextField value={inputVoter} label="Add voter here" onChange={(e) => setInputVoter(e.target.value)} ></TextField>
     <Button sx={{ marginLeft: "1em" }}  variant="outlined" onClick={()=>{setContract({...contract, registeredVoters : contract.registeredVoters.concat(inputVoter)} as PermissionedSimplePollVotingContract);setInputVoter("")}}><Add style={{padding : "0.4em 0em"}}/></Button>
     </Box>
