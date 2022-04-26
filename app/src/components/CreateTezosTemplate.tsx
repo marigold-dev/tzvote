@@ -127,7 +127,7 @@ const CreateTezosTemplate = ({ Tezos, userAddress , votingPeriodOracle, wallet, 
     defaultValue="25"
     name="radio-buttons-group"
     value={contract.votingPeriodIndex}
-    onChange={(e) => {contract.votingPeriodIndex= Number(e.target.value);setContract(contract)}}
+    onChange={(e) => {setContract({...contract, votingPeriodIndex : Number(e.target.value!)}  as TezosTemplateVotingContract)}}
     >
     {[
       ...Array(5),

@@ -72,7 +72,7 @@ const App = () => {
     * LANDING PAGE FIRST TIME
     *  */  
     //console.log("firstTime",firstTime,"publicToken",publicToken,"userAddress",userAddress,"userBalance",userBalance);
-    let network = process.env["REACT_APP_NETWORK"]? NetworkType[process.env["REACT_APP_NETWORK"].toUpperCase() as keyof typeof NetworkType] : NetworkType.HANGZHOUNET;
+    let network = process.env["REACT_APP_NETWORK"]? NetworkType[process.env["REACT_APP_NETWORK"].toUpperCase() as keyof typeof NetworkType] : NetworkType.ITHACANET;
     
     if (false && !userAddress && (!publicToken || publicToken==null))
     return (
@@ -216,6 +216,7 @@ const App = () => {
         </Button>
         </ButtonGroup>
         <Popper
+        sx={{zIndex:"99999"}}
         open={openVotingTemplateOptions}
         anchorEl={anchorRefVotingOptionsComboBox.current}
         role={undefined}

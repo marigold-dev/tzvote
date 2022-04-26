@@ -9,7 +9,7 @@ jobs:
   docker:
     strategy:
       matrix:
-        network: [hangzhounet, ithacanet]
+        network: [ithacanet]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout

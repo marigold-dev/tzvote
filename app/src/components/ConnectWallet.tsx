@@ -51,7 +51,7 @@ const ConnectButton = ({
     try {
       await wallet.requestPermissions({
         network: {
-          type: process.env["REACT_APP_NETWORK"]? NetworkType[process.env["REACT_APP_NETWORK"].toUpperCase() as keyof typeof NetworkType]  : NetworkType.HANGZHOUNET,
+          type: process.env["REACT_APP_NETWORK"]? NetworkType[process.env["REACT_APP_NETWORK"].toUpperCase() as keyof typeof NetworkType]  : NetworkType.ITHACANET,
           rpcUrl: process.env["REACT_APP_TEZOS_NODE"]
         }
       });
@@ -70,7 +70,7 @@ const ConnectButton = ({
       // creates a wallet instance if not exists
       if(!wallet){wallet = new BeaconWallet({
         name: "TzVote",
-        preferredNetwork: process.env["REACT_APP_NETWORK"]? NetworkType[process.env["REACT_APP_NETWORK"].toUpperCase() as keyof typeof NetworkType]  : NetworkType.HANGZHOUNET,
+        preferredNetwork: process.env["REACT_APP_NETWORK"]? NetworkType[process.env["REACT_APP_NETWORK"].toUpperCase() as keyof typeof NetworkType]  : NetworkType.ITHACANET,
       });}
       Tezos.setWalletProvider(wallet);
       setWallet(wallet);

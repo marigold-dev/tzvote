@@ -16,7 +16,7 @@ ligo compile contract votingPeriodOracle.jsligo --output-file votingPeriodOracle
 
 ligo compile storage votingPeriodOracle.jsligo '{votingPeriodIndexes:(Map.empty as map<string, nat>),admin:("tz1VApBuWHuaTfDHtKzU3NBtWFYsxJvvWhYk" as address)}' --output-file votingPeriodOracleStorage.tz --entry-point main
 
-ligo compile parameter votingPeriodOracle.jsligo 'UpdateCurrentVotingPeriod(["hangzhounet",(29 as nat)])' --output-file votingPeriodOracleParameter.tz --entry-point main
+ligo compile parameter votingPeriodOracle.jsligo 'UpdateCurrentVotingPeriod(["ithacanet",(29 as nat)])' --output-file votingPeriodOracleParameter.tz --entry-point main
 
 ```
 
@@ -25,7 +25,7 @@ ligo compile parameter votingPeriodOracle.jsligo 'UpdateCurrentVotingPeriod(["ha
 ### Dry run
 
 ```
-ligo run dry-run votingPeriodOracle.jsligo 'UpdateCurrentVotingPeriod(["hangzhounet",(27 as nat)])' '{votingPeriodIndexes:(Map.empty as map<string, nat>),admin:("tz1VApBuWHuaTfDHtKzU3NBtWFYsxJvvWhYk" as address)}'
+ligo run dry-run votingPeriodOracle.jsligo 'UpdateCurrentVotingPeriod(["ithacanet",(27 as nat)])' '{votingPeriodIndexes:(Map.empty as map<string, nat>),admin:("tz1VApBuWHuaTfDHtKzU3NBtWFYsxJvvWhYk" as address)}'
 
 ```
 
@@ -45,7 +45,7 @@ tezos-client originate contract oracle transferring 0 from tz1VApBuWHuaTfDHtKzU3
 ### initialize some data
 
 ```
-tezos-client transfer 0 from tz1VApBuWHuaTfDHtKzU3NBtWFYsxJvvWhYk to KT1GLuqbSEoaRb3GE4UtUgGkDukVS766V53A  --arg '(Right (Pair "hangzhounet" 27))' --burn-cap 0.005
+tezos-client transfer 0 from tz1VApBuWHuaTfDHtKzU3NBtWFYsxJvvWhYk to KT1GLuqbSEoaRb3GE4UtUgGkDukVS766V53A  --arg '(Right (Pair "ithacanet" 27))' --burn-cap 0.005
 ```
 
 # Smart contract
@@ -55,7 +55,7 @@ tezos-client transfer 0 from tz1VApBuWHuaTfDHtKzU3NBtWFYsxJvvWhYk to KT1GLuqbSEo
 ```
 ligo compile contract tezosTemplate3.jsligo --output-file tezosTemplate3.tz --entry-point main
 
-ligo compile storage tezosTemplate3.jsligo '{  name : "Which is the cutiest pokemon?",votingPeriodIndex : (27 as nat),  options : list(["Mew","Pikachu"]) ,  votes : (Map.empty as map<address, string>),  results : (Map.empty as map<string, int>) , votingPeriodOracle :  ("KT1GLuqbSEoaRb3GE4UtUgGkDukVS766V53A" as address)  ,   protocol : "hangzhounet"}' --output-file tezosTemplate3Storage.tz --entry-point main
+ligo compile storage tezosTemplate3.jsligo '{  name : "Which is the cutiest pokemon?",votingPeriodIndex : (27 as nat),  options : list(["Mew","Pikachu"]) ,  votes : (Map.empty as map<address, string>),  results : (Map.empty as map<string, int>) , votingPeriodOracle :  ("KT1GLuqbSEoaRb3GE4UtUgGkDukVS766V53A" as address)  ,   protocol : "ithacanet"}' --output-file tezosTemplate3Storage.tz --entry-point main
 
 ligo compile parameter tezosTemplate3.jsligo 'Vote(["Pikachu",Crypto.hash_key("edpkuBknW28nW72KG6RoHtYW7p12T6GKc7nAbwYX5m8Wd9sDVC9yav" as key)])' --output-file tezosTemplate3Parameter.tz --entry-point main
 
@@ -73,7 +73,7 @@ ligo compile contract tezosTemplate3.jsligo --output-file ./tezosTemplate3.tz.js
 ### Dry run
 
 ```
-ligo run dry-run tezosTemplate3.jsligo 'Vote(["Pikachu",Crypto.hash_key("edpkuBknW28nW72KG6RoHtYW7p12T6GKc7nAbwYX5m8Wd9sDVC9yav" as key)])' '{  name : "Which is the cutiest pokemon?",votingPeriodIndex : (27 as nat),  options : list(["Mew","Pikachu"]) ,  votes : (Map.empty as map<address, string>),  results : (Map.empty as map<string, int>)  , votingPeriodOracle :  ("KT1GLuqbSEoaRb3GE4UtUgGkDukVS766V53A" as address)  ,   protocol : "hangzhounet"}' 
+ligo run dry-run tezosTemplate3.jsligo 'Vote(["Pikachu",Crypto.hash_key("edpkuBknW28nW72KG6RoHtYW7p12T6GKc7nAbwYX5m8Wd9sDVC9yav" as key)])' '{  name : "Which is the cutiest pokemon?",votingPeriodIndex : (27 as nat),  options : list(["Mew","Pikachu"]) ,  votes : (Map.empty as map<address, string>),  results : (Map.empty as map<string, int>)  , votingPeriodOracle :  ("KT1GLuqbSEoaRb3GE4UtUgGkDukVS766V53A" as address)  ,   protocol : "ithacanet"}' 
 ```
 
 ### Unit tests
