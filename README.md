@@ -11,7 +11,6 @@ TzVote is a dapp for voting purpose composed by :
 
 The app is available on all networks :
  - [MAINNET](https://tzvote.marigold.dev/)
- - [HANGZHOUNET](https://hangzhounet.tzvote.marigold.dev/)
  - [ITHACANET](https://ithacanet.tzvote.marigold.dev/) 
 
 ![](doc/home.png)

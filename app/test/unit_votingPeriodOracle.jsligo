@@ -64,7 +64,7 @@ let assert_failure = ([result,message] : [test_exec_result,string]) : bool => {
   votes : (Map.empty as map<address, string>), 
   results : (Map.empty as map<string, int>),
   votingPeriodOracle : contr,
-  protocol : "hangzhounet" } ;
+  protocol : "ithacanet" } ;
   
   
   let mStorage = Test.compile_value(votingInitial_storage);
@@ -108,9 +108,9 @@ let assert_failure = ([result,message] : [test_exec_result,string]) : bool => {
   let testOriginate = _testOriginate();
   
   //FILL
-  let testSender1UpdateNotAdmin = _testUpdateFail(sender1, "hangzhounet",25 as nat,"You are not the admin !!!");
-  let testAdminUpdateHangzhou = _testUpdate(admin,"hangzhounet",25 as nat);
-  let testAdminUpdateHangzhouAgain = _testUpdate(admin,"hangzhounet",26 as nat);
+  let testSender1UpdateNotAdmin = _testUpdateFail(sender1, "ithacanet",25 as nat,"You are not the admin !!!");
+  let testAdminUpdateIthaca = _testUpdate(admin,"ithacanet",25 as nat);
+  let testAdminUpdateIthacaAgain = _testUpdate(admin,"ithacanet",26 as nat);
   let testAdminUpdateGranada = _testUpdate(admin,"granadanet",254 as nat);
   
   //GET

@@ -62,7 +62,7 @@ let assert_failure = ([result,message] : [test_exec_result,string]) : bool => {
   
   let oracleInitialStorage = {
     admin : faucet,
-    votingPeriodIndexes: Map.literal(list([["hangzhounet",25 as nat],["granadanet",254 as nat]]))
+    votingPeriodIndexes: Map.literal(list([["ithacanet",25 as nat],["granadanet",254 as nat]]))
   };
   let mStorage = Test.compile_value(oracleInitialStorage);
   let [oracletaddr, _, _] = Test.originate_from_file("../src/contracttemplates/votingPeriodOracle.jsligo" ,"main", mStorage, 0 as tez);  
@@ -82,7 +82,7 @@ let assert_failure = ([result,message] : [test_exec_result,string]) : bool => {
   votes : (Map.empty as map<address, string>), 
   results : (Map.empty as map<string, int>),
   votingPeriodOracle : oracletaddr,
-  protocol : "hangzhounet"
+  protocol : "ithacanet"
 } ;
 
 
