@@ -66,7 +66,8 @@ const Search = ({
     if(filterValue == null || filterValue === '')setContracts([]);
     else{
       let filteredContract = allContracts.filter((c: VotingContract) => {
-        return c.name.search(new RegExp(""+filterValue, 'gi')) >= 0}
+        console.log(filterValue.replace(/[^a-zA-Z0-9]/gi, '.'));//avoid issue of special char on the regex
+        return c.name.search(new RegExp(filterValue.replace(/[^a-zA-Z0-9]/gi, '.'), 'gi')) >= 0}
         )
         setContracts(filteredContract); 
       }}
