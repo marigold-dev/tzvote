@@ -16,7 +16,7 @@ ligo compile contract votingPeriodOracle.jsligo --output-file votingPeriodOracle
 
 ligo compile storage votingPeriodOracle.jsligo '{votingPeriodIndexes:(Map.empty as map<string, nat>),admin:("tz1VApBuWHuaTfDHtKzU3NBtWFYsxJvvWhYk" as address)}' --output-file votingPeriodOracleStorage.tz --entry-point main
 
-ligo compile parameter votingPeriodOracle.jsligo 'UpdateCurrentVotingPeriod(["ithacanet",(29 as nat)])' --output-file votingPeriodOracleParameter.tz --entry-point main
+ligo compile parameter votingPeriodOracle.jsligo 'UpdateCurrentVotingPeriod(["jakartanet",(6 as nat)])' --output-file votingPeriodOracleParameter.tz --entry-point main
 
 ```
 
@@ -25,7 +25,7 @@ ligo compile parameter votingPeriodOracle.jsligo 'UpdateCurrentVotingPeriod(["it
 ### Dry run
 
 ```
-ligo run dry-run votingPeriodOracle.jsligo 'UpdateCurrentVotingPeriod(["ithacanet",(27 as nat)])' '{votingPeriodIndexes:(Map.empty as map<string, nat>),admin:("tz1VApBuWHuaTfDHtKzU3NBtWFYsxJvvWhYk" as address)}'
+ligo run dry-run votingPeriodOracle.jsligo 'UpdateCurrentVotingPeriod(["jakartanet",(6 as nat)])' '{votingPeriodIndexes:(Map.empty as map<string, nat>),admin:("tz1VApBuWHuaTfDHtKzU3NBtWFYsxJvvWhYk" as address)}'
 
 ```
 
@@ -39,32 +39,44 @@ ligo run test unit_votingPeriodOracle.jsligo
 ## Deploy 
 
 ```
-tezos-client originate contract oracle transferring 0 from tz1VApBuWHuaTfDHtKzU3NBtWFYsxJvvWhYk running votingPeriodOracle.tz --init "$(cat votingPeriodOracleStorage.tz)" --burn-cap 1 -D
+tezos-client originate contract oracleJakarta transferring 0 from myFirstKey running votingPeriodOracle.tz --init "$(cat votingPeriodOracleStorage.tz)" --burn-cap 1 
 ```
 
 ### initialize some data
 
 ```
-tezos-client transfer 0 from tz1VApBuWHuaTfDHtKzU3NBtWFYsxJvvWhYk to KT1GLuqbSEoaRb3GE4UtUgGkDukVS766V53A  --arg '(Right (Pair "ithacanet" 27))' --burn-cap 0.005
+tezos-client transfer 0 from myFirstKey to oracleJakarta  --arg '(Right (Pair "jakartanet" 6))' --burn-cap 0.005
 ```
 
 # Smart contract
 
-## Compile
+## Compile Tezos baker contract
 
 ```
 ligo compile contract tezosTemplate3.jsligo --output-file tezosTemplate3.tz --entry-point main
 
-ligo compile storage tezosTemplate3.jsligo '{  name : "Which is the cutiest pokemon?",votingPeriodIndex : (27 as nat),  options : list(["Mew","Pikachu"]) ,  votes : (Map.empty as map<address, string>),  results : (Map.empty as map<string, int>) , votingPeriodOracle :  ("KT1GLuqbSEoaRb3GE4UtUgGkDukVS766V53A" as address)  ,   protocol : "ithacanet"}' --output-file tezosTemplate3Storage.tz --entry-point main
+ligo compile storage tezosTemplate3.jsligo '{  name : "Which is the cutiest pokemon?",votingPeriodIndex : (6 as nat),  options : list(["Mew","Pikachu"]) ,  votes : (Map.empty as map<address, string>),  results : (Map.empty as map<string, int>) , votingPeriodOracle :  ("KT1GLuqbSEoaRb3GE4UtUgGkDukVS766V53A" as address)  ,   protocol : "jakartanet"}' --output-file tezosTemplate3Storage.tz --entry-point main
 
 ligo compile parameter tezosTemplate3.jsligo 'Vote(["Pikachu",Crypto.hash_key("edpkuBknW28nW72KG6RoHtYW7p12T6GKc7nAbwYX5m8Wd9sDVC9yav" as key)])' --output-file tezosTemplate3Parameter.tz --entry-point main
 
 ```
 
-## Compile for the frontend
+## Compile permissioned Simple Poll contract
+
+```
+ligo compile contract permissionedSimplePoll.jsligo --output-file permissionedSimplePoll.tz --entry-point main
+
+ligo compile storage permissionedSimplePoll.jsligo '{  name : "Which is the cutiest pokemon?", from : ("2022-01-01t00:00:00Z" as timestamp) , to : ("2023-01-01t00:00:00Z" as timestamp) ,  options : list(["Mew","Pikachu"]) , owner : ("tz1VApBuWHuaTfDHtKzU3NBtWFYsxJvvWhYk" as address) , registeredVoters : list([]) as list<address>,  votes : (Map.empty as map<address, string>),  results : (Map.empty as map<string, int>) }' --output-file permissionedSimplePollStorage.tz --entry-point main
+
+ligo compile parameter permissionedSimplePoll.jsligo 'Vote(["Pikachu",Crypto.hash_key("edpkuBknW28nW72KG6RoHtYW7p12T6GKc7nAbwYX5m8Wd9sDVC9yav" as key)])' --output-file permissionedSimplePollParameter.tz --entry-point main
+
+```
+
+## Compile both for the frontend
 
 ```
 ligo compile contract tezosTemplate3.jsligo --output-file ./tezosTemplate3.tz.json --entry-point main --michelson-format json
+ligo compile contract permissionedSimplePoll.jsligo --output-file ./permissionedSimplePoll.tz.json --entry-point main --michelson-format json
 ```
 
 ## Test
@@ -86,10 +98,13 @@ ligo run test unit_tezosTemplate3.jsligo
 ## Deploy 
 
 ```
-tezos-client originate contract tezosTemplate transferring 0 from tz1VApBuWHuaTfDHtKzU3NBtWFYsxJvvWhYk running tezosTemplate3.tz --init "$(cat tezosTemplate3Storage.tz)" --burn-cap 1
+tezos-client originate contract tezosTemplateJakarta transferring 0 from myFirstKey running tezosTemplate3.tz --init "$(cat tezosTemplate3Storage.tz)" --burn-cap 1
+
+tezos-client originate contract permissionedSimplePollJakarta transferring 0 from myFirstKey running permissionedSimplePoll.tz --init "$(cat permissionedSimplePollStorage.tz)" --burn-cap 1
+
 ```
 
-Can return a contract address : KT1PYJvdStoHsCsNoKTFigqCqjd5eWo1uMYd
+Can return a contract address : KT1NgiC6MC6H9ccAtzk3WqwQ41VCwrQvSTzc , KT19c4S1wQVTHJkuDbZ8VjimrPKZeaFC3o8S
 
 ### Real run
 
