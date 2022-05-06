@@ -12,6 +12,7 @@ import { VOTING_TEMPLATE } from "./contractutils/TezosContractUtils";
 import { Box , Button, ButtonGroup, ClickAwayListener, Grow, MenuItem, MenuList, Paper, Popper } from "@mui/material";
 import { AccountCircle, ArrowDropDownCircleRounded } from "@mui/icons-material";
 import CreatePermissionedSimplePoll from "./components/CreatePermissionedSimplePoll";
+import { Tzip16Module } from '@taquito/tzip16';
 
 
 let votingTemplateAddresses : Map<VOTING_TEMPLATE,string> = new Map();
@@ -24,6 +25,7 @@ const App = () => {
   const [Tezos, setTezos] = useState<TezosToolkit>(
     new TezosToolkit(process.env["REACT_APP_TEZOS_NODE"]!)
     );
+    Tezos.addExtension(new Tzip16Module());
     const [publicToken, setPublicToken] = useState<string | null>("");
     const [wallet, setWallet] = useState<any>(null);
     const [userAddress, setUserAddress] = useState<string>("");

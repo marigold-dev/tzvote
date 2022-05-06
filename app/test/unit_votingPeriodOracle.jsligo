@@ -52,7 +52,7 @@ let assert_failure = ([result,message] : [test_exec_result,string]) : bool => {
   
   let initial_storage = {
     admin : admin,
-    votingPeriodIndexes: Map.empty as map<string, nat>
+    votingPeriodIndexes: Map.empty as map<string, nat> //Map.literal(list([   ["ithacanet",25 as nat], ["granadanet",254 as nat]   ])) as map<string, nat>
   };
   
   
@@ -98,15 +98,21 @@ let assert_failure = ([result,message] : [test_exec_result,string]) : bool => {
   
   let _testGet = ([s,senderHashKey,key,value] : [address,key_hash,string,nat]) : bool => {
     Test.set_source(s);
-    let callback = Test.to_entrypoint("voteCallback", tvotingtaddr);
+    let callback : contract<returned_val> = Test.to_entrypoint("voteCallback", tvotingtaddr);
+    
+    let st = (Test.get_storage(taddr) as oracleStorage);
+    Test.log(st);
+    let st2 = (Test.get_storage(tvotingtaddr) as storage);
+    Test.log(st2);
     let _ = Test.transfer_to_contract_exn(contr,GetCurrentVotingPeriod([key,"anyopt", senderHashKey, callback ]), 1 as mutez); 
+    //it should have same period otherwise it fails with error
     return true;
   }
 
   let _testGetFail = ([s,senderHashKey,key,value,message] : [address,key_hash,string,nat,string]) : bool => {
     Test.set_source(s);
-    //return assert_failure(Test.transfer_to_contract(contr, (GetCurrentVotingPeriod( [key, "anyopt", senderHashKey, votingContract])), 1 as mutez,message));  
-    return true;
+    let callback : contract<returned_val> = Test.to_entrypoint("voteCallback", tvotingtaddr);
+    return assert_failure(Test.transfer_to_contract(contr, GetCurrentVotingPeriod( [key, "anyopt", senderHashKey, callback]), 1 as mutez),message);  
   }
   
   let testOriginate = _testOriginate();
@@ -118,5 +124,6 @@ let assert_failure = ([result,message] : [test_exec_result,string]) : bool => {
   let testAdminUpdateGranada = _testUpdate(admin,"granadanet",254 as nat);
   
   //GET
-  let testSender1GetGranada = _testGet(sender1,Crypto.hash_key(senderKey1[1]),"granadanet",254 as nat);
-  let testSender1GetUnkonwn = _testGetFail(sender1,Crypto.hash_key(senderKey1[1]),"Unkonwn",254 as nat,"Cannot find current voting period index for protocol");
+  let _ = _testUpdate(admin,"ithacanet",25 as nat); //reset
+  let testSender1GetIthaca = _testGet(sender1,Crypto.hash_key(senderKey1[1]),"ithacanet",25 as nat);
+  let testSender1GetUnknown = _testGetFail(sender1,Crypto.hash_key(senderKey1[1]),"Unknown",254 as nat,"Cannot find current voting period index for protocol "+"Unknown");
