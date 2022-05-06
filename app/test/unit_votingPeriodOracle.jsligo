@@ -8,7 +8,8 @@ let assert_failure = ([result,message] : [test_exec_result,string]) : bool => {
     Success: (_ : nat) => false,
     Fail: ( tee : test_exec_error ) => 
       match(tee,{
-        Other: (s : string) => {Test.log(s);false}, 
+        Other: (msg : string) => {Test.log("ERROR Other : "+msg) ; return false}, 
+        Balance_too_low : (record : [ address ,  tez , tez ]) => {Test.log("ERROR Balance_too_low") ; return false}, 
         Rejected: (s:[michelson_program , address])=>{  Test.log (["expected error : ", message, " Actual : "]) ; Test.log(s[0]) ; return ((Test.eval(message)) == s[0]) } }) 
     })
   };
@@ -72,6 +73,7 @@ let assert_failure = ([result,message] : [test_exec_result,string]) : bool => {
   
   let [tvotingtaddr, _, _] = Test.originate(TezosTemplate.main, votingInitial_storage, 0 as tez); 
   let votingContract = Test.to_contract(tvotingtaddr);
+  let votingContractAddress = Tezos.address(votingContract);
 
   
   let _testOriginate = () : bool => {
@@ -98,7 +100,7 @@ let assert_failure = ([result,message] : [test_exec_result,string]) : bool => {
     Test.set_source(s);
 
     let callback = () : contract<returned_val> => { 
-      return match(Tezos.get_entrypoint_opt("%voteCallback",contrAddress) as option<contract<returned_val>>,{ 
+      return match(Tezos.get_entrypoint_opt("%voteCallback",votingContractAddress) as option<contract<returned_val>>,{ 
         None : () => failwith("NO_ORACLE_FOUND"),
         Some : (contract : contract<returned_val>) => contract
       });
