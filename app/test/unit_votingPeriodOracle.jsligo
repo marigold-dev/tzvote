@@ -98,15 +98,8 @@ let assert_failure = ([result,message] : [test_exec_result,string]) : bool => {
   
   let _testGet = ([s,senderHashKey,key,value] : [address,key_hash,string,nat]) : bool => {
     Test.set_source(s);
-
-    let callback = () : contract<returned_val> => { 
-      return match(Tezos.get_entrypoint_opt("%voteCallback",votingContractAddress) as option<contract<returned_val>>,{ 
-        None : () => failwith("NO_CONTRACT_FOUND"),
-        Some : (contract : contract<returned_val>) => contract
-      });
-    };   
-
-    let _ = Test.transfer_to_contract_exn(contr,GetCurrentVotingPeriod([key,"anyopt", senderHashKey, callback() ]), 1 as mutez); //     //  [string, string, key_hash, contract<returned_val>];
+    let callback = Test.to_entrypoint("voteCallback", tvotingtaddr);
+    let _ = Test.transfer_to_contract_exn(contr,GetCurrentVotingPeriod([key,"anyopt", senderHashKey, callback ]), 1 as mutez); 
     return true;
   }
 
