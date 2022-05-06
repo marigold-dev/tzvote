@@ -1,8 +1,8 @@
 #include "./shared/tezosTemplate3Types.jsligo"
 
 //redefining find_opt function
-let find_opt : (f : (x : _a) => bool, xs : list<_a>) => option<_a> 
-= (f : (x : _a) => bool, xs : list<_a>) : option<_a> =>
+let find_opt : <T>(f : (x : T) => bool, xs : list<T>) => option<T> 
+= (f : (x : T) => bool, xs : list<T>) : option<T> =>
 match(xs ,list([
   ([] : list<_a>) => None(),
   ([x,... xs] : list<_a>) => {

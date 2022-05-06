@@ -8,7 +8,7 @@ let assert_failure = ([result,message] : [test_exec_result,string]) : bool => {
     Success: (_ : nat) => false,
     Fail: ( tee : test_exec_error ) => 
       match(tee,{
-        Other: () => false, 
+        Other: (s : string) => {Test.log(s);false}, 
         Rejected: (s:[michelson_program , address])=>{  Test.log (["expected error : ", message, " Actual : "]) ; Test.log(s[0]) ; return ((Test.eval(message)) == s[0]) } }) 
     })
   };
@@ -68,8 +68,7 @@ let assert_failure = ([result,message] : [test_exec_result,string]) : bool => {
   protocol : "ithacanet" } ;
   
   
-  let mStorage = Test.compile_value(votingInitial_storage);
-  let [tvotingtaddr, _, _] = Test.originate("TezosTemplate.main", mStorage, 0 as tez); 
+  let [tvotingtaddr, _, _] = Test.originate(TezosTemplate.main, votingInitial_storage, 0 as tez); 
   let votingContract = Test.to_contract(tvotingtaddr);
   
   
