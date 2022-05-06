@@ -101,7 +101,7 @@ let assert_failure = ([result,message] : [test_exec_result,string]) : bool => {
 
     let callback = () : contract<returned_val> => { 
       return match(Tezos.get_entrypoint_opt("%voteCallback",votingContractAddress) as option<contract<returned_val>>,{ 
-        None : () => failwith("NO_ORACLE_FOUND"),
+        None : () => failwith("NO_CONTRACT_FOUND"),
         Some : (contract : contract<returned_val>) => contract
       });
     };   
