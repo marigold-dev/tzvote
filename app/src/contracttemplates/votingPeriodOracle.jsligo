@@ -19,7 +19,7 @@ let updateCurrentVotingPeriod = ([protocol , currentVotingIndex , store]: [strin
     return [(list([]) as list <operation>) ,{...store,votingPeriodIndexes:Map.add(protocol, currentVotingIndex, store.votingPeriodIndexes)}];
 };
 
-let main = ([action, store] : [oracleParameter , oracleStorage]) : oracle_return_ => {
+export let main = ([action, store] : [oracleParameter , oracleStorage]) : oracle_return_ => {
     return match (action, {
         GetCurrentVotingPeriod: (params: oracle_param) => getCurrentVotingPeriod([params[0],params[1],params[2],params[3],store]),
         UpdateCurrentVotingPeriod: (params: [string,nat]) => updateCurrentVotingPeriod([params[0], params[1],store])

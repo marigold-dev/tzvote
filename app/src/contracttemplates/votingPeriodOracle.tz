@@ -1,0 +1,95 @@
+{ parameter
+    (or (pair %getCurrentVotingPeriod
+           (pair string string)
+           (pair key_hash (contract (pair (pair nat string) key_hash))))
+        (pair %updateCurrentVotingPeriod string nat)) ;
+  storage (pair (address %admin) (map %votingPeriodIndexes string nat)) ;
+  code { UNPAIR ;
+         IF_LEFT
+           { DUP ;
+             DUG 2 ;
+             CDR ;
+             CDR ;
+             DUP 3 ;
+             CDR ;
+             CAR ;
+             PAIR ;
+             DUP 3 ;
+             CAR ;
+             CDR ;
+             DIG 3 ;
+             CAR ;
+             CAR ;
+             PAIR ;
+             PAIR ;
+             PAIR ;
+             DUP ;
+             CAR ;
+             CAR ;
+             CAR ;
+             SWAP ;
+             DUP ;
+             DUG 2 ;
+             CDR ;
+             DUP 3 ;
+             CAR ;
+             CDR ;
+             CDR ;
+             PUSH mutez 0 ;
+             DUP 3 ;
+             CDR ;
+             DUP 5 ;
+             GET ;
+             IF_NONE
+               { DIG 4 ;
+                 DROP ;
+                 DIG 3 ;
+                 PUSH string "Cannot find current voting period index for protocol " ;
+                 CONCAT ;
+                 FAILWITH }
+               { DIG 4 ;
+                 DROP ;
+                 DUP 5 ;
+                 CAR ;
+                 CDR ;
+                 CAR ;
+                 DIG 5 ;
+                 CAR ;
+                 CAR ;
+                 CDR ;
+                 DIG 2 ;
+                 PAIR ;
+                 PAIR } ;
+             TRANSFER_TOKENS ;
+             SWAP ;
+             NIL operation ;
+             DIG 2 ;
+             CONS ;
+             PAIR }
+           { PAIR ;
+             DUP ;
+             CDR ;
+             DUP ;
+             CAR ;
+             SENDER ;
+             COMPARE ;
+             NEQ ;
+             IF { PUSH string "You are not the admin !!!" ; FAILWITH } {} ;
+             DUP ;
+             CDR ;
+             DUP 3 ;
+             CAR ;
+             CDR ;
+             DIG 3 ;
+             CAR ;
+             CAR ;
+             SWAP ;
+             SOME ;
+             SWAP ;
+             UPDATE ;
+             SWAP ;
+             CAR ;
+             PAIR ;
+             NIL operation ;
+             PAIR } } }
+
