@@ -63,7 +63,7 @@ let voteCallback = ([rvm,store] : [returned_val , storage]) : return_ => {
       
 /* Main access point that dispatches to the entrypoints according to
 the smart contract parameter. */
-let main = ([action, store] : [parameter, storage]) : return_ => {
+export let main = ([action, store] : [parameter, storage]) : return_ => {
   return match (action, {
     Vote: (params: [string,key_hash]) => vote([store, params[0], params[1]]),
     VoteCallback: (params : returned_val) => voteCallback(params,store)

@@ -57,6 +57,8 @@ let assert_failure = ([result,message] : [test_exec_result,string]) : bool => {
   
   let [taddr, _, _] = Test.originate(main, initial_storage, 0 as tez);
   let contr = Test.to_contract(taddr);
+  let contrAddress = Tezos.address(contr);
+  
   
   let votingInitial_storage = 
   {  name : "Which is the cutiest pokemon?",
@@ -64,13 +66,13 @@ let assert_failure = ([result,message] : [test_exec_result,string]) : bool => {
   options : list(["Mew","Pikachu"]) ,  
   votes : (Map.empty as map<address, string>), 
   results : (Map.empty as map<string, int>),
-  votingPeriodOracle : contr,
+  votingPeriodOracle : contrAddress,
   protocol : "ithacanet" } ;
   
   
   let [tvotingtaddr, _, _] = Test.originate(TezosTemplate.main, votingInitial_storage, 0 as tez); 
   let votingContract = Test.to_contract(tvotingtaddr);
-  
+
   
   let _testOriginate = () : bool => {
     assert((Test.get_storage(taddr) as oracleStorage).admin  == admin);
@@ -94,13 +96,21 @@ let assert_failure = ([result,message] : [test_exec_result,string]) : bool => {
   
   let _testGet = ([s,senderHashKey,key,value] : [address,key_hash,string,nat]) : bool => {
     Test.set_source(s);
-    let _ = Test.transfer_to_contract(contr,GetCurrentVotingPeriod([key, "anyopt", senderHashKey, votingContract]), 1 as mutez);  
+
+    let callback = () : contract<returned_val> => { 
+      return match(Tezos.get_entrypoint_opt("%voteCallback",contrAddress) as option<contract<returned_val>>,{ 
+        None : () => failwith("NO_ORACLE_FOUND"),
+        Some : (contract : contract<returned_val>) => contract
+      });
+    };   
+
+    let _ = Test.transfer_to_contract_exn(contr,GetCurrentVotingPeriod([key,"anyopt", senderHashKey, callback() ]), 1 as mutez); //     //  [string, string, key_hash, contract<returned_val>];
     return true;
   }
 
   let _testGetFail = ([s,senderHashKey,key,value,message] : [address,key_hash,string,nat,string]) : bool => {
     Test.set_source(s);
-    return assert_failure(Test.transfer_to_contract(contr, (GetCurrentVotingPeriod( [key, "anyopt", senderHashKey, votingContract])), 1 as mutez,message));  
+    //return assert_failure(Test.transfer_to_contract(contr, (GetCurrentVotingPeriod( [key, "anyopt", senderHashKey, votingContract])), 1 as mutez,message));  
     return true;
   }
   
