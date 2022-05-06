@@ -1,4 +1,5 @@
 #include "../src/contracttemplates/votingPeriodOracle.jsligo" 
+#import "../src/contracttemplates/tezosTemplate3.jsligo" "TezosTemplate"
 
 
 //util function
@@ -68,8 +69,7 @@ let assert_failure = ([result,message] : [test_exec_result,string]) : bool => {
   
   
   let mStorage = Test.compile_value(votingInitial_storage);
-  let [votingtaddr, _, _] = Test.originate_from_file("../src/contracttemplates/tezosTemplate3.jsligo" ,"main", mStorage, 0 as tez); 
-  let tvotingtaddr : typed_address<[list<operation>, storage],storage> = Test.cast_address(votingtaddr) ;
+  let [tvotingtaddr, _, _] = Test.originate("TezosTemplate.main", mStorage, 0 as tez); 
   let votingContract = Test.to_contract(tvotingtaddr);
   
   
@@ -95,13 +95,13 @@ let assert_failure = ([result,message] : [test_exec_result,string]) : bool => {
   
   let _testGet = ([s,senderHashKey,key,value] : [address,key_hash,string,nat]) : bool => {
     Test.set_source(s);
-    //let _1 = Test.transfer_to_contract(contr,GetCurrentVotingPeriod([key, "anyopt", senderHashKey, votingContract]), 1 as mutez);  
+    let _ = Test.transfer_to_contract(contr,GetCurrentVotingPeriod([key, "anyopt", senderHashKey, votingContract]), 1 as mutez);  
     return true;
   }
 
   let _testGetFail = ([s,senderHashKey,key,value,message] : [address,key_hash,string,nat,string]) : bool => {
     Test.set_source(s);
-    //FIXME return assert_failure(Test.transfer_to_contract(contr, (GetCurrentVotingPeriod( [key, "anyopt", senderHashKey, votingContract])), 1 as mutez,message));  
+    return assert_failure(Test.transfer_to_contract(contr, (GetCurrentVotingPeriod( [key, "anyopt", senderHashKey, votingContract])), 1 as mutez,message));  
     return true;
   }
   
