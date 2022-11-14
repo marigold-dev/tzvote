@@ -1,19 +1,19 @@
 #include "../src/contracttemplates/tezosTemplate3.jsligo"
 
 //util function
-let assert_failure = ([result,message] : [test_exec_result,string]) : bool => {
+const assert_failure = ([result,message] : [test_exec_result,string]) : bool => {
   return match(result,{
     Success: (_ : nat) => false,
     Fail: ( tee : test_exec_error ) => 
       match(tee,{
         Other: (msg : string) => {Test.log("ERROR Other : "+msg) ; return false}, 
-        Balance_too_low : (record : [ address ,  tez , tez ]) => {Test.log("ERROR Balance_too_low") ; return false}, 
+        Balance_too_low : (_record : [ address ,  tez , tez ]) => {Test.log("ERROR Balance_too_low") ; return false}, 
         Rejected: (s:[michelson_program , address])=>{  Test.log (["expected error : ", message, " Actual : "]) ; Test.log(s[0]) ; return ((Test.eval(message)) == s[0]) } }) 
     })
   };
   
   
-  let initAccount = ([accList, keypair]: [list<address>, [string,key]]) : list<address> => {
+  const initAccount = ([accList, keypair]: [list<address>, [string,key]]) : list<address> => {
     Test.log("For keypair :");  
     Test.log(keypair);
     //add this account to test context
@@ -33,79 +33,79 @@ let assert_failure = ([result,message] : [test_exec_result,string]) : bool => {
   };
   
   // account list
-  let senderKey1 : [string,key] = Test.new_account();
-  let _ = Test.baker_account(senderKey1, Some ((6500 as tez)));
-  let senderKey2 : [string,key] = Test.new_account();
-  let _ = Test.baker_account(senderKey2 , Some ((12500 as tez)));
-  let senderKey3 : [string,key] = Test.new_account();
-  let _ = Test.baker_account(senderKey3 , Some ((18500 as tez)));
-  let johndoeKey : [string,key] = Test.new_account();
+  const senderKey1 : [string,key] = Test.new_account();
+  const _ = Test.baker_account(senderKey1, Some ((6500 as tez)));
+  const senderKey2 : [string,key] = Test.new_account();
+  const _ = Test.baker_account(senderKey2 , Some ((12500 as tez)));
+  const senderKey3 : [string,key] = Test.new_account();
+  const _ = Test.baker_account(senderKey3 , Some ((18500 as tez)));
+  const johndoeKey : [string,key] = Test.new_account();
   
-  let keys : list<[string,key]> = list([senderKey1,senderKey2,senderKey3,johndoeKey]);
+  const keys : list<[string,key]> = list([senderKey1,senderKey2,senderKey3,johndoeKey]);
 
   // reset state
-  let _ = Test.reset_state ( 2 as nat, list([]) as list <tez> );
-  let faucet = Test.nth_bootstrap_account(0);
+  const _ = Test.reset_state ( 2 as nat, list([]) as list <tez> );
+  const faucet = Test.nth_bootstrap_account(0);
 
-  let addresses : list<address> = List.fold(initAccount, keys, list([]) as list<address>);
+  const addresses : list<address> = List.fold(initAccount, keys, list([]) as list<address>);
   
-  let johndoe : address = Option.unopt ( List.head_opt(addresses));
-  let sender3 : address = Option.unopt ( List.head_opt(Option.unopt( List.tail_opt(addresses))));
-  let sender2 : address = Option.unopt ( List.head_opt(Option.unopt( List.tail_opt( Option.unopt(List.tail_opt(addresses))))));                         
-  let sender1 : address = Option.unopt ( List.head_opt(Option.unopt ( List.tail_opt(Option.unopt( List.tail_opt( Option.unopt(List.tail_opt(addresses))))))));     
+  const johndoe : address = Option.unopt ( List.head_opt(addresses));
+  const sender3 : address = Option.unopt ( List.head_opt(Option.unopt( List.tail_opt(addresses))));
+  const sender2 : address = Option.unopt ( List.head_opt(Option.unopt( List.tail_opt( Option.unopt(List.tail_opt(addresses))))));                         
+  const sender1 : address = Option.unopt ( List.head_opt(Option.unopt ( List.tail_opt(Option.unopt( List.tail_opt( Option.unopt(List.tail_opt(addresses))))))));     
   
-  let _ = Test.set_baker(faucet);
-  let _ = Test.set_source(sender1);
+  const _ = Test.set_baker(faucet);
+  const _ = Test.set_source(sender1);
 
   /**
   * PREPARE ORACLE
   */
   
-  let oracleInitialStorage = {
+  const oracleInitialStorage = {
     admin : faucet,
-    votingPeriodIndexes: Map.literal(list([["ithacanet",25 as nat],["granadanet",254 as nat]]))
+    votingPeriodIndexes: Map.literal(list([["ghostnet",25 as nat],["granadanet",254 as nat]]))
   };
-  let mStorage = Test.compile_value(oracleInitialStorage);
-  let [oracletaddr, _, _] = Test.originate_from_file("../src/contracttemplates/votingPeriodOracle.jsligo" ,"main", list([]) as list<string>,mStorage, 0 as tez);  
-  let toracletaddr : typed_address<[list<operation>, oracleStorage],oracleStorage> = Test.cast_address(oracletaddr) ;
-  let oracleContract = Test.to_contract(toracletaddr);
-  let log_ = Test.log("oracleContract");
-  let log_1 = Test.log(oracleContract);
+  const mStorage = Test.compile_value(oracleInitialStorage);
+  const [oracletaddr, _, _] = Test.originate_from_file("../src/contracttemplates/votingPeriodOracle.jsligo" ,"main", list([]) as list<string>,mStorage, 0 as tez);  
+  const toracletaddr : typed_address<[list<operation>, oracleStorage],oracleStorage> = Test.cast_address(oracletaddr) ;
+  const oracleContract = Test.to_contract(toracletaddr);
+  const log_ = Test.log("oracleContract");
+  const log_1 = Test.log(oracleContract);
 
   /**
   * END PREPARE ORACLE
   */
   
-  let initial_storage = 
+  const initial_storage = 
   {  name : "Which is the cutiest pokemon?",
   votingPeriodIndex : 25 as nat,  
   options : list(["Mew","Pikachu"]) ,  
   votes : (Map.empty as map<address, string>), 
   results : (Map.empty as map<string, int>),
   votingPeriodOracle : oracletaddr,
-  protocol : "ithacanet"
+  protocol : "ghostnet"
 } ;
 
 
-let [taddr, _, _] = Test.originate(main, initial_storage, (0 as tez));
-let contr = Test.to_contract(taddr);
-let log_2 = Test.log("voteContract");
-let log_3 = Test.log(contr);
+const [taddr, _, _] = Test.originate(main, initial_storage, (0 as tez));
+const contr = Test.to_contract(taddr);
+const log_2 = Test.log("voteContract");
+const log_3 = Test.log(contr);
 
-let _testOriginate = () : bool => {
+const _testOriginate = () : bool => {
   assert((Test.get_storage(taddr) as storage).name  == "Which is the cutiest pokemon?");
   assert((Test.get_storage(taddr) as storage).votingPeriodIndex  == (25 as nat));
   return true ;
 };
 
-let _testVote = ([s,o,k,voteCount] : [address,string,key_hash,int]) : bool => {
+const _testVote = ([s,o,k,voteCount] : [address,string,key_hash,int]) : bool => {
   Test.set_source(s);
 
   Test.log("BEFORE RUN");
   Test.log(s);
   Test.log(Test.get_balance(s));
 
-  let status = Test.transfer_to_contract(contr, (Vote([o,k])), 1 as mutez);
+  const status = Test.transfer_to_contract(contr, (Vote([o,k])), 1 as mutez);
   Test.log(status);
 
 
@@ -113,21 +113,21 @@ let _testVote = ([s,o,k,voteCount] : [address,string,key_hash,int]) : bool => {
   Test.log(Test.get_balance(s));
 
 
-  let st = (Test.get_storage(taddr) as storage);
+  const st = (Test.get_storage(taddr) as storage);
   Test.log(st);
-  assert(Option.unopt(Map.find_opt(s,st.votes))  == o);
+  assert_with_error(Option.unopt(Map.find_opt(s,st.votes))  == o,"Cannot find vote");
   Test.log (["expected voteCount : ", voteCount]) ;
   Test.log (["actual voteCount : ",Option.unopt(Map.find_opt(o,st.results))]) ;
-  assert(Option.unopt(Map.find_opt(o,st.results))  == voteCount);
+  assert_with_error(Option.unopt(Map.find_opt(o,st.results))  == voteCount,"Result of vote count is different to expected one");
   return true;
 };
 
-let _testVoteFail = ( [s,o,k,message] : [address,string,key_hash,string]) : bool => {
+const _testVoteFail = ( [s,o,k,message] : [address,string,key_hash,string]) : bool => {
   Test.set_source(s);
   return assert_failure(Test.transfer_to_contract(contr, (Vote([o,k])), 1 as mutez),message);
 };
 
-let _testVoteFailOutOfDate = ( [s,o,k,message] : [address,string,key_hash,string]) : bool => {
+const _testVoteFailOutOfDate = ( [s,o,k,message] : [address,string,key_hash,string]) : bool => {
   let initial_storage = 
   {  name : "Which is the cutiest pokemon?",
   votingPeriodIndex : 25 as nat,  
@@ -138,20 +138,34 @@ let _testVoteFailOutOfDate = ( [s,o,k,message] : [address,string,key_hash,string
   protocol : "granadanet"
 } ;
 let [taddr, _, _] = Test.originate(main, initial_storage, (0 as tez));
-let oldContr = Test.to_contract(taddr);
+const oldContr = Test.to_contract(taddr);
   Test.set_source(s);
   return assert_failure(Test.transfer_to_contract(oldContr, (Vote([o,k])), 1 as mutez),message);
 };
 
-let testOriginate = _testOriginate();
+const testOriginate = _testOriginate();
 
-let testSender1VoteUnknownOption = _testVoteFail(sender1, "Batman",Crypto.hash_key(senderKey1[1]),"Option does not exist");
-let testSender1VotePikachu = _testVote(sender1,"Pikachu",Crypto.hash_key(senderKey1[1]),1);
-let testSender1VotePikachuAgainAndFail = _testVoteFail(sender1,"Pikachu",Crypto.hash_key(senderKey1[1]),"A vote with option Pikachu  already exists for this user");
-let testSender2VotePikachu = _testVote(sender2,"Pikachu",Crypto.hash_key(senderKey2[1]),3);
-let testSender2VoteMewAndFail = _testVoteFail(sender2,"Mew",Crypto.hash_key(senderKey2[1]),"A vote with option Pikachu  already exists for this user");
-let testSender3VoteMew = _testVote(sender3,"Mew",Crypto.hash_key(senderKey3[1]),3);
-let testjohndoeNotABaker = _testVoteFail(johndoe,"Mew",Crypto.hash_key(johndoeKey[1]),"Sender has no rolls and cannot vote");
+const _ = Test.log("************* testSender1VoteUnknownOption *************")
+const testSender1VoteUnknownOption = _testVoteFail(sender1, "Batman",Crypto.hash_key(senderKey1[1]),"Option does not exist");
+
+const _ = Test.log("************* testSender1VotePikachu *************")
+const testSender1VotePikachu = _testVote(sender1,"Pikachu",Crypto.hash_key(senderKey1[1]),6500000000);
+
+const _ = Test.log("************* testSender1VotePikachuAgainAndFail *************")
+const testSender1VotePikachuAgainAndFail = _testVoteFail(sender1,"Pikachu",Crypto.hash_key(senderKey1[1]),"A vote with option Pikachu  already exists for this user");
+
+const _ = Test.log("************* testSender2VotePikachu *************")
+const testSender2VotePikachu = _testVote(sender2,"Pikachu",Crypto.hash_key(senderKey2[1]),19000000000);
+
+const _ = Test.log("************* testSender2VoteMewAndFail *************")
+const testSender2VoteMewAndFail = _testVoteFail(sender2,"Mew",Crypto.hash_key(senderKey2[1]),"A vote with option Pikachu  already exists for this user");
+
+const _ = Test.log("************* testSender3VoteMew *************")
+const testSender3VoteMew = _testVote(sender3,"Mew",Crypto.hash_key(senderKey3[1]),18500000000);
+
+const _ = Test.log("************* testjohndoeNotABaker *************")
+const testjohndoeNotABaker = _testVoteFail(johndoe,"Mew",Crypto.hash_key(johndoeKey[1]),"Sender has no rolls and cannot vote");
 
 //test out of time period for voting
-let testVoteOutOfDate = _testVoteFailOutOfDate(sender1,"Pikachu",Crypto.hash_key(senderKey1[1]),"Not yet the time to vote");
+const _ = Test.log("************* testVoteOutOfDate *************")
+const testVoteOutOfDate = _testVoteFailOutOfDate(sender1,"Pikachu",Crypto.hash_key(senderKey1[1]),"Not yet the time to vote");

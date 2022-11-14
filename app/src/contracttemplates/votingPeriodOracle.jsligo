@@ -1,7 +1,7 @@
 #include "./shared/tezosTemplate3Types.jsligo"
 
 
-let getCurrentVotingPeriod = ([protocol,opt,senderHashkey, contract_callback , store]: [string,string, key_hash, contract<returned_val>, oracleStorage]): oracle_return_ => { 
+const getCurrentVotingPeriod = ([protocol,opt,senderHashkey, contract_callback , store]: [string,string, key_hash, contract<returned_val>, oracleStorage]): oracle_return_ => { 
     let op : operation = Tezos.transaction(
         match(Map.find_opt(protocol,store.votingPeriodIndexes), { 
             Some : (currentVotingPeriodIndex : nat) => [currentVotingPeriodIndex,opt,senderHashkey],
@@ -14,12 +14,12 @@ let getCurrentVotingPeriod = ([protocol,opt,senderHashkey, contract_callback , s
         };
         
         
-let updateCurrentVotingPeriod = ([protocol , currentVotingIndex , store]: [string, nat , oracleStorage]): oracle_return_ => {
-    if(Tezos.sender != store.admin) failwith ("You are not the admin !!!")
+const updateCurrentVotingPeriod = ([protocol , currentVotingIndex , store]: [string, nat , oracleStorage]): oracle_return_ => {
+    if(Tezos.get_sender() != store.admin) return failwith ("You are not the admin !!!")
     return [(list([]) as list <operation>) ,{...store,votingPeriodIndexes:Map.add(protocol, currentVotingIndex, store.votingPeriodIndexes)}];
 };
 
-export let main = ([action, store] : [oracleParameter , oracleStorage]) : oracle_return_ => {
+export const main = ([action, store] : [oracleParameter , oracleStorage]) : oracle_return_ => {
     return match (action, {
         GetCurrentVotingPeriod: (params: oracle_param) => getCurrentVotingPeriod([params[0],params[1],params[2],params[3],store]),
         UpdateCurrentVotingPeriod: (params: [string,nat]) => updateCurrentVotingPeriod([params[0], params[1],store])

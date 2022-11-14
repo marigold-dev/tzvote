@@ -1,6 +1,6 @@
 type storage = {
   name : string,
-  from : timestamp,
+  from_ : timestamp,
   to : timestamp,
   options : list<string>,
   owner : address, //the administrator who can add/remove voters
@@ -18,35 +18,35 @@ type parameter =
 
 
 //redefining find_opt function
-let find_opt : (f : (x : _a) => bool, xs : list<_a>) => option<_a> 
-= (f : (x : _a) => bool, xs : list<_a>) : option<_a> =>
+const find_opt : <T>(f : (x : T) => bool, xs : list<T>) => option<T> 
+= (f : (x : T) => bool, xs : list<T>) : option<T> =>
 match(xs ,list([
-  ([] : list<_a>) => None(),
-  ([x,... xs] : list<_a>) => {
+  ([] : list<T>) => None(),
+  ([x,... xs] : list<T>) => {
     if(f(x)) { return Some(x); } else {return find_opt(f, xs); } 
   } 
 ]));
 
 
 //redefining reverse
-let reverse : (xs : list<_a>) => list<_a> =
-    (xs : list<_a>) : list<_a> => {
-        let f = (ys : list<_a>, x : _a) : list<_a> => list([x, ...ys]);
-        return List.fold_left(f, list([]) as list<_a>, xs);
+const reverse : <T>(xs : list<T>) => list<T> =
+    (xs : list<T>) : list<T> => {
+        let f = (ys : list<T>, x : T) : list<T> => list([x, ...ys]);
+        return List.fold_left(f, list([]) as list<T>, xs);
     };
 
 //redefining concat
-let concat : (xs : list<_a>, ys : list<_a>) => list<_a> 
-= (xs : list<_a>, ys : list<_a>) : list<_a> => {
-   let f = ([x,ys] : [_a,list<_a>]) : list<_a> => list([x,...ys]);
+const concat : <T>(xs : list<T>, ys : list<T>) => list<T> 
+= (xs : list<T>, ys : list<T>) : list<T> => {
+   let f = ([x,ys] : [T,list<T>]) : list<T> => list([x,...ys]);
    return List.fold_right(f ,xs ,ys)
   };
 
-let remove : (f : (x : _a) => bool, xs : list<_a>, acc : list<_a>) => list<_a> 
-= (f : (x : _a) => bool, xs : list<_a>, acc : list<_a>) : list<_a> =>
+const remove : <T>(f : (x : T) => bool, xs : list<T>, acc : list<T>) => list<T> 
+= (f : (x : T) => bool, xs : list<T>, acc : list<T>) : list<T> =>
 match(xs ,list([
-  ([] : list<_a>) => reverse(acc),
-  ([x,... xs] : list<_a>) => {
+  ([] : list<T>) => reverse(acc),
+  ([x,... xs] : list<T>) => {
     if(f(x)) { return concat(reverse(acc),xs); } else {return remove(f, xs, list([x,...acc])); } 
   } 
 ]));
@@ -56,31 +56,31 @@ match(xs ,list([
  * @param opt an option to vote to 
  * @returns an updated storage
  */
-let vote = ([opt, store] : [string, storage]) : return_ => {
+const vote = ([opt, store] : [string, storage]) : return_ => {
   
   //check user is in registered list
-  let user : option<address> = find_opt(( (a : address) => a == Tezos.source), store.registeredVoters);
-  if( user == (None () as option<address>)) failwith ("User is not registered") ;
+  let user : option<address> = find_opt(( (a : address) => a == Tezos.get_source()), store.registeredVoters);
+  if( user == (None () as option<address>)) return failwith ("User is not registered") ;
   
   //check if option exists
   let opt_ : option<string> = find_opt(( (s : string) => s == opt), store.options);
-  if( opt_ == (None () as option<string>)) failwith ("Option does not exist") ;
+  if( opt_ == (None () as option<string>)) return failwith ("Option does not exist") ;
   
   //check if sender has not yet voted
-  match(Map.find_opt(Tezos.source,store.votes), { 
+  match(Map.find_opt(Tezos.get_source(),store.votes), { 
     Some : (voted : string) => failwith ("A vote with option " + voted + "  already exists for this user"),
     None : () => unit
   });
   
   //check if voting period is between from and to date
-  if (Tezos.now < store.from || Tezos.now > store.to) failwith ("Not yet the time to vote");
+  if (Tezos.get_now() < store.from_ || Tezos.get_now() > store.to) return failwith ("Not yet the time to vote");
   
   //update results cache & finally add the new vote
   return [  list([]) as list<operation>, {...store, 
     results : match(Map.find_opt(opt,store.results),{
       Some : (r:int) => Map.add(opt,r+1,store.results),
       None: ()=> Map.add(opt,1,store.results)}) ,
-    votes : Map.add(Tezos.source, opt, store.votes) }]; 
+    votes : Map.add(Tezos.get_source(), opt, store.votes) }]; 
 };
 
  
@@ -90,17 +90,17 @@ let vote = ([opt, store] : [string, storage]) : return_ => {
  * @param store storage to update
  * @returns a new updated storage with voter list
  */ 
-let addVoter = ([voter, store] : [address, storage]) : return_ => { 
+const addVoter = ([voter, store] : [address, storage]) : return_ => { 
 
   //check is admin
-  if(Tezos.source != store.owner) failwith ("User has to be owner") ;
+  if(Tezos.get_source() != store.owner) return failwith ("User has to be owner") ;
 
   //check user is not in registered list
   let user : option<address> = find_opt(( (a : address) => a == voter), store.registeredVoters);
-  if( user != (None () as option<address>)) failwith ("User is already registered") ;
+  if( user != (None () as option<address>)) return failwith ("User is already registered") ;
 
   //check if date < to
-  if (Tezos.now > store.to) failwith ("Too late to add voter");
+  if (Tezos.get_now() > store.to) return failwith ("Too late to add voter");
 
   return [  list([]) as list<operation>, {...store ,
     registeredVoters : list([voter, ...store.registeredVoters])
@@ -113,17 +113,17 @@ let addVoter = ([voter, store] : [address, storage]) : return_ => {
  * @param store storage to update
  * @returns a new updated storage with voter list
  */ 
-let removeVoter = ([voter, store] : [address, storage]) : return_ => { 
+const removeVoter = ([voter, store] : [address, storage]) : return_ => { 
 
    //check is admin
-   if(Tezos.source != store.owner) failwith ("User has to be owner") ;
+   if(Tezos.get_source() != store.owner) return failwith ("User has to be owner") ;
 
    //check user is in registered list
    let user : option<address> = find_opt(( (a : address) => a == voter), store.registeredVoters);
-   if( user == (None () as option<address>)) failwith ("User not found") ;
+   if( user == (None () as option<address>)) return failwith ("User not found") ;
  
    //check if date < to
-   if (Tezos.now > store.to) failwith ("Too late to remove voter");
+   if (Tezos.get_now() > store.to) return failwith ("Too late to remove voter");
 
    //check if sender has not yet voted
    match(Map.find_opt(voter,store.votes), { 
@@ -142,7 +142,7 @@ let removeVoter = ([voter, store] : [address, storage]) : return_ => {
  * @param storage storage to update
  * @returns 
  */
-let main = ([action, store] : [parameter, storage]) : return_ => {
+const main = ([action, store] : [parameter, storage]) : return_ => {
   return match (action, {
     Vote: (opt: string) => vote([opt,store]),
     AddVoter: (voter : address) => addVoter(voter,store),
