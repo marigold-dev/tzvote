@@ -3,6 +3,7 @@
 [logo]: https://i.imgflip.com/r56sp.jpg?a456398 "Vote"
 
 TzVote is a dapp for voting purpose composed by :
+
 - a React application with Taquito SDK
 - a voting session smart contract template in jsligo
 - a cronjob pushing data to the oracle smart contract
@@ -10,8 +11,9 @@ TzVote is a dapp for voting purpose composed by :
 # Play with the application
 
 The app is available on all networks :
- - [MAINNET](https://tzvote.marigold.dev/)
- - [ITHACANET](https://ithacanet.tzvote.marigold.dev/) 
+
+- [MAINNET](https://tzvote.marigold.dev/)
+- [GHOSTNET](https://ghostnet.tzvote.marigold.dev/)
 
 ![](doc/home.png)
 
@@ -29,13 +31,11 @@ Select your account
 
 ![](doc/account.png)
 
-
 ## Search
 
 You can search existing polls and click on the status of a particular one to see the results
 
 ![](doc/search.png)
-
 
 ## Create
 
@@ -52,14 +52,13 @@ If you have connected your wallet, you will be able to deploy a voting session S
 ## Vote
 
 Vote button only appears (depending of the choosen template policies) if you are :
+
 - logged in
 - authorized to vote
 - have not yet voted
 
 ![](doc/vote.png)
 
-
 # Cronjob
 
 Push current Tezos voting period index to the Oracle storage
-

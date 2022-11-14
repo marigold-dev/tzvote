@@ -52,7 +52,7 @@ let assert_failure = ([result,message] : [test_exec_result,string]) : bool => {
   
   let initial_storage = {
     admin : admin,
-    votingPeriodIndexes: Map.empty as map<string, nat> //Map.literal(list([   ["ithacanet",25 as nat], ["granadanet",254 as nat]   ])) as map<string, nat>
+    votingPeriodIndexes: Map.empty as map<string, nat> //Map.literal(list([   ["ghostnet",25 as nat], ["granadanet",254 as nat]   ])) as map<string, nat>
   };
   
   
@@ -68,7 +68,7 @@ let assert_failure = ([result,message] : [test_exec_result,string]) : bool => {
   votes : (Map.empty as map<address, string>), 
   results : (Map.empty as map<string, int>),
   votingPeriodOracle : contrAddress,
-  protocol : "ithacanet" } ;
+  protocol : "ghostnet" } ;
   
   
   let [tvotingtaddr, _, _] = Test.originate(TezosTemplate.main, votingInitial_storage, 0 as tez); 
@@ -118,12 +118,12 @@ let assert_failure = ([result,message] : [test_exec_result,string]) : bool => {
   let testOriginate = _testOriginate();
   
   //FILL
-  let testSender1UpdateNotAdmin = _testUpdateFail(sender1, "ithacanet",25 as nat,"You are not the admin !!!");
-  let testAdminUpdateIthaca = _testUpdate(admin,"ithacanet",25 as nat);
-  let testAdminUpdateIthacaAgain = _testUpdate(admin,"ithacanet",26 as nat);
+  let testSender1UpdateNotAdmin = _testUpdateFail(sender1, "ghostnet",25 as nat,"You are not the admin !!!");
+  let testAdminUpdateGhost = _testUpdate(admin,"ghostnet",25 as nat);
+  let testAdminUpdateGhostAgain = _testUpdate(admin,"ghostnet",26 as nat);
   let testAdminUpdateGranada = _testUpdate(admin,"granadanet",254 as nat);
   
   //GET
-  let _ = _testUpdate(admin,"ithacanet",25 as nat); //reset
-  let testSender1GetIthaca = _testGet(sender1,Crypto.hash_key(senderKey1[1]),"ithacanet",25 as nat);
+  let _ = _testUpdate(admin,"ghostnet",25 as nat); //reset
+  let testSender1GetGhost = _testGet(sender1,Crypto.hash_key(senderKey1[1]),"ghostnet",25 as nat);
   let testSender1GetUnknown = _testGetFail(sender1,Crypto.hash_key(senderKey1[1]),"Unknown",254 as nat,"Cannot find current voting period index for protocol "+"Unknown");

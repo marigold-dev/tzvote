@@ -1,11 +1,9 @@
-import React, { Dispatch, SetStateAction, useState, useEffect } from "react";
-import { TezosToolkit } from "@taquito/taquito";
-import { BeaconWallet } from "@taquito/beacon-wallet";
-import {
-  NetworkType
-} from "@airgap/beacon-sdk";
-import { DelegatesResponse } from "@taquito/rpc";
+import { NetworkType } from "@airgap/beacon-sdk";
 import { Button } from "@mui/material";
+import { BeaconWallet } from "@taquito/beacon-wallet";
+import { DelegatesResponse } from "@taquito/rpc";
+import { TezosToolkit } from "@taquito/taquito";
+import { Dispatch, SetStateAction } from "react";
 
 type ButtonProps = {
   Tezos: TezosToolkit;
@@ -27,9 +25,8 @@ const ConnectButton = ({
   setBakerDelegators,
   setBakerPower,
   setBeaconConnection,
-  wallet
+  wallet,
 }: ButtonProps): JSX.Element => {
-
   const setup = async (userAddress: string): Promise<void> => {
     setUserAddress(userAddress);
     // updates balance
@@ -37,12 +34,18 @@ const ConnectButton = ({
     setUserBalance(balance.toNumber());
     //update baker power
     try {
-      const delegatesResponse : DelegatesResponse = await Tezos.rpc.getDelegates(userAddress);
-      if(delegatesResponse !== undefined && delegatesResponse.delegated_contracts !== undefined && delegatesResponse.delegated_balance !== undefined){
+      const delegatesResponse: DelegatesResponse = await Tezos.rpc.getDelegates(
+        userAddress
+      );
+      if (
+        delegatesResponse !== undefined &&
+        delegatesResponse.delegated_contracts !== undefined &&
+        delegatesResponse.delegated_balance !== undefined
+      ) {
         console.log("We have a baker");
         setBakerDelegators(delegatesResponse.delegated_contracts);
         setBakerPower(Number(delegatesResponse.voting_power));
-      }else{
+      } else {
         setBakerPower(0);
         console.log("We have a baker with no power");
       }
@@ -55,9 +58,15 @@ const ConnectButton = ({
     try {
       await wallet.requestPermissions({
         network: {
-          type: process.env["REACT_APP_NETWORK"]? NetworkType[process.env["REACT_APP_NETWORK"].toUpperCase() as keyof typeof NetworkType]  : NetworkType.ITHACANET,
-          rpcUrl: process.env["REACT_APP_TEZOS_NODE"]
-        }
+          type: process.env["REACT_APP_NETWORK"]
+            ? NetworkType[
+                process.env[
+                  "REACT_APP_NETWORK"
+                ].toUpperCase() as keyof typeof NetworkType
+              ]
+            : NetworkType.GHOSTNET,
+          rpcUrl: process.env["REACT_APP_TEZOS_NODE"],
+        },
       });
       // gets user's address
       const userAddress = await wallet.getPKH();
@@ -68,30 +77,10 @@ const ConnectButton = ({
     }
   };
 
-
-  useEffect(() => {
-    (async () => {
-      // creates a wallet instance if not exists
-      if(!wallet){wallet = new BeaconWallet({
-        name: "TzVote",
-        preferredNetwork: process.env["REACT_APP_NETWORK"]? NetworkType[process.env["REACT_APP_NETWORK"].toUpperCase() as keyof typeof NetworkType]  : NetworkType.ITHACANET,
-      });}
-      Tezos.setWalletProvider(wallet);
-      setWallet(wallet);
-      // checks if wallet was connected before
-      const activeAccount = await wallet.client.getActiveAccount();
-      if (activeAccount) {
-        const userAddress = await wallet.getPKH();
-        await setup(userAddress);
-        setBeaconConnection(true);
-      }
-    })();
-  }, []);
-
   return (
-      <Button variant="contained" onClick={connectWallet}>
-          <i className="fas fa-wallet"></i>&nbsp; Connect with wallet
-      </Button>
+    <Button variant="contained" onClick={connectWallet}>
+      <i className="fas fa-wallet"></i>&nbsp; Connect with wallet
+    </Button>
   );
 };
 

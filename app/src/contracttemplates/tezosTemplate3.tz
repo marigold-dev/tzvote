@@ -2,176 +2,172 @@
     (or (pair %vote string key_hash) (pair %voteCallback (pair nat string) key_hash)) ;
   storage
     (pair (pair (pair (string %name) (list %options string))
-                (pair (string %protocol) (map %results string int)))
-          (pair (pair (map %votes address string) (nat %votingPeriodIndex))
-                (address %votingPeriodOracle))) ;
+                (string %protocol)
+                (map %results string int))
+          (pair (map %votes address string) (nat %votingPeriodIndex))
+          (address %votingPeriodOracle)) ;
   code { UNPAIR ;
          IF_LEFT
            { UNPAIR ;
-             DIG 2 ;
-             PAIR ;
-             PAIR ;
-             DUP ;
-             CAR ;
-             CAR ;
-             SWAP ;
-             DUP ;
-             DUG 2 ;
-             CAR ;
-             CDR ;
-             DIG 2 ;
-             CDR ;
              PUSH int 0 ;
-             SWAP ;
-             DUP ;
-             DUG 2 ;
+             DUP 3 ;
              VOTING_POWER ;
              INT ;
              COMPARE ;
              EQ ;
-             IF { PUSH string "Sender has no rolls and cannot vote" ; FAILWITH } {} ;
-             DUP 3 ;
-             CAR ;
-             CAR ;
-             CDR ;
-             DUP 3 ;
-             LAMBDA (pair string string) bool { UNPAIR ; SWAP ; COMPARE ; EQ } ;
-             SWAP ;
-             APPLY ;
-             PAIR ;
-             LEFT (option string) ;
-             LOOP_LEFT
-               { DUP ;
-                 CAR ;
-                 SWAP ;
-                 CDR ;
-                 IF_CONS
-                   { DUP ;
-                     DUP 4 ;
-                     SWAP ;
-                     EXEC ;
-                     IF { SWAP ; DIG 2 ; DROP 2 ; SOME ; RIGHT (pair (lambda string bool) (list string)) }
-                        { DROP ; SWAP ; PAIR ; LEFT (option string) } }
-                   { DROP ; NONE string ; RIGHT (pair (lambda string bool) (list string)) } } ;
-             NONE string ;
-             SWAP ;
-             COMPARE ;
-             EQ ;
-             IF { PUSH string "Option does not exist" ; FAILWITH } {} ;
-             DUP 3 ;
-             CDR ;
-             CAR ;
-             CAR ;
-             SOURCE ;
-             GET ;
-             IF_NONE
-               {}
-               { PUSH string "  already exists for this user" ;
-                 SWAP ;
-                 PUSH string "A vote with option " ;
-                 CONCAT ;
-                 CONCAT ;
-                 FAILWITH } ;
-             DUP 3 ;
-             CDR ;
-             CDR ;
-             CONTRACT %getCurrentVotingPeriod
-               (pair (pair string string) (pair key_hash (contract (pair (pair nat string) key_hash)))) ;
-             IF_NONE { PUSH string "NO_ORACLE_FOUND" ; FAILWITH } {} ;
-             PUSH mutez 0 ;
-             SELF %voteCallback ;
-             DIG 3 ;
-             PAIR ;
-             DIG 3 ;
-             DUP 5 ;
-             CAR ;
-             CDR ;
-             CAR ;
-             PAIR ;
-             PAIR ;
-             TRANSFER_TOKENS ;
-             SWAP ;
-             NIL operation ;
-             DIG 2 ;
-             CONS ;
-             PAIR }
+             IF { DROP 3 ; PUSH string "Sender has no rolls and cannot vote" ; FAILWITH }
+                { DUP 3 ;
+                  CAR ;
+                  CAR ;
+                  CDR ;
+                  LAMBDA (pair string string) bool { UNPAIR ; SWAP ; COMPARE ; EQ } ;
+                  DUP 3 ;
+                  APPLY ;
+                  PAIR ;
+                  LEFT (option string) ;
+                  LOOP_LEFT
+                    { UNPAIR ;
+                      SWAP ;
+                      IF_CONS
+                        { DUP ;
+                          DUP 4 ;
+                          SWAP ;
+                          EXEC ;
+                          IF { SWAP ; DIG 2 ; DROP 2 ; SOME ; RIGHT (pair (lambda string bool) (list string)) }
+                             { DROP ; SWAP ; PAIR ; LEFT (option string) } }
+                        { DROP ; NONE string ; RIGHT (pair (lambda string bool) (list string)) } } ;
+                  NONE string ;
+                  SWAP ;
+                  COMPARE ;
+                  EQ ;
+                  IF { DROP 3 ; PUSH string "Option does not exist" ; FAILWITH }
+                     { DUP 3 ;
+                       CDR ;
+                       CAR ;
+                       CAR ;
+                       SOURCE ;
+                       GET ;
+                       IF_NONE
+                         {}
+                         { PUSH string "  already exists for this user" ;
+                           SWAP ;
+                           PUSH string "A vote with option " ;
+                           CONCAT ;
+                           CONCAT ;
+                           FAILWITH } ;
+                       LAMBDA
+                         (pair (pair (pair (pair string (list string)) string (map string int))
+                                     (pair (map address string) nat)
+                                     address)
+                               unit)
+                         (contract
+                            (pair (pair string string) key_hash (contract (pair (pair nat string) key_hash))))
+                         { CAR ;
+                           CDR ;
+                           CDR ;
+                           CONTRACT %getCurrentVotingPeriod
+                             (pair (pair string string) key_hash (contract (pair (pair nat string) key_hash))) ;
+                           IF_NONE { PUSH string "NO_ORACLE_FOUND" ; FAILWITH } {} } ;
+                       DUP 4 ;
+                       APPLY ;
+                       UNIT ;
+                       EXEC ;
+                       PUSH mutez 0 ;
+                       SELF %voteCallback ;
+                       DIG 4 ;
+                       PAIR ;
+                       DIG 3 ;
+                       DUP 5 ;
+                       CAR ;
+                       CDR ;
+                       CAR ;
+                       PAIR ;
+                       PAIR ;
+                       TRANSFER_TOKENS ;
+                       SWAP ;
+                       NIL operation ;
+                       DIG 2 ;
+                       CONS ;
+                       PAIR } } }
            { UNPAIR ;
              UNPAIR ;
+             SWAP ;
+             DIG 2 ;
              DUP 4 ;
              CDR ;
              CAR ;
              CDR ;
-             SWAP ;
+             DIG 3 ;
              COMPARE ;
              NEQ ;
-             IF { PUSH string "Not yet the time to vote" ; FAILWITH } {} ;
-             DUP 3 ;
-             CDR ;
-             DUP 4 ;
-             CAR ;
-             CDR ;
-             CDR ;
-             DUP 3 ;
-             GET ;
-             IF_NONE
-               { DUP 4 ;
-                 CAR ;
-                 CDR ;
-                 CDR ;
-                 DIG 3 ;
-                 VOTING_POWER ;
-                 INT ;
-                 DUP 4 ;
-                 SWAP ;
-                 SOME ;
-                 SWAP ;
-                 UPDATE }
-               { DUP 5 ;
-                 CAR ;
-                 CDR ;
-                 CDR ;
-                 DIG 4 ;
-                 VOTING_POWER ;
-                 INT ;
-                 DIG 2 ;
-                 ADD ;
-                 DUP 4 ;
-                 SWAP ;
-                 SOME ;
-                 SWAP ;
-                 UPDATE } ;
-             DUP 4 ;
-             CAR ;
-             CDR ;
-             CAR ;
-             PAIR ;
-             DUP 4 ;
-             CAR ;
-             CAR ;
-             PAIR ;
-             PAIR ;
-             DUP ;
-             CDR ;
-             CDR ;
-             SWAP ;
-             DUP ;
-             DUG 2 ;
-             CDR ;
-             CAR ;
-             CDR ;
-             DIG 4 ;
-             CDR ;
-             CAR ;
-             CAR ;
-             DIG 4 ;
-             SOME ;
-             SOURCE ;
-             UPDATE ;
-             PAIR ;
-             PAIR ;
-             SWAP ;
-             CAR ;
-             PAIR ;
-             NIL operation ;
-             PAIR } } }
+             IF { DROP 3 ; PUSH string "Not yet the time to vote" ; FAILWITH }
+                { DUP 3 ;
+                  CDR ;
+                  DUP 4 ;
+                  CAR ;
+                  CDR ;
+                  CDR ;
+                  DUP 4 ;
+                  GET ;
+                  IF_NONE
+                    { DUP 4 ;
+                      CAR ;
+                      CDR ;
+                      CDR ;
+                      DIG 2 ;
+                      VOTING_POWER ;
+                      INT ;
+                      DUP 4 ;
+                      SWAP ;
+                      SOME ;
+                      SWAP ;
+                      UPDATE }
+                    { DUP 5 ;
+                      CAR ;
+                      CDR ;
+                      CDR ;
+                      DIG 3 ;
+                      VOTING_POWER ;
+                      INT ;
+                      DIG 2 ;
+                      ADD ;
+                      DUP 4 ;
+                      SWAP ;
+                      SOME ;
+                      SWAP ;
+                      UPDATE } ;
+                  DUP 4 ;
+                  CAR ;
+                  CDR ;
+                  CAR ;
+                  PAIR ;
+                  DUP 4 ;
+                  CAR ;
+                  CAR ;
+                  PAIR ;
+                  PAIR ;
+                  DUP ;
+                  CDR ;
+                  CDR ;
+                  DUP 2 ;
+                  CDR ;
+                  CAR ;
+                  CDR ;
+                  DIG 4 ;
+                  CDR ;
+                  CAR ;
+                  CAR ;
+                  DIG 4 ;
+                  SOURCE ;
+                  SWAP ;
+                  SOME ;
+                  SWAP ;
+                  UPDATE ;
+                  PAIR ;
+                  PAIR ;
+                  SWAP ;
+                  CAR ;
+                  PAIR ;
+                  NIL operation ;
+                  PAIR } } } }
 
