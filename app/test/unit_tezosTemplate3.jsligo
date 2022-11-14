@@ -93,8 +93,8 @@ const log_2 = Test.log("voteContract");
 const log_3 = Test.log(contr);
 
 const _testOriginate = () : bool => {
-  assert((Test.get_storage(taddr) as storage).name  == "Which is the cutiest pokemon?");
-  assert((Test.get_storage(taddr) as storage).votingPeriodIndex  == (25 as nat));
+  Test.assert((Test.get_storage(taddr) as storage).name  == "Which is the cutiest pokemon?");
+  Test.assert((Test.get_storage(taddr) as storage).votingPeriodIndex  == (25 as nat));
   return true ;
 };
 
@@ -115,10 +115,10 @@ const _testVote = ([s,o,k,voteCount] : [address,string,key_hash,int]) : bool => 
 
   const st = (Test.get_storage(taddr) as storage);
   Test.log(st);
-  assert_with_error(Option.unopt(Map.find_opt(s,st.votes))  == o,"Cannot find vote");
+  Test.assert_with_error(Option.unopt(Map.find_opt(s,st.votes))  == o,"Cannot find vote");
   Test.log (["expected voteCount : ", voteCount]) ;
   Test.log (["actual voteCount : ",Option.unopt(Map.find_opt(o,st.results))]) ;
-  assert_with_error(Option.unopt(Map.find_opt(o,st.results))  == voteCount,"Result of vote count is different to expected one");
+  Test.assert_with_error(Option.unopt(Map.find_opt(o,st.results))  == voteCount,"Result of vote count is different to expected one");
   return true;
 };
 
