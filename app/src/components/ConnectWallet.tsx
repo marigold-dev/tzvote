@@ -37,14 +37,15 @@ const ConnectButton = ({
       const delegatesResponse: DelegatesResponse = await Tezos.rpc.getDelegates(
         userAddress
       );
+
       if (
         delegatesResponse !== undefined &&
         delegatesResponse.delegated_contracts !== undefined &&
-        delegatesResponse.delegated_balance !== undefined
+        delegatesResponse.staking_balance !== undefined
       ) {
         console.log("We have a baker");
         setBakerDelegators(delegatesResponse.delegated_contracts);
-        setBakerPower(Number(delegatesResponse.voting_power));
+        setBakerPower(delegatesResponse.staking_balance.toNumber());
       } else {
         setBakerPower(0);
         console.log("We have a baker with no power");
