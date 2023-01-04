@@ -1,4 +1,4 @@
-name: Create App Docker Image for Testnets
+name: Create App Docker Images
 
 on:
   push:
