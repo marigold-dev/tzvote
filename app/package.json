@@ -56,6 +56,7 @@
     "start:ghostnet": "HTTPS=true env-cmd -f .env.ghostnet react-app-rewired start",
     "build": "react-app-rewired --max_old_space_size=2048 build",
     "build:ghostnet": "env-cmd -f .env.ghostnet react-app-rewired --max_old_space_size=2048 build",
+    "build:mainnet": "env-cmd -f .env.mainnet react-app-rewired --max_old_space_size=2048 build",
     "test": "react-app-rewired test",
     "eject": "react-app-rewired eject",
     "update-taquito": "ncu -u --target newest --filter '/^@taquito.*$/' && npm i"
