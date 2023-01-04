@@ -33,5 +33,5 @@ jobs:
           # Only push if on main branch
           push: ${{ github.ref == 'refs/heads/main' && github.event_name == 'push' }}
           tags: |
-            ghcr.io/marigold-dev/delegator-votes-cronjob:latest
-            ghcr.io/marigold-dev/delegator-votes-cronjob:${{ github.sha }}
+            ghcr.io/marigold-dev/tzvote-cronjob:latest
+            ghcr.io/marigold-dev/tzvote-cronjob:${{ github.sha }}
