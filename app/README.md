@@ -123,7 +123,7 @@ Install dependencies:
 ### Docker
 
 ```
-docker build -t delegator-votes .
+docker build -t tzvotes .
 ```
 
 ## Deploy
@@ -139,7 +139,7 @@ Open https://localhost:3000 in your browser to see a sample application.
 ### Docker
 
 ```
-docker run -d -p 3000:80 delegator-votes
+docker run -d -p 3000:80 tzvotes
 ```
 
 # TIPS

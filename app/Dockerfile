@@ -7,7 +7,7 @@ COPY yarn.lock ./
 RUN yarn install --frozen-lockfile
 RUN yarn global add react-scripts@4.0.2
 COPY . ./
-RUN yarn build
+RUN yarn build:mainnet
 
 # production environment
 FROM nginx:stable-alpine

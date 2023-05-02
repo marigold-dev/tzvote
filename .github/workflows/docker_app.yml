@@ -1,4 +1,4 @@
-name: Create App Docker Image
+name: Create App Docker Images
 
 on:
   push:
@@ -7,6 +7,9 @@ on:
 
 jobs:
   docker:
+    strategy:
+      matrix:
+        network: [mainnet, ghostnet]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -22,10 +25,12 @@ jobs:
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build and push
-        id: docker_build_delegator-votes
+      - name: Build and push mainnet
+        if: ${{ matrix.network == 'mainnet' }}
+        id: docker_build_tzvotes_mainnet
         uses: docker/build-push-action@v2
         with:
+          file: ./app/Dockerfile
           context: ./app/
           platforms: linux/amd64
           cache-from: type=gha
@@ -33,5 +38,22 @@ jobs:
           # Only push if on main branch
           push: ${{ github.ref == 'refs/heads/main' && github.event_name == 'push' }}
           tags: |
-            ghcr.io/marigold-dev/delegator-votes:latest
-            ghcr.io/marigold-dev/delegator-votes:${{ github.sha }}
+            ghcr.io/marigold-dev/tzvote:latest
+            ghcr.io/marigold-dev/tzvote-${{ matrix.network }}:latest
+            ghcr.io/marigold-dev/tzvote-${{ matrix.network }}:${{ github.sha }}
+
+      - name: Build and push testnet
+        if: ${{ matrix.network != 'mainnet' }}
+        id: docker_build_tzvotes_testnet
+        uses: docker/build-push-action@v2
+        with:
+          file: ./app/Dockerfile.${{ matrix.network }}
+          context: ./app/
+          platforms: linux/amd64
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          # Only push if on main branch
+          push: ${{ github.ref == 'refs/heads/main' && github.event_name == 'push' }}
+          tags: |
+            ghcr.io/marigold-dev/tzvote-${{ matrix.network }}:latest
+            ghcr.io/marigold-dev/tzvote-${{ matrix.network }}:${{ github.sha }}
