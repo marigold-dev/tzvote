@@ -19,6 +19,10 @@ ligo compile parameter votingPeriodOracle.jsligo 'UpdateCurrentVotingPeriod(["gh
 
 ```
 
+```bash
+TAQ_LIGO_IMAGE=ligolang/ligo:0.71.1 taq compile votingPeriodOracle.jsligo
+```
+
 ## Test
 
 ### Dry run
@@ -52,6 +56,10 @@ tezos-client transfer 0 from myFirstKey to oracleGhost  --arg '(Right (Pair "gho
 
 ## Compile Tezos baker contract
 
+```bash
+TAQ_LIGO_IMAGE=ligolang/ligo:0.71.1 taq compile tezosTemplate3.jsligo
+```
+
 ```
 ligo compile contract tezosTemplate3.jsligo --output-file tezosTemplate3.tz --entry-point main
 
@@ -62,6 +70,10 @@ ligo compile parameter tezosTemplate3.jsligo 'Vote(["Pikachu",Crypto.hash_key("e
 ```
 
 ## Compile permissioned Simple Poll contract
+
+```bash
+TAQ_LIGO_IMAGE=ligolang/ligo:0.71.1 taq compile permissionedSimplePoll.jsligo
+```
 
 ```
 ligo compile contract permissionedSimplePoll.jsligo --output-file permissionedSimplePoll.tz --entry-point main

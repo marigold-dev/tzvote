@@ -1,0 +1,23 @@
+type storage = {
+    votingPeriodIndex: nat,
+    admin: address
+};
+
+type return_ = [list<operation>, storage];
+
+@entry
+const updateCurrentVotingPeriod = (currentVotingIndex: nat, store: storage)
+    : return_ => {
+    if (Tezos.get_sender() != store.admin) return failwith(
+        "You are not the admin !!!"
+    );
+    return [
+        (list([]) as list<operation>),
+        { ...store, votingPeriodIndex: currentVotingIndex }
+    ]
+};
+
+@view
+const currentVotingPeriod = ([_, store]: [unit, storage]): nat => {
+    return store.votingPeriodIndex
+};
