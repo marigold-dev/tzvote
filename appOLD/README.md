@@ -113,38 +113,17 @@ taq generate types ./app/src
 
 ## Build
 
-### Locally
-
 Install dependencies:
 
-`yarn install`
-
-### Docker
-
-```
-docker build -t tzvotes .
-```
-
-## Deploy
-
-### Locally
-
-Start development server:
-
-`yarn run start`
-
-Open https://localhost:3000 in your browser to see a sample application.
-
-### Docker
-
-```
-docker run -d -p 3000:80 tzvotes
+```bash
+yarn
+yarn dev
 ```
 
 # TIPS
 
-Add one of my account **myFirstKey** as a baker
+Add one of my account **alice** as a baker
 
 ```
-tezos-client register key myFirstKey as delegate
+tezos-client register key alice as delegate
 ```
