@@ -64,6 +64,10 @@
         {
             "type": "npm",
             "name": "@taqueria/plugin-taquito"
+        },
+        {
+            "type": "npm",
+            "name": "@taqueria/plugin-contract-types"
         }
     ]
 }

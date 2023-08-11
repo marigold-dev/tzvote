@@ -99,8 +99,16 @@ taq deploy permissionedSimplePoll.tz -e "production" --storage permissionedSimpl
 ## Compile both for the frontend
 
 ```bash
-ligo compile contract tezosTemplate3.jsligo --output-file ./tezosTemplate3.tz.json --entry-point main --michelson-format json
-ligo compile contract permissionedSimplePoll.jsligo --output-file ./permissionedSimplePoll.tz.json --entry-point main --michelson-format json
+TAQ_LIGO_IMAGE=ligolang/ligo:0.71.1 taq compile tezosTemplate3.jsligo --json && mv artifacts/tezosTemplate3.json ./app/src/contracttemplates/
+
+TAQ_LIGO_IMAGE=ligolang/ligo:0.71.1 taq compile permissionedSimplePoll.jsligo --json && mv artifacts/permissionedSimplePoll.json ./app/src/contracttemplates/
+```
+
+Generate types
+
+```bash
+taq install @taqueria/plugin-contract-types
+taq generate types ./app/src
 ```
 
 ## Build
