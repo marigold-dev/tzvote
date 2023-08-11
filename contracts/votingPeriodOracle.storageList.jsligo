@@ -1,6 +1,14 @@
 #include "votingPeriodOracle.jsligo"
+const default_storage =
+    {
+        votingPeriodIndex: 0 as nat,
+        admin: ("tz1VSUr8wwNhLAzempoch5d6hLRiTh8Cjcjb" as address)
+    };
 
-// Define your initial storage values as a list of LIGO variable definitions,
-// the first of which will be considered the default value to be used for origination later on
-// E.g. const aStorageValue : aStorageType = 10;
+const mainnet =
+    {
+        votingPeriodIndex: 0 as nat,
+        admin: ("tz1QYD1zbK2gTUu1YWX8m7hPcKNkuXoxPo73" as address)
+    };
 
+const ghostnet = default_storage;

@@ -1,5 +1,2 @@
-#include "permissionedSimplePoll.jsligo"
-
-// Define your parameter values as a list of LIGO variable definitions
-// E.g. const aParameterValue : aParameterType = (Increment (1));
-
+#import "permissionedSimplePoll.jsligo" "TZ"
+const default_parameter: parameter_of TZ = Vote("Pikachu");

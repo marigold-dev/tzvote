@@ -56,6 +56,14 @@
         {
             "type": "npm",
             "name": "@taqueria/plugin-ligo"
+        },
+        {
+            "type": "npm",
+            "name": "@taqueria/plugin-tezos-client"
+        },
+        {
+            "type": "npm",
+            "name": "@taqueria/plugin-taquito"
         }
     ]
 }

@@ -1,6 +1,26 @@
 #include "permissionedSimplePoll.jsligo"
+const default_storage =
+    {
+        name: "Which is the cutiest pokemon?",
+        from_: ("2023-01-01t00:00:00Z" as timestamp),
+        to: ("2024-01-01t00:00:00Z" as timestamp),
+        options: list(["Mew", "Pikachu"]),
+        owner: ("tz1VSUr8wwNhLAzempoch5d6hLRiTh8Cjcjb" as address),
+        registeredVoters: list([]) as list<address>,
+        votes: (Map.empty as map<address, string>),
+        results: (Map.empty as map<string, int>)
+    };
 
-// Define your initial storage values as a list of LIGO variable definitions,
-// the first of which will be considered the default value to be used for origination later on
-// E.g. const aStorageValue : aStorageType = 10;
+const mainnet =
+    {
+        name: "Which is the cutiest pokemon?",
+        from_: ("2023-01-01t00:00:00Z" as timestamp),
+        to: ("2024-01-01t00:00:00Z" as timestamp),
+        options: list(["Mew", "Pikachu"]),
+        owner: ("tz1VSUr8wwNhLAzempoch5d6hLRiTh8Cjcjb" as address),
+        registeredVoters: list([]) as list<address>,
+        votes: (Map.empty as map<address, string>),
+        results: (Map.empty as map<string, int>)
+    };
 
+const ghostnet = default_storage;
