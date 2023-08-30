@@ -1,5 +1,5 @@
+import { IonButton } from "@ionic/react";
 import { BeaconWallet } from "@taquito/beacon-wallet";
-import { TezosToolkit } from "@taquito/taquito";
 import { Dispatch, SetStateAction } from "react";
 
 interface ButtonProps {
@@ -8,8 +8,6 @@ interface ButtonProps {
   setUserAddress: Dispatch<SetStateAction<string>>;
   setUserBalance: Dispatch<SetStateAction<number>>;
   setBakerDelegators: Dispatch<SetStateAction<string[]>>;
-  setWallet: Dispatch<SetStateAction<any>>;
-  setTezos: Dispatch<SetStateAction<TezosToolkit>>;
   setBeaconConnection: Dispatch<SetStateAction<boolean>>;
   setActiveTab: Dispatch<SetStateAction<string>>;
 }
@@ -20,8 +18,6 @@ const DisconnectButton = ({
   setUserAddress,
   setUserBalance,
   setBakerDelegators,
-  setWallet,
-  setTezos,
   setBeaconConnection,
   setActiveTab,
 }: ButtonProps): JSX.Element => {
@@ -38,11 +34,9 @@ const DisconnectButton = ({
   };
 
   return (
-    <div className="buttons">
-      <button className="button" onClick={disconnectWallet}>
-        <i className="fas fa-times"></i>&nbsp; Disconnect wallet
-      </button>
-    </div>
+    <IonButton className="button" onClick={disconnectWallet}>
+      <i className="fas fa-times"></i>&nbsp; Disconnect wallet
+    </IonButton>
   );
 };
 

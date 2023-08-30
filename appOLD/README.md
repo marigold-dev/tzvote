@@ -11,7 +11,7 @@ The Oracle is here to store missing information of current **voting period index
 ## compile
 
 ```bash
-TAQ_LIGO_IMAGE=ligolang/ligo:0.71.1 taq compile votingPeriodOracle.jsligo
+TAQ_LIGO_IMAGE=ligolang/ligo:0.72.0 taq compile votingPeriodOracle.jsligo
 ```
 
 ## Test
@@ -51,7 +51,7 @@ taq call votingPeriodOracle --param pokeGame.parameter.default_parameter.tz  -e 
 ## Compile Tezos baker contract
 
 ```bash
-TAQ_LIGO_IMAGE=ligolang/ligo:0.71.1 taq compile tezosTemplate3.jsligo
+TAQ_LIGO_IMAGE=ligolang/ligo:0.72.0 taq compile tezosTemplate3.jsligo
 ```
 
 ### Unit tests
@@ -75,7 +75,7 @@ taq deploy tezosTemplate3.tz -e "production" --storage tezosTemplate3.storage.ma
 ## Compile permissioned Simple Poll contract
 
 ```bash
-TAQ_LIGO_IMAGE=ligolang/ligo:0.71.1 taq compile permissionedSimplePoll.jsligo
+TAQ_LIGO_IMAGE=ligolang/ligo:0.72.0 taq compile permissionedSimplePoll.jsligo
 ```
 
 ### Unit tests
@@ -99,9 +99,9 @@ taq deploy permissionedSimplePoll.tz -e "production" --storage permissionedSimpl
 ## Compile both for the frontend
 
 ```bash
-TAQ_LIGO_IMAGE=ligolang/ligo:0.71.1 taq compile tezosTemplate3.jsligo --json && mv artifacts/tezosTemplate3.json ./app/src/contracttemplates/
+TAQ_LIGO_IMAGE=ligolang/ligo:0.72.0 taq compile tezosTemplate3.jsligo --json && mv artifacts/tezosTemplate3.json ./app/src/contracttemplates/
 
-TAQ_LIGO_IMAGE=ligolang/ligo:0.71.1 taq compile permissionedSimplePoll.jsligo --json && mv artifacts/permissionedSimplePoll.json ./app/src/contracttemplates/
+TAQ_LIGO_IMAGE=ligolang/ligo:0.72.0 taq compile permissionedSimplePoll.jsligo --json && mv artifacts/permissionedSimplePoll.json ./app/src/contracttemplates/
 ```
 
 Generate types
@@ -116,8 +116,8 @@ taq generate types ./app/src
 Install dependencies:
 
 ```bash
-yarn
-yarn dev
+npm i
+npm run dev
 ```
 
 # TIPS

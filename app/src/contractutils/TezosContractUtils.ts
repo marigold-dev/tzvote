@@ -1,6 +1,21 @@
-import { Contract } from "@dipdup/tzkt-api";
-import { TezosToolkit } from "@taquito/taquito";
+import * as api from "@tzkt/sdk-api";
 import { STATUS } from "./TezosUtils";
+
+import {
+  Storage as PermissionedSimplePollVotingContract,
+  PermissionedSimplePollWalletType,
+} from "../permissionedSimplePoll.types";
+
+import { TezosToolkit } from "@taquito/taquito";
+import { Contract } from "@tzkt/sdk-api";
+import {
+  TezosTemplate3WalletType,
+  Storage as TezosTemplateVotingContract,
+} from "../tezosTemplate3.types";
+import { address, int, timestamp } from "../type-aliases";
+
+api.defaults.baseUrl =
+  "https://api." + import.meta.env.VITE_NETWORK + ".tzkt.io";
 
 export class VOTING_TEMPLATE {
   public static readonly TEZOSTEMPLATE = new VOTING_TEMPLATE(
@@ -18,180 +33,79 @@ export class VOTING_TEMPLATE {
   ) {}
 }
 
-export abstract class VotingContract {
+export type VotingContract = (
+  | PermissionedSimplePollVotingContract
+  | TezosTemplateVotingContract
+) & {
   type: VOTING_TEMPLATE;
-  name: string;
-  dateFrom: Date;
-  dateTo: Date;
-  options: Array<string>;
-  votes: Map<string, string>; //transient
-  results: Map<string, number>; //transient
-  tzkt?: Contract | undefined; //transient
+  address: address;
+  from: timestamp;
+  to: timestamp;
   status?: STATUS; //calculated at initialization
+  creator: string;
+};
 
-  constructor(
-    type: VOTING_TEMPLATE,
-    name: string,
-    dateFrom: Date,
-    dateTo: Date,
-    options: Array<string>,
-    votes: Map<string, string>,
-    results: Map<string, number>,
-    tzkt?: Contract | undefined
-  ) {
-    this.type = type;
-    this.name = name;
-    this.dateFrom = dateFrom;
-    this.dateTo = dateTo;
-    this.options = options;
-    this.results = results;
-    this.votes = votes;
-    this.tzkt = tzkt;
-  }
-
-  /**
-   * Return if user can vote now
-   * @param userAddress the user address
-   * @param bakerPower (optional) baker power number
-   * @returns boolean
-   */
-  abstract userCanVoteNow(userAddress: string, bakerPower?: number): boolean;
-}
-
-export class PermissionedSimplePollVotingContract extends VotingContract {
-  owner: string; //the administrator who can add/remove voters
-  registeredVoters: Array<string>; // registered people who can vote
-
-  constructor(
-    name?: string,
-    dateFrom?: Date,
-    dateTo?: Date,
-    options?: Array<string>,
-    votes?: Map<string, string>,
-    results?: Map<string, number>,
-    tzkt?: Contract,
-    owner?: string,
-    registeredVoters?: Array<string>,
-    tzktContract?: Contract
-  ) {
-    //default constructor
-    if (!tzktContract) {
-      if (
-        !name ||
-        !dateFrom ||
-        !dateTo ||
-        !options ||
-        !owner ||
-        !registeredVoters
-      )
-        throw new Error(
-          "name ,dateFrom ,dateTo ,options ,owner ,registeredVoters are mandatory"
-        );
-      super(
-        VOTING_TEMPLATE.PERMISSIONEDSIMPLEPOLL,
-        name!,
-        dateFrom!,
-        dateTo!,
-        options!,
-        new Map(),
-        new Map(),
-        undefined
+/**
+ * Return if user can vote now
+ * @param userAddress the user address
+ * @param bakerPower (optional) baker power number
+ * @returns boolean
+ */
+export const userCanVoteNow = (
+  votingContract: VotingContract,
+  userAddress: address,
+  bakerPower?: number
+): boolean => {
+  switch (votingContract.type) {
+    case VOTING_TEMPLATE.PERMISSIONEDSIMPLEPOLL:
+      return (
+        !votingContract.votes.has(userAddress!) &&
+        votingContract.status == STATUS.ONGOING &&
+        (
+          votingContract as PermissionedSimplePollVotingContract
+        ).registeredVoters.indexOf(userAddress) >= 0
       );
-      this.owner = owner!;
-      this.registeredVoters = registeredVoters!;
+    case VOTING_TEMPLATE.TEZOSTEMPLATE:
+      return (
+        !votingContract.votes.has(userAddress!) &&
+        votingContract.status == STATUS.ONGOING &&
+        bakerPower! > 0
+      );
+    default:
+      throw Error("Cannot guess votingContract type");
+  }
+};
+
+export const getWinner = (
+  contract: PermissionedSimplePollVotingContract | TezosTemplateVotingContract
+): Array<string> => {
+  var winnerList: Array<string> = [];
+  var maxScore: number = 0;
+  contract.results.forEach((value: int, key: string) => {
+    if (value.eq(maxScore)) {
+      winnerList.push(key);
+    } else if (value.gt(maxScore)) {
+      winnerList = [];
+      winnerList.push(key);
     } else {
-      //from tzkt constructor
-      super(
-        VOTING_TEMPLATE.PERMISSIONEDSIMPLEPOLL,
-        tzktContract.storage.name,
-        new Date(tzktContract.storage.from_),
-        new Date(tzktContract.storage.to),
-        Array.from<string>(
-          new Map(Object.entries<string>(tzktContract.storage.options)).values()
-        ),
-        new Map<string, string>(
-          Object.entries<string>(tzktContract.storage.votes)
-        ),
-        new Map<string, number>(
-          Object.keys(tzktContract.storage.results).map((key) => [
-            key,
-            Number(tzktContract.storage.results[key]),
-          ])
-        ),
-        tzktContract
-      );
-      this.owner = tzktContract.storage.owner;
-      this.registeredVoters = Array.from<string>(
-        new Map(
-          Object.entries<string>(tzktContract.storage.registeredVoters)
-        ).values()
-      );
+      //pass
     }
-    this.status =
-      new Date() > this.dateFrom && new Date() < this.dateTo
-        ? STATUS.ONGOING
-        : STATUS.LOCKED;
-  }
-
-  userCanVoteNow(
-    userAddress: string,
-    bakerPower?: number,
-    Tezos?: TezosToolkit
-  ): boolean {
-    return (
-      !this.votes.has(userAddress!) &&
-      this.status == STATUS.ONGOING &&
-      this.registeredVoters.indexOf(userAddress) >= 0
-    );
-  }
-}
-
-export class TezosTemplateVotingContract extends VotingContract {
-  votingPeriodIndex: number;
-  votingPeriodOracle: string; // address of the oracle
-  protocol: string; //deployed on this network protocol
-
-  constructor(
-    name: string,
-    votingPeriodIndex: number,
-    dateFrom: Date,
-    dateTo: Date,
-    options: Array<string>,
-    votes: Map<string, string>,
-    results: Map<string, number>,
-    votingPeriodOracle: string,
-    protocol: string,
-    tzkt?: Contract
-  ) {
-    super(
-      VOTING_TEMPLATE.TEZOSTEMPLATE,
-      name,
-      dateFrom,
-      dateTo,
-      options,
-      votes,
-      results,
-      tzkt
-    );
-    this.votingPeriodIndex = votingPeriodIndex;
-    this.votingPeriodOracle = votingPeriodOracle;
-    this.protocol = protocol;
-  }
-
-  userCanVoteNow(userAddress: string, bakerPower?: number): boolean {
-    return (
-      !this.votes.has(userAddress!) &&
-      this.status == STATUS.ONGOING &&
-      bakerPower! > 0
-    );
-  }
-}
+  });
+  return winnerList;
+};
 
 export abstract class VotingContractUtils {
   public static async convertFromTZKTTezosContractToTezosTemplateVotingContract(
     Tezos: TezosToolkit,
     tzktContract: Contract
-  ): Promise<TezosTemplateVotingContract> {
+  ): Promise<VotingContract> {
+    const tezosTemplate3WalletType: TezosTemplate3WalletType =
+      await Tezos.wallet.at<TezosTemplate3WalletType>(tzktContract.address!);
+
+    let tezosTemplateVotingContract: VotingContract =
+      (await tezosTemplate3WalletType.storage()) as VotingContract;
+    tezosTemplateVotingContract.type = VOTING_TEMPLATE.TEZOSTEMPLATE;
+
     let votingPeriodBlockResult = await Tezos.rpc.getCurrentPeriod();
     const currentPeriodStartBlock =
       votingPeriodBlockResult.voting_period.start_position;
@@ -219,34 +133,48 @@ export abstract class VotingContractUtils {
         Date.now() + 1000 * blocksUntilTheEnd * block_estimated_duration
       );
     }
-    let votes = new Map<string, string>(
-      Object.entries<string>(tzktContract.storage.votes)
-    );
-    let tezosTemplateVotingContract = new TezosTemplateVotingContract(
-      tzktContract.storage.name,
-      tzktContract.storage.votingPeriodIndex,
-      dateFrom,
-      dateTo,
-      Array.from<string>(
-        new Map(Object.entries<string>(tzktContract.storage.options)).values()
-      ),
-      votes,
-      new Map<string, number>(
-        Object.keys(tzktContract.storage.results).map((key, index) => [
-          key,
-          Number(tzktContract.storage.results[key]),
-        ])
-      ),
-      tzktContract.storage.votingPeriodOracle,
-      tzktContract.storage.protocol,
-      tzktContract
-    );
 
-    tezosTemplateVotingContract.status =
-      tezosTemplateVotingContract.votingPeriodIndex ==
-      votingPeriodBlockResult.voting_period.index
+    tezosTemplateVotingContract.from = dateFrom.toISOString() as timestamp;
+    tezosTemplateVotingContract.to = dateTo.toISOString() as timestamp;
+
+    tezosTemplateVotingContract.status = (
+      tezosTemplateVotingContract as TezosTemplateVotingContract
+    ).votingPeriodIndex.eq(votingPeriodBlockResult.voting_period.index)
+      ? STATUS.ONGOING
+      : STATUS.LOCKED;
+
+    tezosTemplateVotingContract.creator = tzktContract.creator?.address!;
+
+    return tezosTemplateVotingContract;
+  }
+
+  public static async convertFromTZKTTezosContractToPermissionnedSimplePollTemplateVotingContract(
+    Tezos: TezosToolkit,
+    tzktContract: Contract
+  ): Promise<VotingContract> {
+    const permissionedSimplePollWalletType: PermissionedSimplePollWalletType =
+      await Tezos.wallet.at<PermissionedSimplePollWalletType>(
+        tzktContract.address!
+      );
+
+    let permissionedSimplePollVotingContract: VotingContract =
+      (await permissionedSimplePollWalletType.storage()) as VotingContract;
+    permissionedSimplePollVotingContract.type =
+      VOTING_TEMPLATE.PERMISSIONEDSIMPLEPOLL;
+
+    permissionedSimplePollVotingContract.from = (
+      permissionedSimplePollVotingContract as PermissionedSimplePollVotingContract
+    ).from_;
+
+    permissionedSimplePollVotingContract.status =
+      new Date() > new Date(permissionedSimplePollVotingContract.from) &&
+      new Date() < new Date(permissionedSimplePollVotingContract.to)
         ? STATUS.ONGOING
         : STATUS.LOCKED;
-    return tezosTemplateVotingContract;
+
+    permissionedSimplePollVotingContract.creator =
+      tzktContract.creator?.address!;
+
+    return permissionedSimplePollVotingContract;
   }
 }

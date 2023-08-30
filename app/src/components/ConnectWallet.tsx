@@ -1,5 +1,5 @@
 import { NetworkType } from "@airgap/beacon-sdk";
-import { Button } from "@mui/material";
+import { IonButton } from "@ionic/react";
 import { BeaconWallet } from "@taquito/beacon-wallet";
 import { DelegatesResponse } from "@taquito/rpc";
 import { TezosToolkit } from "@taquito/taquito";
@@ -7,7 +7,6 @@ import { Dispatch, SetStateAction } from "react";
 
 type ButtonProps = {
   Tezos: TezosToolkit;
-  setWallet: Dispatch<SetStateAction<any>>;
   setUserAddress: Dispatch<SetStateAction<string>>;
   setUserBalance: Dispatch<SetStateAction<number>>;
   setBakerDelegators: Dispatch<SetStateAction<string[]>>;
@@ -19,13 +18,13 @@ type ButtonProps = {
 
 const ConnectButton = ({
   Tezos,
-  setWallet,
   setUserAddress,
   setUserBalance,
+  wallet,
+
   setBakerDelegators,
   setBakerPower,
   setBeaconConnection,
-  wallet,
 }: ButtonProps): JSX.Element => {
   const setup = async (userAddress: string): Promise<void> => {
     setUserAddress(userAddress);
@@ -59,14 +58,12 @@ const ConnectButton = ({
     try {
       await wallet.requestPermissions({
         network: {
-          type: process.env["REACT_APP_NETWORK"]
+          type: import.meta.env.VITE_NETWORK
             ? NetworkType[
-                process.env[
-                  "REACT_APP_NETWORK"
-                ].toUpperCase() as keyof typeof NetworkType
+                import.meta.env.VITE_NETWORK.toUpperCase() as keyof typeof NetworkType
               ]
             : NetworkType.GHOSTNET,
-          rpcUrl: process.env["REACT_APP_TEZOS_NODE"],
+          rpcUrl: import.meta.env.VITE_TEZOS_NODE,
         },
       });
       // gets user's address
@@ -79,9 +76,9 @@ const ConnectButton = ({
   };
 
   return (
-    <Button variant="contained" onClick={connectWallet}>
+    <IonButton onClick={connectWallet}>
       <i className="fas fa-wallet"></i>&nbsp; Connect with wallet
-    </Button>
+    </IonButton>
   );
 };
 
