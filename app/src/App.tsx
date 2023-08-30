@@ -35,8 +35,8 @@ setupIonicReact();
 
 export type UserContextType = {
   Tezos: TezosToolkit;
-  userAddress: string;
-  setUserAddress: Dispatch<SetStateAction<string>>;
+  userAddress: string | undefined;
+  setUserAddress: Dispatch<SetStateAction<string | undefined>>;
   wallet: BeaconWallet;
   votingTemplateAddresses: Map<VOTING_TEMPLATE, string>;
   setVotingTemplateAddresses: Dispatch<
@@ -62,7 +62,7 @@ const App: React.FC = () => {
       : NetworkType.GHOSTNET,
   });
   Tezos.setWalletProvider(wallet);
-  const [userAddress, setUserAddress] = useState<string>("");
+  const [userAddress, setUserAddress] = useState<string | undefined>();
   const [bakerPower, setBakerPower] = useState<number>(0);
   const [bakerDelegators, setBakerDelegators] = useState<string[]>([]);
 

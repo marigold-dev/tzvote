@@ -1,4 +1,5 @@
 import * as api from "@tzkt/sdk-api";
+import { BigNumber } from "bignumber.js";
 import { STATUS } from "./TezosUtils";
 
 import {
@@ -12,7 +13,7 @@ import {
   TezosTemplate3WalletType,
   Storage as TezosTemplateVotingContract,
 } from "../tezosTemplate3.types";
-import { address, int, timestamp } from "../type-aliases";
+import { address, int, nat, timestamp } from "../type-aliases";
 
 api.defaults.baseUrl =
   "https://api." + import.meta.env.VITE_NETWORK + ".tzkt.io";
@@ -56,23 +57,28 @@ export const userCanVoteNow = (
   userAddress: address,
   bakerPower?: number
 ): boolean => {
-  switch (votingContract.type) {
-    case VOTING_TEMPLATE.PERMISSIONEDSIMPLEPOLL:
-      return (
-        !votingContract.votes.has(userAddress!) &&
-        votingContract.status == STATUS.ONGOING &&
-        (
-          votingContract as PermissionedSimplePollVotingContract
-        ).registeredVoters.indexOf(userAddress) >= 0
-      );
-    case VOTING_TEMPLATE.TEZOSTEMPLATE:
-      return (
-        !votingContract.votes.has(userAddress!) &&
-        votingContract.status == STATUS.ONGOING &&
-        bakerPower! > 0
-      );
-    default:
-      throw Error("Cannot guess votingContract type");
+  if (userAddress && votingContract) {
+    switch (votingContract.type) {
+      case VOTING_TEMPLATE.PERMISSIONEDSIMPLEPOLL:
+        return (
+          !votingContract.votes.has(userAddress!) &&
+          votingContract.status == STATUS.ONGOING &&
+          (
+            votingContract as PermissionedSimplePollVotingContract
+          ).registeredVoters.indexOf(userAddress) >= 0
+        );
+      case VOTING_TEMPLATE.TEZOSTEMPLATE:
+        return (
+          !votingContract.votes.has(userAddress!) &&
+          votingContract.status == STATUS.ONGOING &&
+          bakerPower! > 0
+        );
+      default:
+        throw Error("Cannot guess votingContract type");
+    }
+  } else {
+    console.warn("cannot check if time to vote, ignoring the call.. ");
+    return false;
   }
 };
 
@@ -105,8 +111,10 @@ export abstract class VotingContractUtils {
     let tezosTemplateVotingContract: VotingContract =
       (await tezosTemplate3WalletType.storage()) as VotingContract;
     tezosTemplateVotingContract.type = VOTING_TEMPLATE.TEZOSTEMPLATE;
+    tezosTemplateVotingContract.address = tzktContract.address as address;
 
     let votingPeriodBlockResult = await Tezos.rpc.getCurrentPeriod();
+
     const currentPeriodStartBlock =
       votingPeriodBlockResult.voting_period.start_position;
 
@@ -117,15 +125,29 @@ export abstract class VotingContractUtils {
     );
 
     const constantsResponse = await Tezos.rpc.getConstants();
-    let blocksUntilTheEnd: number = constantsResponse.blocks_per_voting_period;
-    //Provided that at least two thirds of the total active stake participates honestly in consensus, then a decision is eventually taken.2 In the current implementation of Tenderbake the duration of each round increments by 15 seconds, starting from 30 seconds: thus the deadline for participation in round 0 is 30 seconds, that for round 1 is 45 seconds after that, and so on. So in normal conditions, when consensus is reached promptly at round 0 every time, we can expect Tenderbake to add one block every 30 seconds. Note that: Tenderbake has deterministic finality after just two blocks. In normal conditions, when the network is healthy, decisions are made at round 0, after 30 seconds. This means that in normal conditions the time to finality is about one minute.
-    const block_estimated_duration = 30;
+
+    let blocksUntilTheEnd: number =
+      constantsResponse.cycles_per_voting_period! *
+      constantsResponse.blocks_per_cycle;
+
+    //Provided that at least two thirds of the total active stake participates honestly in consensus,
+    //then a decision is eventually taken.2 In the current implementation of Tenderbake the duration of each round increments by 15 seconds,
+    // starting from 15 seconds: thus the deadline for participation in round 0 is 15 seconds,
+    //that for round 1 is 45 seconds after that, and so on. So in normal conditions, when consensus is reached
+    //promptly at round 0 every time, we can expect Tenderbake to add one block every 15 seconds.
+    //Note that: Tenderbake has deterministic finality after just two blocks.
+    //In normal conditions, when the network is healthy, decisions are made at round 0, after 15 seconds.
+    //This means that in normal conditions the time to finality is about 30s.
+    const block_estimated_duration = 15;
+
     let dateTo = new Date(
       dateFrom.getTime() + 1000 * blocksUntilTheEnd * block_estimated_duration
     );
+
     if (
-      tzktContract.storage.votingPeriodIndex ==
-      votingPeriodBlockResult.voting_period.index
+      (tezosTemplateVotingContract as TezosTemplateVotingContract)
+        .votingPeriodIndex ==
+      (new BigNumber(votingPeriodBlockResult.voting_period.index) as nat)
     ) {
       //if current, we can have more accurate thatns to remaining blocks data
       blocksUntilTheEnd = votingPeriodBlockResult.remaining;
@@ -135,6 +157,7 @@ export abstract class VotingContractUtils {
     }
 
     tezosTemplateVotingContract.from = dateFrom.toISOString() as timestamp;
+
     tezosTemplateVotingContract.to = dateTo.toISOString() as timestamp;
 
     tezosTemplateVotingContract.status = (
@@ -161,6 +184,9 @@ export abstract class VotingContractUtils {
       (await permissionedSimplePollWalletType.storage()) as VotingContract;
     permissionedSimplePollVotingContract.type =
       VOTING_TEMPLATE.PERMISSIONEDSIMPLEPOLL;
+
+    permissionedSimplePollVotingContract.address =
+      tzktContract.address as address;
 
     permissionedSimplePollVotingContract.from = (
       permissionedSimplePollVotingContract as PermissionedSimplePollVotingContract

@@ -6,7 +6,9 @@ import {
   IonChip,
   IonCol,
   IonContent,
+  IonFooter,
   IonGrid,
+  IonHeader,
   IonIcon,
   IonInput,
   IonLabel,
@@ -20,12 +22,15 @@ import {
   IonSearchbar,
   IonSpinner,
   IonText,
+  IonTitle,
+  IonToolbar,
   useIonAlert,
 } from "@ionic/react";
 
 import { WalletContract } from "@taquito/taquito";
 import { Contract } from "@tzkt/sdk-api";
-import * as moment from "moment";
+//import * as moment from "moment";
+import moment from "moment";
 import momentDurationFormatSetup from "moment-duration-format";
 import React, { FormEvent, useRef, useState } from "react";
 import {
@@ -62,6 +67,7 @@ import {
 import { useHistory } from "react-router";
 import { PAGES, UserContext, UserContextType } from "../App";
 import { address, key_hash } from "../type-aliases";
+import DisconnectButton from "./DisconnectWallet";
 
 momentDurationFormatSetup(moment);
 
@@ -69,8 +75,14 @@ export const Search: React.FC = () => {
   api.defaults.baseUrl =
     "https://api." + import.meta.env.VITE_NETWORK + ".tzkt.io";
 
-  const { Tezos, votingTemplateAddresses, userAddress, bakerPower } =
-    React.useContext(UserContext) as UserContextType;
+  const {
+    Tezos,
+    votingTemplateAddresses,
+    userAddress,
+    bakerPower,
+    wallet,
+    setUserAddress,
+  } = React.useContext(UserContext) as UserContextType;
 
   const [presentAlert] = useIonAlert();
   const { push } = useHistory();
@@ -80,7 +92,6 @@ export const Search: React.FC = () => {
   const [options, setOptions] = useState<Array<string>>([]);
   const loading = open && options.length === 0;
   const [inputValue, setInputValue] = React.useState<string>("");
-  const [searchValue, setSearchValue] = React.useState<string | null>(null);
 
   //LIST
   const [allContracts, setAllContracts] = useState<Array<VotingContract>>([]);
@@ -153,21 +164,37 @@ export const Search: React.FC = () => {
     if (filterValue == null || filterValue === "") setContracts([]);
     else {
       let filteredContract = allContracts.filter((c: VotingContract) => {
-        console.log(filterValue.replace(/[^a-zA-Z0-9]/gi, ".")); //avoid issue of special char on the regex
+        //console.log(filterValue.replace(/[^a-zA-Z0-9]/gi, ".")); //avoid issue of special char on the regex
         return (
           c.name.search(
             new RegExp(filterValue.replace(/[^a-zA-Z0-9]/gi, "."), "gi")
           ) >= 0
         );
       });
+
+      //console.log("filteredContract", filteredContract);
+
       setContracts(filteredContract);
     }
   };
 
   //EFFECTS
-  React.useEffect(refreshData, []); //init load
+  React.useEffect(() => {
+    //in case of forced page refresh
+    if (!userAddress) {
+      (async () => {
+        const activeAccount = await wallet.client.getActiveAccount();
+        setUserAddress(activeAccount!.address);
+      })();
+    }
 
-  React.useEffect(() => filterOnNewInput(inputValue), [allContracts]); //if data refreshed, need to refresh the filtered list too
+    refreshData();
+  }, []); //init load
+
+  React.useEffect(() => {
+    setInputValue("*");
+    filterOnNewInput(inputValue);
+  }, [allContracts]); //if data refreshed, need to refresh the filtered list too
 
   const durationToString = (value: number): string => {
     return moment
@@ -717,142 +744,124 @@ export const Search: React.FC = () => {
   /***  MAIN FRAME *******************
    *************************************/
   return (
-    <IonPage>
+    <IonPage className="container">
       {loading ? (
         <IonSpinner color="inherit" />
       ) : (
         <>
-          <IonSearchbar
-            id="searchInput"
-            value={searchValue}
-            onIonInput={(e) => {
-              setInputValue(e.target.value!);
-            }}
-            onIonChange={(e) => {
-              filterOnNewInput(e.target.value!);
-            }}
-          />
+          <IonHeader>
+            <IonToolbar>
+              <IonTitle>Search</IonTitle>
+            </IonToolbar>
+          </IonHeader>
+          <IonContent fullscreen>
+            <IonSearchbar
+              animated
+              debounce={1000}
+              id="searchInput"
+              placeholder="Filter here ..."
+              value={inputValue}
+              onIonChange={(e) => {
+                let inputValue = e.target.value;
+                if (
+                  inputValue === undefined ||
+                  !inputValue ||
+                  inputValue === ""
+                ) {
+                  inputValue = "*";
+                }
 
-          {contracts.length == 0 ? (
-            <div id="dialog-login">
-              <header>Free voting Dapp</header>
-              <div id="content-login">
-                <div>
-                  Voting session journey
-                  <div>
-                    <hr />
-                    <div>
-                      Login : Connect to your wallet to enable blockchain
-                      interactions, or just skip and continue read only
-                    </div>
-                    <br />
-                    <div>
-                      Search : See voting session details, vote and display
-                      results on status icon
-                    </div>
-                    <br />
-                    <div>
-                      Create : Create new voting sessions from templates{" "}
-                      <IonChip id="PERMISSIONEDSIMPLEPOLL" color="info">
-                        {VOTING_TEMPLATE.PERMISSIONEDSIMPLEPOLL.name}
-                      </IonChip>
-                      <IonPopover
-                        trigger="PERMISSIONEDSIMPLEPOLL"
-                        triggerAction="hover"
-                      >
-                        <IonContent class="ion-padding">
-                          {VOTING_TEMPLATE.PERMISSIONEDSIMPLEPOLL.description}
-                        </IonContent>
-                      </IonPopover>
-                      or{" "}
-                      <IonChip id="TEZOSTEMPLATE" color="info">
-                        {VOTING_TEMPLATE.TEZOSTEMPLATE.name}
-                      </IonChip>
-                      <IonPopover trigger="TEZOSTEMPLATE" triggerAction="hover">
-                        <IonContent class="ion-padding">
-                          {VOTING_TEMPLATE.TEZOSTEMPLATE.description}
-                        </IonContent>
-                      </IonPopover>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          ) : (
-            ""
-          )}
+                setInputValue(inputValue); //search all
 
-          {contracts.map((contract, _) => (
-            <IonCard
-              key={contract.address}
-              style={{ display: "flex", marginTop: "0.2em" }}
-            >
-              <IonCardContent style={{ flex: "1 0 auto", padding: "1vw" }}>
-                <IonText>
-                  <h6>
-                    <a
-                      href={`https://${
-                        import.meta.env.VITE_NETWORK
-                          ? NetworkType[
-                              import.meta.env.VITE_NETWORK.toUpperCase() as keyof typeof NetworkType
-                            ]
-                          : NetworkType.GHOSTNET
-                      }.tzkt.io/${contract.address}/info`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      {contract.name}
-                    </a>
+                filterOnNewInput(inputValue); //filter
+              }}
+            />
 
-                    <IonChip color="info" id={contract.type.name}>
-                      {contract.type.name}
-                    </IonChip>
-                    <IonPopover
-                      trigger={contract.type.name}
-                      triggerAction="hover"
-                    >
-                      <IonContent class="ion-padding">
-                        {contract.type.description}
-                      </IonContent>
-                    </IonPopover>
-                  </h6>
-                </IonText>
+            {contracts.length === 0 ? (
+              <IonTitle> No results ...</IonTitle>
+            ) : (
+              contracts.map((contract, _) => (
+                <IonCard key={contract.address}>
+                  <IonCardContent>
+                    <IonGrid style={{ flex: "1 0 auto", padding: "1vw" }}>
+                      <IonRow>
+                        <IonText>
+                          <h6>
+                            <a
+                              href={`https://${
+                                import.meta.env.VITE_NETWORK
+                                  ? NetworkType[
+                                      import.meta.env.VITE_NETWORK.toUpperCase() as keyof typeof NetworkType
+                                    ]
+                                  : NetworkType.GHOSTNET
+                              }.tzkt.io/${contract.address}/info`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                            >
+                              {contract.name}
+                            </a>
 
-                <IonText color="text.secondary">
-                  <div>Created by </div>
-                  <IonChip style={{ maxWidth: "40vw" }}>
-                    <IonIcon icon={personCircleOutline}></IonIcon>
-                    <IonLabel>
-                      <a
-                        style={{
-                          fontSize: "0.8em",
-                          margin: "1em",
-                        }}
-                        href={
-                          `https://` +
-                          (import.meta.env.VITE_NETWORK
-                            ? NetworkType[
-                                import.meta.env[
-                                  "VITE_NETWORK"
-                                ].toUpperCase() as keyof typeof NetworkType
-                              ]
-                            : NetworkType.GHOSTNET) +
-                          `.tzkt.io/${contract.creator}/info`
-                        }
-                        target="_blank"
-                      >
-                        {contract.creator}
-                      </a>
-                    </IonLabel>
-                  </IonChip>
-                </IonText>
+                            <IonChip color="dark" id={contract.address}>
+                              {contract.type.name ==
+                              VOTING_TEMPLATE.PERMISSIONEDSIMPLEPOLL.name
+                                ? "P"
+                                : "B"}
+                            </IonChip>
+                            <IonPopover
+                              trigger={contract.address}
+                              triggerAction="hover"
+                            >
+                              <IonContent class="ion-padding">
+                                {contract.type.description}
+                              </IonContent>
+                            </IonPopover>
+                          </h6>
+                        </IonText>
+                      </IonRow>
+                      <IonRow>
+                        <IonChip
+                          style={{
+                            fontSize: "x-small",
+                          }}
+                        >
+                          <IonIcon icon={personCircleOutline}></IonIcon>
+                          <IonLabel>
+                            <a
+                              href={
+                                `https://` +
+                                (import.meta.env.VITE_NETWORK
+                                  ? NetworkType[
+                                      import.meta.env[
+                                        "VITE_NETWORK"
+                                      ].toUpperCase() as keyof typeof NetworkType
+                                    ]
+                                  : NetworkType.GHOSTNET) +
+                                `.tzkt.io/${contract.creator}/info`
+                              }
+                              target="_blank"
+                            >
+                              {contract.creator}
+                            </a>
+                          </IonLabel>
+                        </IonChip>
+                      </IonRow>
+                    </IonGrid>
+                  </IonCardContent>
 
-                {buttonChoices(contract)}
-              </IonCardContent>
+                  <IonButton>//TODO Replace buttons !!!</IonButton>
+                  {buttonChoices(contract)}
 
-              <div>{resultArea(contract)}</div>
-            </IonCard>
-          ))}
+                  <IonButton>//TODO Replace results !!!</IonButton>
+                  {resultArea(contract)}
+                </IonCard>
+              ))
+            )}
+          </IonContent>
+          <IonFooter>
+            <IonToolbar>
+              <DisconnectButton /> {userAddress}
+            </IonToolbar>
+          </IonFooter>
         </>
       )}
     </IonPage>

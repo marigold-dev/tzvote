@@ -1,9 +1,28 @@
-import { IonPage, IonSpinner, useIonAlert } from "@ionic/react";
+import {
+  IonButton,
+  IonContent,
+  IonGrid,
+  IonIcon,
+  IonInput,
+  IonItem,
+  IonLabel,
+  IonList,
+  IonPage,
+  IonPopover,
+  IonRadio,
+  IonRadioGroup,
+  IonSpinner,
+  useIonAlert,
+} from "@ionic/react";
 import { BigNumber } from "bignumber.js";
 
+import {
+  addCircleOutline,
+  radioButtonOffOutline,
+  trashBinOutline,
+} from "ionicons/icons";
 import React, { FormEvent, useState } from "react";
 import { useHistory } from "react-router";
-import { Tooltip } from "recharts";
 import { PAGES, UserContext, UserContextType } from "../App";
 import {
   TezosUtils,
@@ -12,9 +31,9 @@ import {
 import { Storage as TezosTemplateVotingContract } from "../tezosTemplate3.types";
 import { address, asMap, int, nat } from "../type-aliases";
 
-const jsonContractTemplate = require("../contracttemplates/tezosTemplate3.tz.json");
+import jsonContractTemplate from "../contracttemplates/tezosTemplate3.json";
 
-export const CreateTezosTemplate: React.FC = () => {
+const CreateTezosTemplate: React.FC = () => {
   const { Tezos, userAddress } = React.useContext(
     UserContext
   ) as UserContextType;
@@ -119,165 +138,146 @@ export const CreateTezosTemplate: React.FC = () => {
       ) : (
         <>
           <form onSubmit={(e) => createVoteContract(e, contract)}>
-            <FormControl fullWidth>
-              <Grid container>
-                <Grid item xs={12}>
-                  <Box>
-                    <TextField
-                      fullWidth
-                      required
-                      id="name"
-                      label="Question"
-                      value={contract.name}
-                      onChange={(e) => {
+            <IonGrid>
+              <div>
+                <IonInput
+                  required
+                  id="name"
+                  label="Question"
+                  value={contract.name}
+                  onIonChange={(e) => {
+                    setContract({
+                      ...contract,
+                      name: e.target.value!,
+                    } as TezosTemplateVotingContract);
+                  }}
+                />
+
+                <div style={{ paddingTop: "2em" }}>
+                  <IonLabel id="demo-radio-buttons-group-label">
+                    Select a period*
+                  </IonLabel>
+                  <IonRadioGroup
+                    aria-labelledby="demo-radio-buttons-group-label"
+                    defaultValue="25"
+                    name="radio-buttons-group"
+                    value={contract.votingPeriodIndex}
+                    onIonChange={(e) => {
+                      setContract({
+                        ...contract,
+                        votingPeriodIndex: new BigNumber(e.target.value!),
+                      } as TezosTemplateVotingContract);
+                    }}
+                  >
+                    {[...Array(5)].map((_: undefined, index: number) => (
+                      <IonRadio
+                        key={currentVotingPeriodIndex.plus(index).toNumber()}
+                        value={currentVotingPeriodIndex.plus(index)}
+                      >
+                        <div>
+                          Period{" "}
+                          {currentVotingPeriodIndex.plus(index).toNumber()}
+                          <br />
+                          From{" "}
+                          {periodDates[index]
+                            ? periodDates[index].toLocaleDateString()
+                            : ""}
+                          <br />
+                          To{" "}
+                          {periodDates[index + 1]
+                            ? periodDates[index + 1].toLocaleDateString()
+                            : ""}
+                          <br />
+                          (estimated){" "}
+                        </div>
+                      </IonRadio>
+                    ))}
+                  </IonRadioGroup>
+                </div>
+              </div>
+            </IonGrid>
+            <IonGrid>
+              <IonLabel
+                color={contract.options.length == 0 ? "danger" : "info"}
+                id="demo-radio-buttons-group-label"
+              >
+                Options*
+              </IonLabel>
+
+              <div>
+                <IonInput
+                  value={inputOption}
+                  label="type your option here"
+                  onIonChange={(e) => setInputOption(e.target.value as string)}
+                ></IonInput>
+
+                <IonButton
+                  id="add"
+                  style={{ marginLeft: "1em" }}
+                  onClick={() => {
+                    setContract({
+                      ...contract,
+                      options: contract.options.concat(inputOption),
+                    } as TezosTemplateVotingContract);
+                    setInputOption("");
+                  }}
+                >
+                  <IonIcon icon={addCircleOutline} />
+                </IonButton>
+
+                <IonPopover
+                  trigger="add"
+                  triggerAction="hover"
+                  isOpen={contract.options.length == 0}
+                  aria-label="add"
+                >
+                  <IonContent class="ion-padding">
+                    At least one option is needed
+                  </IonContent>
+                </IonPopover>
+              </div>
+
+              <IonList inputMode="text">
+                {contract.options.map((option: string, index: number) => (
+                  <IonItem key={option}>
+                    <IonIcon icon={radioButtonOffOutline} />
+
+                    <IonLabel>{option}</IonLabel>
+
+                    <IonIcon
+                      icon={trashBinOutline}
+                      onClick={() => {
+                        contract.options.splice(index, 1);
                         setContract({
                           ...contract,
-                          name: e.target.value!,
+                          options: contract.options,
                         } as TezosTemplateVotingContract);
                       }}
                     />
-
-                    <div style={{ paddingTop: "2em" }}>
-                      <FormLabel required id="demo-radio-buttons-group-label">
-                        Select a period
-                      </FormLabel>
-                      <RadioGroup
-                        row
-                        aria-labelledby="demo-radio-buttons-group-label"
-                        defaultValue="25"
-                        name="radio-buttons-group"
-                        value={contract.votingPeriodIndex}
-                        onChange={(e) => {
-                          setContract({
-                            ...contract,
-                            votingPeriodIndex: new BigNumber(e.target.value!),
-                          } as TezosTemplateVotingContract);
-                        }}
-                      >
-                        {[...Array(5)].map((_: undefined, index: number) => (
-                          <FormControlLabel
-                            key={currentVotingPeriodIndex
-                              .plus(index)
-                              .toNumber()}
-                            labelPlacement="top"
-                            value={currentVotingPeriodIndex.plus(index)}
-                            control={<Radio required />}
-                            label={
-                              <React.Fragment>
-                                <Paper
-                                  style={{
-                                    padding: "0.5em",
-                                    fontSize: "0.8rem",
-                                  }}
-                                  elevation={3}
-                                >
-                                  Period{" "}
-                                  {currentVotingPeriodIndex
-                                    .plus(index)
-                                    .toNumber()}
-                                  <br />
-                                  From{" "}
-                                  {periodDates[index]
-                                    ? periodDates[index].toLocaleDateString()
-                                    : ""}
-                                  <br />
-                                  To{" "}
-                                  {periodDates[index + 1]
-                                    ? periodDates[
-                                        index + 1
-                                      ].toLocaleDateString()
-                                    : ""}
-                                  <br />
-                                  (estimated){" "}
-                                </Paper>
-                              </React.Fragment>
-                            }
-                          />
-                        ))}
-                      </RadioGroup>
-                    </div>
-                  </Box>
-                </Grid>
-                <Grid item xs={12}>
-                  <FormLabel
-                    error={contract.options.length == 0}
-                    required
-                    id="demo-radio-buttons-group-label"
-                  >
-                    Options
-                  </FormLabel>
-
-                  <Box alignContent={"center"}>
-                    <TextField
-                      value={inputOption}
-                      label="type your option here"
-                      onChange={(e) => setInputOption(e.target.value)}
-                    ></TextField>
-                    <Tooltip
-                      open={contract.options.length == 0}
-                      title="At least one option is needed"
-                      placement="top-end"
-                      aria-label="add"
-                    >
-                      <Button
-                        sx={{ marginLeft: "1em" }}
-                        variant="outlined"
-                        onClick={() => {
-                          setContract({
-                            ...contract,
-                            options: contract.options.concat(inputOption),
-                          } as TezosTemplateVotingContract);
-                          setInputOption("");
-                        }}
-                      >
-                        <Add style={{ padding: "0.4em 0em" }} />
-                      </Button>
-                    </Tooltip>
-                  </Box>
-
-                  <List inputMode="text">
-                    {contract.options.map((option: string, index: number) => (
-                      <ListItem key={option} disablePadding value={option}>
-                        <ListItemButton>
-                          <ListItemIcon>
-                            <RadioButtonUncheckedIcon />
-                          </ListItemIcon>
-                          <FormLabel>{option}</FormLabel>
-                          <Delete
-                            onClick={() => {
-                              contract.options.splice(index, 1);
-                              setContract({
-                                ...contract,
-                                options: contract.options,
-                              } as TezosTemplateVotingContract);
-                            }}
-                          />
-                        </ListItemButton>
-                      </ListItem>
-                    ))}
-                  </List>
-                </Grid>
-                <Grid item xs={12}>
-                  <Box textAlign="center">
-                    <Button
-                      sx={{ mt: 1, mr: 1 }}
-                      type="submit"
-                      variant="contained"
-                      disabled={
-                        !contract.name ||
-                        !contract.votingPeriodIndex ||
-                        contract.options.length == 0
-                      }
-                    >
-                      CREATE
-                    </Button>
-                  </Box>
-                </Grid>
-              </Grid>
-            </FormControl>
+                  </IonItem>
+                ))}
+              </IonList>
+            </IonGrid>
+            <IonGrid>
+              <div>
+                <IonButton
+                  style={{ mt: 1, mr: 1 }}
+                  type="submit"
+                  disabled={
+                    !contract.name ||
+                    !contract.votingPeriodIndex ||
+                    contract.options.length == 0
+                  }
+                >
+                  CREATE
+                </IonButton>
+              </div>
+            </IonGrid>
           </form>
         </>
       )}
     </IonPage>
   );
 };
+
+export default CreateTezosTemplate;

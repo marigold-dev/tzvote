@@ -1,25 +1,31 @@
 import { NetworkType } from "@airgap/beacon-sdk";
 import {
-  IonActionSheet,
-  IonButton,
+  IonCard,
+  IonCardContent,
+  IonCardHeader,
+  IonCardTitle,
+  IonChip,
+  IonCol,
   IonContent,
   IonFooter,
+  IonGrid,
   IonHeader,
   IonIcon,
-  IonModal,
+  IonImg,
   IonPage,
+  IonRow,
   IonTitle,
   IonToolbar,
 } from "@ionic/react";
 import { Tzip16Module } from "@taquito/tzip16";
-import { person } from "ionicons/icons";
+import {
+  albumsOutline,
+  constructOutline,
+  fileTrayFullOutline,
+} from "ionicons/icons";
 import React, { useRef, useState } from "react";
 import { UserContext, UserContextType } from "../App";
 import ConnectButton from "../components/ConnectWallet";
-import CreatePermissionedSimplePoll from "../components/CreatePermissionedSimplePoll";
-import CreateTezosTemplate from "../components/CreateTezosTemplate";
-import DisconnectButton from "../components/DisconnectWallet";
-import { Search } from "../components/Search";
 import { VOTING_TEMPLATE } from "../contractutils/TezosContractUtils";
 import "./Home.css";
 
@@ -87,178 +93,113 @@ const Home: React.FC = () => {
   const modal = useRef<HTMLIonModalElement>(null);
 
   return (
-    <IonPage>
+    <IonPage className="container">
       <IonHeader>
         <IonToolbar>
-          <IonTitle>Blank</IonTitle>
+          <IonChip color="transparent">
+            <IonImg src="/logo_white.png" style={{ height: "30px" }} />
+            <IonTitle>TzVote</IonTitle>
+          </IonChip>
         </IonToolbar>
       </IonHeader>
-      <IonContent fullscreen>
-        <IonHeader collapse="condense">
-          <IonToolbar>
-            <IonTitle size="large">Blank</IonTitle>
-          </IonToolbar>
-        </IonHeader>
-        <div className="main-box">
-          {network != NetworkType.MAINNET ? (
-            <div className="banner">WARNING: TEST ONLY {network}</div>
-          ) : (
-            <span />
-          )}
-          <IonContent
-            style={{
-              height: "6vh",
-              display: "flex",
-              backgroundColor: "var(--main-bg-color)",
-              color: "white",
-              justifyContent: "space-between",
-              textAlign: "center",
-              fontSize: "1.5em",
-              padding: "0.2em",
-            }}
-          >
-            <img className="logo" src="/logo_white.png" alt="marigold-button" />
+      <IonContent
+        fullscreen
+        style={{
+          "--background": "none",
+          backgroundImage: "url(/vote.jpg)",
+          backgroundPosition: "center",
+          backgroundSize: "cover",
+          backgroundBlendMode: "overlay",
+          backgroundColor: "rgba(0, 0, 0, 0.8)",
+        }}
+      >
+        {network != NetworkType.MAINNET ? (
+          <div className="banner">WARNING: You are on {network}</div>
+        ) : (
+          <span />
+        )}
 
-            <IonButton
-              style={{ marginRight: 0.5 }}
-              id="search"
-              onClick={() => setActiveTab("search")}
-            >
-              Search
-            </IonButton>
+        <IonContent style={{ "--background": "none", color: "primary" }}>
+          <h1 style={{ paddingTop: "5vh" }}>Web3 voting app</h1>
 
-            {userAddress ? (
-              <>
-                <IonButton id="anchorRefVotingOptionsComboBox">
-                  Create a poll
-                </IonButton>
+          <ConnectButton />
 
-                <IonActionSheet
-                  trigger="anchorRefVotingOptionsComboBox"
-                  header="Choose a template"
-                  buttons={[
-                    {
-                      text: "Create permissioned voting template",
-                      data: {
-                        action: "delete",
-                      },
-                    },
-                    {
-                      text: "Create baker voting template",
-                      data: {
-                        action: "delete",
-                      },
-                    },
-                    {
-                      text: "Cancel",
-                      role: "cancel",
-                      data: {
-                        action: "cancel",
-                      },
-                    },
-                  ]}
-                ></IonActionSheet>
-              </>
-            ) : (
-              ""
-            )}
+          <IonGrid>
+            <IonRow>
+              <IonCol sizeSm="12" sizeXs="12" sizeMd="6" sizeXl="6">
+                <IonCard style={{ backgroundColor: "rgba(0, 0, 0, 0.5)" }}>
+                  <IonCardHeader>
+                    <IonCardTitle>
+                      <IonIcon icon={albumsOutline}></IonIcon>
+                      &nbsp;&nbsp; Create your own poll
+                    </IonCardTitle>
+                  </IonCardHeader>
+                  <IonCardContent>
+                    TzVote helps you deploy your own smart contract and provides
+                    you the UI to manage the vote session
+                  </IonCardContent>
+                </IonCard>
+              </IonCol>
+              <IonCol sizeSm="12" sizeXs="12" sizeMd="6" sizeXl="6">
+                <IonCard style={{ backgroundColor: "rgba(0, 0, 0, 0.5)" }}>
+                  <IonCardHeader>
+                    <IonCardTitle>
+                      <IonIcon icon={fileTrayFullOutline}></IonIcon>
+                      &nbsp;&nbsp; Several templates available
+                    </IonCardTitle>
+                  </IonCardHeader>
+                  <IonCardContent>
+                    <ul>
+                      <li>
+                        <b>permissioned vote </b> : invite voters, 1 voter = 1
+                        vote
+                      </li>
+                      <li>
+                        <b>baker vote</b> : all bakers can vote, weight based on
+                        baker voting power{" "}
+                      </li>
+                    </ul>
+                  </IonCardContent>
+                </IonCard>
+              </IonCol>
 
-            {userAddress ? (
-              <>
-                <IonButton id="open-modal" expand="block">
-                  <IonIcon icon={person} />
-                </IonButton>
-                <IonModal ref={modal} trigger="open-modal">
-                  <p>
-                    <i className="far fa-address-card"></i>&nbsp; {userAddress}
-                  </p>
-                  <p>
-                    <i className="fas fa-piggy-bank"></i>&nbsp;
-                    {(userBalance / 1000000).toLocaleString("en-US")} ꜩ
-                  </p>
-
-                  {bakerDelegators.length > 0 ? (
-                    <p>
-                      <i className="fas fa-bolt"></i>&nbsp;
-                      {bakerPower} from {bakerDelegators.length} delegators
-                    </p>
-                  ) : (
-                    ""
-                  )}
-
-                  <hr></hr>
-                  <DisconnectButton
-                    wallet={wallet}
-                    setPublicToken={setPublicToken}
-                    setUserAddress={setUserAddress}
-                    setUserBalance={setUserBalance}
-                    setBakerDelegators={setBakerDelegators}
-                    setBeaconConnection={setBeaconConnection}
-                    setActiveTab={setActiveTab}
-                  />
-                </IonModal>
-              </>
-            ) : (
-              <ConnectButton
-                Tezos={Tezos}
-                wallet={wallet}
-                setPublicToken={setPublicToken}
-                setUserAddress={setUserAddress}
-                setUserBalance={setUserBalance}
-                setBakerDelegators={setBakerDelegators}
-                setBakerPower={setBakerPower}
-                setBeaconConnection={setBeaconConnection}
-              />
-            )}
-          </IonContent>
-          <div id="dialog">
-            <div id="content">
-              {activeTab === "search" ? (
-                <div id="search">
-                  <h3 className="text-align-center">Search voting sessions</h3>
-                  <Search />
-                </div>
-              ) : activeTab == VOTING_TEMPLATE.TEZOSTEMPLATE.name ? (
-                <div>
-                  <h3 className="text-align-center">
-                    Create new {VOTING_TEMPLATE.TEZOSTEMPLATE.name} voting
-                    session
-                  </h3>
-                  <CreateTezosTemplate
-                    Tezos={Tezos}
-                    userAddress={userAddress}
-                  />
-                </div>
-              ) : (
-                <div>
-                  <h3 className="text-align-center">
-                    Create new {VOTING_TEMPLATE.PERMISSIONEDSIMPLEPOLL.name}{" "}
-                    voting session
-                  </h3>
-                  <CreatePermissionedSimplePoll
-                    Tezos={Tezos}
-                    userAddress={userAddress}
-                    bakerDelegators={bakerDelegators}
-                    setActiveTab={setActiveTab}
-                  />
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
+              <IonCol sizeSm="12" sizeXs="12" sizeMd="6" sizeXl="6">
+                <IonCard style={{ backgroundColor: "rgba(0, 0, 0, 0.5)" }}>
+                  <IonCardHeader>
+                    {" "}
+                    <IonCardTitle>
+                      <IonIcon icon={constructOutline}></IonIcon>
+                      &nbsp;&nbsp; TzCommunity integration
+                    </IonCardTitle>
+                  </IonCardHeader>
+                  <IonCardContent>
+                    Leverage Tezos social graph as user registry to pick your
+                    voters ..
+                  </IonCardContent>
+                </IonCard>
+              </IonCol>
+            </IonRow>
+          </IonGrid>
+        </IonContent>
       </IonContent>
       <IonFooter>
-        <a href="https://github.com/marigold-dev/tzvote">
-          <img
-            height={15}
-            src="https://github.githubassets.com/images/modules/logos_page/Octocat.png"
-          />
-          <img
-            height={15}
-            src="https://github.githubassets.com/images/modules/logos_page/GitHub-Logo.png"
-          />
-        </a>
-        Marigold 2023
+        <IonToolbar>
+          <IonRow>
+            <IonCol>
+              <a href="https://github.com/marigold-dev/tzvote" target="_blank">
+                <IonImg
+                  style={{ height: 30 }}
+                  src="https://github.githubassets.com/images/modules/logos_page/Octocat.png"
+                />
+              </a>
+            </IonCol>{" "}
+            <IonCol>
+              <a href="https://marigold.dev" target="_blank">
+                <IonImg style={{ height: 30 }} src="/marigold.png" />
+              </a>
+            </IonCol>
+          </IonRow>
+        </IonToolbar>
       </IonFooter>
     </IonPage>
   );

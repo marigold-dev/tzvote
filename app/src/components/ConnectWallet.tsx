@@ -1,36 +1,20 @@
 import { NetworkType } from "@airgap/beacon-sdk";
-import { IonButton } from "@ionic/react";
-import { BeaconWallet } from "@taquito/beacon-wallet";
+import { IonButton, IonIcon, IonLabel } from "@ionic/react";
 import { DelegatesResponse } from "@taquito/rpc";
-import { TezosToolkit } from "@taquito/taquito";
-import { Dispatch, SetStateAction } from "react";
+import { walletOutline } from "ionicons/icons";
+import React from "react";
+import { useHistory } from "react-router";
+import { PAGES, UserContext, UserContextType } from "../App";
 
-type ButtonProps = {
-  Tezos: TezosToolkit;
-  setUserAddress: Dispatch<SetStateAction<string>>;
-  setUserBalance: Dispatch<SetStateAction<number>>;
-  setBakerDelegators: Dispatch<SetStateAction<string[]>>;
-  setBakerPower: Dispatch<SetStateAction<number>>;
-  setBeaconConnection: Dispatch<SetStateAction<boolean>>;
-  setPublicToken: Dispatch<SetStateAction<string | null>>;
-  wallet: BeaconWallet;
-};
+const ConnectButton = (): JSX.Element => {
+  const { Tezos, setUserAddress, wallet, setBakerDelegators, setBakerPower } =
+    React.useContext(UserContext) as UserContextType;
 
-const ConnectButton = ({
-  Tezos,
-  setUserAddress,
-  setUserBalance,
-  wallet,
+  const { replace } = useHistory();
 
-  setBakerDelegators,
-  setBakerPower,
-  setBeaconConnection,
-}: ButtonProps): JSX.Element => {
   const setup = async (userAddress: string): Promise<void> => {
     setUserAddress(userAddress);
-    // updates balance
-    const balance = await Tezos.tz.getBalance(userAddress);
-    setUserBalance(balance.toNumber());
+
     //update baker power
     try {
       const delegatesResponse: DelegatesResponse = await Tezos.rpc.getDelegates(
@@ -69,15 +53,17 @@ const ConnectButton = ({
       // gets user's address
       const userAddress = await wallet.getPKH();
       await setup(userAddress);
-      setBeaconConnection(true);
+
+      replace(PAGES.SEARCH);
     } catch (error) {
       console.log(error);
     }
   };
 
   return (
-    <IonButton onClick={connectWallet}>
-      <i className="fas fa-wallet"></i>&nbsp; Connect with wallet
+    <IonButton color="dark" onClick={connectWallet}>
+      <IonIcon icon={walletOutline} />
+      <IonLabel>&nbsp; Connect wallet</IonLabel>
     </IonButton>
   );
 };
