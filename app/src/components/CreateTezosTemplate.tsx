@@ -134,7 +134,9 @@ const CreateTezosTemplate: React.FC = () => {
   return (
     <IonPage>
       {loading ? (
-        <IonSpinner color="inherit" />
+        <div className="spin">
+          <IonSpinner name="lines-sharp" color="primary" />
+        </div>
       ) : (
         <>
           <form onSubmit={(e) => createVoteContract(e, contract)}>

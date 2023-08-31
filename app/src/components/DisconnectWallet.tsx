@@ -5,8 +5,13 @@ import { useHistory } from "react-router";
 import { PAGES, UserContext, UserContextType } from "../App";
 
 const DisconnectButton = (): JSX.Element => {
-  const { setUserAddress, wallet, setBakerDelegators, setBakerPower } =
-    React.useContext(UserContext) as UserContextType;
+  const {
+    userAddress,
+    setUserAddress,
+    wallet,
+    setBakerDelegators,
+    setBakerPower,
+  } = React.useContext(UserContext) as UserContextType;
 
   const { replace } = useHistory();
   const disconnectWallet = async (): Promise<void> => {
@@ -23,7 +28,7 @@ const DisconnectButton = (): JSX.Element => {
   return (
     <IonButton color="dark" onClick={disconnectWallet}>
       <IonIcon icon={logOutOutline} />
-      <IonLabel>&nbsp; Disconnect wallet</IonLabel>
+      <IonLabel>&nbsp; Logout {userAddress}</IonLabel>
     </IonButton>
   );
 };

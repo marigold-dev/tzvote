@@ -68,9 +68,16 @@
   align-items: center;
 }
 
-.spinner {
-  color: var(--ion-color-primary);
-  height: 100vh;
+.spin {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+ion-spinner {
+  width: 10em;
+  height: 10em;
 }
 
 .nopm {
@@ -210,4 +217,19 @@ a:hover {
 
 a:active {
   text-decoration: none;
+}
+
+ion-datetime::part(.datetime-header) {
+  padding-top: 5px;
+  padding-bottom: 5px;
+}
+
+:host .datetime-selected-date {
+  margin-top: 5px;
+  font-size: medium;
+}
+
+.item {
+  padding-top: 0.5em;
+  padding-bottom: 0.5em;
 }

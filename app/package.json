@@ -29,6 +29,7 @@
     "@types/react-router-dom": "^5.3.3",
     "@tzkt/sdk-api": "^2.2.0",
     "autosuggest-highlight": "^3.3.4",
+    "date-fns-tz": "^2.0.0",
     "ionicons": "^7.1.2",
     "moment": "^2.29.4",
     "moment-duration-format": "^2.3.2",

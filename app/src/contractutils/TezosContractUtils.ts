@@ -156,9 +156,10 @@ export abstract class VotingContractUtils {
       );
     }
 
-    tezosTemplateVotingContract.from = dateFrom.toISOString() as timestamp;
+    tezosTemplateVotingContract.from =
+      dateFrom.toLocaleDateString() as timestamp;
 
-    tezosTemplateVotingContract.to = dateTo.toISOString() as timestamp;
+    tezosTemplateVotingContract.to = dateTo.toLocaleDateString() as timestamp;
 
     tezosTemplateVotingContract.status = (
       tezosTemplateVotingContract as TezosTemplateVotingContract

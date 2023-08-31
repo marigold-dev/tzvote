@@ -26,9 +26,14 @@ const ConnectButton = (): JSX.Element => {
         delegatesResponse.delegated_contracts !== undefined &&
         delegatesResponse.staking_balance !== undefined
       ) {
-        console.log("We have a baker");
         setBakerDelegators(delegatesResponse.delegated_contracts);
         setBakerPower(delegatesResponse.staking_balance.toNumber());
+        console.log(
+          "We have a baker with power ",
+          delegatesResponse.staking_balance.toNumber(),
+          " and delegators ",
+          delegatesResponse.delegated_contracts
+        );
       } else {
         setBakerPower(0);
         console.log("We have a baker with no power");
@@ -63,7 +68,7 @@ const ConnectButton = (): JSX.Element => {
   return (
     <IonButton color="dark" onClick={connectWallet}>
       <IonIcon icon={walletOutline} />
-      <IonLabel>&nbsp; Connect wallet</IonLabel>
+      <IonLabel>&nbsp; Login</IonLabel>
     </IonButton>
   );
 };

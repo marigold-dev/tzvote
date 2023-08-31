@@ -188,6 +188,7 @@ body {
   --ion-item-background: #000000;
 
   --ion-card-background: #1c1c1d;
+  --ion-card-color: var(--ion-text-color);
 }
 
 .ios ion-modal {
@@ -234,4 +235,8 @@ body {
   --ion-tab-bar-background: #1f1f1f;
 
   --ion-card-background: transparent;
+  --ion-card-color: var(--ion-text-color);
+
+  --wheel-fade-background-rgb: var(--ion-color-primary-tint);
+  --wheel-highlight-background: var(--ion-text-color);
 }

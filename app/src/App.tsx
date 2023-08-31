@@ -22,12 +22,14 @@ import "@ionic/react/css/text-transformation.css";
 /* Theme variables */
 import { NetworkType } from "@airgap/beacon-types";
 import { BeaconWallet } from "@taquito/beacon-wallet";
+import { DelegatesResponse } from "@taquito/rpc";
 import { TezosToolkit } from "@taquito/taquito";
 import React, { Dispatch, SetStateAction, useState } from "react";
 import CreatePermissionedSimplePoll from "./components/CreatePermissionedSimplePoll";
 import CreateTezosTemplate from "./components/CreateTezosTemplate";
 import { Results } from "./components/Results";
 import { Search } from "./components/Search";
+import { Settings } from "./components/Settings";
 import { VOTING_TEMPLATE } from "./contractutils/TezosContractUtils";
 import "./theme/variables.css";
 
@@ -46,6 +48,7 @@ export type UserContextType = {
   setBakerPower: Dispatch<SetStateAction<number>>;
   bakerDelegators: string[];
   setBakerDelegators: Dispatch<SetStateAction<string[]>>;
+  reloadUser: () => Promise<void>;
 };
 
 export const UserContext = React.createContext<UserContextType | null>(null);
@@ -81,6 +84,43 @@ const App: React.FC = () => {
     ])
   );
 
+  const reloadUser = async (): Promise<void> => {
+    console.log("Reload user ********");
+
+    const activeAccount = await wallet.client.getActiveAccount();
+    let userAddress = activeAccount!.address;
+    setUserAddress(userAddress);
+
+    console.log("userAddress", userAddress);
+
+    //update baker power
+    try {
+      const delegatesResponse: DelegatesResponse = await Tezos.rpc.getDelegates(
+        userAddress
+      );
+
+      if (
+        delegatesResponse !== undefined &&
+        delegatesResponse.delegated_contracts !== undefined &&
+        delegatesResponse.staking_balance !== undefined
+      ) {
+        setBakerDelegators(delegatesResponse.delegated_contracts);
+        setBakerPower(delegatesResponse.staking_balance.toNumber());
+        console.log(
+          "We have a baker with power ",
+          delegatesResponse.staking_balance.toNumber(),
+          " and delegators ",
+          delegatesResponse.delegated_contracts
+        );
+      } else {
+        setBakerPower(0);
+        console.log("We have a baker with no power");
+      }
+    } catch (error) {
+      console.log("We have a simple user");
+    }
+  };
+
   return (
     <IonApp>
       {" "}
@@ -96,6 +136,7 @@ const App: React.FC = () => {
           setBakerPower,
           bakerDelegators,
           setBakerDelegators,
+          reloadUser,
         }}
       >
         <IonReactRouter>
@@ -107,6 +148,7 @@ const App: React.FC = () => {
               <Search />
             </Route>
             <Route path={`${PAGES.RESULTS}/:type/:id`} component={Results} />
+            <Route path={`${PAGES.SETTINGS}/:type/:id`} component={Settings} />
             <Route exact path={PAGES.CreatePermissionedSimplePoll}>
               <CreatePermissionedSimplePoll />
             </Route>
@@ -129,6 +171,7 @@ export enum PAGES {
   SEARCH = "/search",
   HOME = "/home",
   RESULTS = "/results",
+  SETTINGS = "/settings",
   CreatePermissionedSimplePoll = "/createPermissionedSimplePoll",
   CreateTezosTemplate = "/createTezosTemplate",
 }
