@@ -66,7 +66,7 @@ export const Settings: React.FC<SettingsProps> = ({ match }) => {
   const [contract, setContract] = useState<VotingContract>();
 
   //CONTEXT
-  const { Tezos, bakerDelegators } = React.useContext(
+  const { Tezos, bakerDelegators, userAddress, reloadUser } = React.useContext(
     UserContext
   ) as UserContextType;
 
@@ -104,6 +104,13 @@ export const Settings: React.FC<SettingsProps> = ({ match }) => {
 
   useEffect(() => {
     (async () => {
+      //in case of forced page refresh
+      if (!userAddress) {
+        (async () => {
+          await reloadUser();
+        })();
+      }
+
       await refreshData();
     })();
   }, []);
@@ -111,7 +118,59 @@ export const Settings: React.FC<SettingsProps> = ({ match }) => {
   //add,remove member button
   const [inputVoter, setInputVoter] = React.useState<string>("");
 
+  const handleAddDelegatorVoters = async () => {
+    try {
+      const batch = Tezos.wallet.batch();
+      let batchNotEmpty: boolean = false;
+      await Promise.all(
+        bakerDelegators.map(async (delegator) => {
+          //only new voters
+          if (
+            (
+              contract as PermissionedSimplePollVotingContract
+            ).registeredVoters.indexOf(delegator as address) < 0
+          ) {
+            const c = await Tezos.wallet.at<PermissionedSimplePollWalletType>(
+              contract!.address
+            );
+            batchNotEmpty = true;
+            const op = await c.methods.addVoter(delegator as address);
+
+            batch.withContractCall(op);
+          }
+        })
+      );
+
+      if (batchNotEmpty) {
+        const batchOp = await batch.send();
+
+        await batchOp.confirmation();
+        //refresh info on list
+        setTimeout(async () => {
+          await refreshData();
+          setLoading(false);
+        }, 7000);
+      } else {
+        presentAlert({
+          header: "Wanning",
+          message: "All delegators already added",
+        });
+      }
+    } catch (error: any) {
+      console.table(`Error: ${JSON.stringify(error, null, 2)}`);
+      let tibe: TransactionInvalidBeaconError =
+        new TransactionInvalidBeaconError(error);
+      presentAlert({
+        header: "Error",
+        message: tibe.data_message,
+      });
+      setLoading(false);
+    }
+  };
+
   const handleAddVoter = async () => {
+    console.log("handleAddVoter", inputVoter);
+
     setLoading(true);
 
     if (inputVoter !== "") {
@@ -260,14 +319,7 @@ export const Settings: React.FC<SettingsProps> = ({ match }) => {
                               marginRight: "1em",
                               marginBottom: "0.2em",
                             }}
-                            onClick={() => {
-                              setContract({
-                                ...contract,
-                                registeredVoters: [...bakerDelegators].map(
-                                  (s) => s as address
-                                ),
-                              });
-                            }}
+                            onClick={handleAddDelegatorVoters}
                           >
                             <IonIcon icon={addCircleOutline} /> &nbsp;
                             delegators
