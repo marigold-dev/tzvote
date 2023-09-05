@@ -7,8 +7,14 @@ import { useHistory } from "react-router";
 import { PAGES, UserContext, UserContextType } from "../App";
 
 const ConnectButton = (): JSX.Element => {
-  const { Tezos, setUserAddress, wallet, setBakerDelegators, setBakerPower } =
-    React.useContext(UserContext) as UserContextType;
+  const {
+    Tezos,
+    setUserAddress,
+    wallet,
+    setBakerDelegators,
+    setBakerPower,
+    setBakerDeactivated,
+  } = React.useContext(UserContext) as UserContextType;
 
   const { replace } = useHistory();
 
@@ -27,12 +33,21 @@ const ConnectButton = (): JSX.Element => {
         delegatesResponse.staking_balance !== undefined
       ) {
         setBakerDelegators(delegatesResponse.delegated_contracts);
-        setBakerPower(delegatesResponse.staking_balance.toNumber());
+        setBakerPower(
+          delegatesResponse.voting_power
+            ? delegatesResponse.voting_power.toNumber()
+            : 0
+        );
+        setBakerDeactivated(delegatesResponse.deactivated);
         console.log(
           "We have a baker with power ",
           delegatesResponse.staking_balance.toNumber(),
           " and delegators ",
-          delegatesResponse.delegated_contracts
+          delegatesResponse.delegated_contracts,
+          " and status deactivated  ",
+          delegatesResponse.deactivated,
+          " and voting_power  ",
+          delegatesResponse.voting_power
         );
       } else {
         setBakerPower(0);

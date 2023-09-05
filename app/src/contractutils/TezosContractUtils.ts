@@ -1,5 +1,6 @@
 import * as api from "@tzkt/sdk-api";
 import { BigNumber } from "bignumber.js";
+import { format, utcToZonedTime } from "date-fns-tz";
 import { STATUS } from "./TezosUtils";
 
 import {
@@ -55,7 +56,8 @@ export type VotingContract = (
 export const userCanVoteNow = (
   votingContract: VotingContract,
   userAddress: address,
-  bakerPower?: number
+  bakerPower?: number,
+  bakerDeactivated?: boolean
 ): boolean => {
   if (userAddress && votingContract) {
     switch (votingContract.type) {
@@ -71,7 +73,8 @@ export const userCanVoteNow = (
         return (
           !votingContract.votes.has(userAddress!) &&
           votingContract.status == STATUS.ONGOING &&
-          bakerPower! > 0
+          bakerPower! > 0 &&
+          !bakerDeactivated
         );
       default:
         throw Error("Cannot guess votingContract type");
@@ -119,7 +122,7 @@ export abstract class VotingContractUtils {
       votingPeriodBlockResult.voting_period.start_position;
 
     let dateFrom = new Date(
-      await (
+      (
         await Tezos.rpc.getBlockHeader({ block: "" + currentPeriodStartBlock })
       ).timestamp
     );
@@ -156,10 +159,21 @@ export abstract class VotingContractUtils {
       );
     }
 
-    tezosTemplateVotingContract.from =
-      dateFrom.toLocaleDateString() as timestamp;
+    //FIXME
+    // Get the time zone set on the user's device
+    const userTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
-    tezosTemplateVotingContract.to = dateTo.toLocaleDateString() as timestamp;
+    tezosTemplateVotingContract.from = format(
+      utcToZonedTime(dateFrom, userTimeZone),
+      "yyyy-MM-dd'T'HH:mm:ssXXX",
+      { timeZone: userTimeZone }
+    ) as timestamp;
+
+    tezosTemplateVotingContract.to = format(
+      utcToZonedTime(dateTo, userTimeZone),
+      "yyyy-MM-dd'T'HH:mm:ssXXX",
+      { timeZone: userTimeZone }
+    ) as timestamp;
 
     tezosTemplateVotingContract.status = (
       tezosTemplateVotingContract as TezosTemplateVotingContract

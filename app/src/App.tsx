@@ -48,6 +48,10 @@ export type UserContextType = {
   setBakerPower: Dispatch<SetStateAction<number>>;
   bakerDelegators: string[];
   setBakerDelegators: Dispatch<SetStateAction<string[]>>;
+
+  bakerDeactivated: boolean;
+  setBakerDeactivated: Dispatch<SetStateAction<boolean>>;
+
   reloadUser: () => Promise<void>;
 };
 
@@ -68,6 +72,8 @@ const App: React.FC = () => {
   const [userAddress, setUserAddress] = useState<string | undefined>();
   const [bakerPower, setBakerPower] = useState<number>(0);
   const [bakerDelegators, setBakerDelegators] = useState<string[]>([]);
+
+  const [bakerDeactivated, setBakerDeactivated] = useState<boolean>(true);
 
   const [votingTemplateAddresses, setVotingTemplateAddresses] = useState<
     Map<VOTING_TEMPLATE, string>
@@ -105,12 +111,21 @@ const App: React.FC = () => {
         delegatesResponse.staking_balance !== undefined
       ) {
         setBakerDelegators(delegatesResponse.delegated_contracts);
-        setBakerPower(delegatesResponse.staking_balance.toNumber());
+        setBakerPower(
+          delegatesResponse.voting_power
+            ? delegatesResponse.voting_power.toNumber()
+            : 0
+        );
+        setBakerDeactivated(delegatesResponse.deactivated);
         console.log(
           "We have a baker with power ",
           delegatesResponse.staking_balance.toNumber(),
           " and delegators ",
-          delegatesResponse.delegated_contracts
+          delegatesResponse.delegated_contracts,
+          " and status deactivated  ",
+          delegatesResponse.deactivated,
+          " and voting_power  ",
+          delegatesResponse.voting_power
         );
       } else {
         setBakerPower(0);
@@ -137,6 +152,8 @@ const App: React.FC = () => {
           bakerDelegators,
           setBakerDelegators,
           reloadUser,
+          bakerDeactivated,
+          setBakerDeactivated,
         }}
       >
         <IonReactRouter>

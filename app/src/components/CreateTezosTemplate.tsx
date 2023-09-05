@@ -1,17 +1,27 @@
 import {
+  IonAvatar,
   IonButton,
+  IonButtons,
+  IonCard,
+  IonCardContent,
+  IonCardHeader,
+  IonCardSubtitle,
   IonContent,
-  IonGrid,
+  IonHeader,
   IonIcon,
+  IonImg,
   IonInput,
   IonItem,
   IonLabel,
   IonList,
   IonPage,
-  IonPopover,
   IonRadio,
   IonRadioGroup,
+  IonRow,
   IonSpinner,
+  IonTextarea,
+  IonTitle,
+  IonToolbar,
   useIonAlert,
 } from "@ionic/react";
 import { BigNumber } from "bignumber.js";
@@ -19,9 +29,10 @@ import { BigNumber } from "bignumber.js";
 import {
   addCircleOutline,
   radioButtonOffOutline,
+  returnUpBackOutline,
   trashBinOutline,
 } from "ionicons/icons";
-import React, { FormEvent, useState } from "react";
+import React, { useState } from "react";
 import { useHistory } from "react-router";
 import { PAGES, UserContext, UserContextType } from "../App";
 import {
@@ -32,6 +43,7 @@ import { Storage as TezosTemplateVotingContract } from "../tezosTemplate3.types"
 import { address, asMap, int, nat } from "../type-aliases";
 
 import jsonContractTemplate from "../contracttemplates/tezosTemplate3.json";
+import { VOTING_TEMPLATE } from "../contractutils/TezosContractUtils";
 
 const CreateTezosTemplate: React.FC = () => {
   const { Tezos, userAddress } = React.useContext(
@@ -44,7 +56,7 @@ const CreateTezosTemplate: React.FC = () => {
   // MESSAGES
 
   const [presentAlert] = useIonAlert();
-  const { push } = useHistory();
+  const { push, goBack } = useHistory();
   // CURRRENT CONTRACT
 
   const [contract, setContract] = useState<TezosTemplateVotingContract>({
@@ -78,12 +90,7 @@ const CreateTezosTemplate: React.FC = () => {
     })();
   }, []);
 
-  const createVoteContract = async (
-    event: FormEvent<HTMLFormElement>,
-    contract: TezosTemplateVotingContract
-  ) => {
-    event.preventDefault();
-
+  const createVoteContract = async () => {
     //block if no option
     if (contract.options == undefined || contract.options.length == 0) {
       console.log("At least one option is needed...");
@@ -132,150 +139,190 @@ const CreateTezosTemplate: React.FC = () => {
   };
 
   return (
-    <IonPage>
+    <IonPage className="container">
       {loading ? (
         <div className="spin">
           <IonSpinner name="lines-sharp" color="primary" />
         </div>
       ) : (
         <>
-          <form onSubmit={(e) => createVoteContract(e, contract)}>
-            <IonGrid>
-              <div>
-                <IonInput
+          <IonHeader>
+            <IonToolbar>
+              <IonButtons slot="start">
+                <IonButton onClick={goBack}>
+                  <IonIcon icon={returnUpBackOutline}></IonIcon>
+                  <IonLabel>Back</IonLabel>
+                </IonButton>
+              </IonButtons>
+              <IonButtons slot="end">
+                <IonButton
+                  disabled={
+                    !contract.name ||
+                    !contract.votingPeriodIndex ||
+                    contract.options.length == 0
+                  }
+                  onClick={createVoteContract}
+                >
+                  <IonLabel>Create</IonLabel>
+                </IonButton>
+              </IonButtons>
+
+              <IonTitle>
+                <IonRow>
+                  Create &nbsp;
+                  <IonAvatar style={{ height: "20px", width: "20px" }}>
+                    <IonImg src="/baker.png" />
+                  </IonAvatar>
+                  &nbsp; Poll
+                </IonRow>
+              </IonTitle>
+            </IonToolbar>
+          </IonHeader>
+
+          <IonContent fullscreen>
+            <IonCard>
+              <IonCardHeader>
+                <IonTitle>Description</IonTitle>
+                <IonCardSubtitle>
+                  {VOTING_TEMPLATE.TEZOSTEMPLATE.description}
+                </IonCardSubtitle>
+              </IonCardHeader>
+
+              <IonCardContent></IonCardContent>
+            </IonCard>
+
+            <IonCard>
+              <IonCardHeader>
+                <IonTitle>Question</IonTitle>
+              </IonCardHeader>
+
+              <IonCardContent>
+                <IonTextarea
+                  autoGrow
+                  labelPlacement="floating"
+                  color="primary"
                   required
                   id="name"
-                  label="Question"
-                  value={contract.name}
-                  onIonChange={(e) => {
+                  placeholder="Type question here ..."
+                  maxlength={100}
+                  counter
+                  onIonInput={(e) => {
                     setContract({
                       ...contract,
                       name: e.target.value!,
                     } as TezosTemplateVotingContract);
                   }}
                 />
+              </IonCardContent>
+            </IonCard>
 
-                <div style={{ paddingTop: "2em" }}>
-                  <IonLabel id="demo-radio-buttons-group-label">
-                    Select a period*
-                  </IonLabel>
-                  <IonRadioGroup
-                    aria-labelledby="demo-radio-buttons-group-label"
-                    defaultValue="25"
-                    name="radio-buttons-group"
-                    value={contract.votingPeriodIndex}
-                    onIonChange={(e) => {
-                      setContract({
-                        ...contract,
-                        votingPeriodIndex: new BigNumber(e.target.value!),
-                      } as TezosTemplateVotingContract);
-                    }}
-                  >
-                    {[...Array(5)].map((_: undefined, index: number) => (
-                      <IonRadio
-                        key={currentVotingPeriodIndex.plus(index).toNumber()}
-                        value={currentVotingPeriodIndex.plus(index)}
-                      >
-                        <div>
-                          Period{" "}
-                          {currentVotingPeriodIndex.plus(index).toNumber()}
-                          <br />
-                          From{" "}
-                          {periodDates[index]
-                            ? periodDates[index].toLocaleDateString()
-                            : ""}
-                          <br />
-                          To{" "}
-                          {periodDates[index + 1]
-                            ? periodDates[index + 1].toLocaleDateString()
-                            : ""}
-                          <br />
-                          (estimated){" "}
-                        </div>
-                      </IonRadio>
-                    ))}
-                  </IonRadioGroup>
-                </div>
-              </div>
-            </IonGrid>
-            <IonGrid>
-              <IonLabel
-                color={contract.options.length == 0 ? "danger" : "info"}
-                id="demo-radio-buttons-group-label"
-              >
-                Options*
-              </IonLabel>
+            <IonCard>
+              <IonCardHeader>
+                <IonTitle>Voting Period</IonTitle>
+              </IonCardHeader>
 
-              <div>
-                <IonInput
-                  value={inputOption}
-                  label="type your option here"
-                  onIonChange={(e) => setInputOption(e.target.value as string)}
-                ></IonInput>
-
-                <IonButton
-                  id="add"
-                  style={{ marginLeft: "1em" }}
-                  onClick={() => {
+              <IonCardContent>
+                <IonRadioGroup
+                  aria-labelledby="demo-radio-buttons-group-label"
+                  defaultValue="25"
+                  name="radio-buttons-group"
+                  value={contract.votingPeriodIndex.toNumber()}
+                  onIonChange={(e) => {
                     setContract({
                       ...contract,
-                      options: contract.options.concat(inputOption),
+                      votingPeriodIndex: new BigNumber(e.target.value!),
                     } as TezosTemplateVotingContract);
-                    setInputOption("");
                   }}
                 >
-                  <IonIcon icon={addCircleOutline} />
-                </IonButton>
+                  {[...Array(5)].map((_: undefined, index: number) => (
+                    <IonRadio
+                      style={{ margin: "1em" }}
+                      key={currentVotingPeriodIndex.plus(index).toNumber()}
+                      value={currentVotingPeriodIndex.plus(index).toNumber()}
+                    >
+                      <div>
+                        Period {currentVotingPeriodIndex.plus(index).toNumber()}
+                        <br />
+                        (From{" "}
+                        {periodDates[index]
+                          ? periodDates[index].toLocaleString()
+                          : ""}
+                        <br />
+                        To{" "}
+                        {periodDates[index + 1]
+                          ? periodDates[index + 1].toLocaleString() + ")"
+                          : ""}
+                        <br />
+                      </div>
+                    </IonRadio>
+                  ))}
+                </IonRadioGroup>
+              </IonCardContent>
+            </IonCard>
 
-                <IonPopover
-                  trigger="add"
-                  triggerAction="hover"
-                  isOpen={contract.options.length == 0}
-                  aria-label="add"
-                >
-                  <IonContent class="ion-padding">
-                    At least one option is needed
-                  </IonContent>
-                </IonPopover>
-              </div>
+            <IonCard>
+              <IonCardHeader>
+                <IonTitle>Options</IonTitle>
+                <IonCardSubtitle>
+                  <IonRow>
+                    <IonInput
+                      style={{ width: "80%" }}
+                      value={inputOption}
+                      label="New option to add"
+                      labelPlacement="floating"
+                      color="primary"
+                      required
+                      id="name"
+                      placeholder="Enter new option here ..."
+                      maxlength={100}
+                      counter
+                      onIonInput={(e) => {
+                        setInputOption(e.target.value as string);
+                      }}
+                    ></IonInput>
 
-              <IonList inputMode="text">
-                {contract.options.map((option: string, index: number) => (
-                  <IonItem key={option}>
-                    <IonIcon icon={radioButtonOffOutline} />
-
-                    <IonLabel>{option}</IonLabel>
-
-                    <IonIcon
-                      icon={trashBinOutline}
+                    <IonButton
+                      style={{ marginLeft: "1em" }}
                       onClick={() => {
-                        contract.options.splice(index, 1);
                         setContract({
                           ...contract,
-                          options: contract.options,
+                          options: contract.options.concat(inputOption),
                         } as TezosTemplateVotingContract);
+                        setInputOption("");
                       }}
-                    />
-                  </IonItem>
-                ))}
-              </IonList>
-            </IonGrid>
-            <IonGrid>
-              <div>
-                <IonButton
-                  style={{ mt: 1, mr: 1 }}
-                  type="submit"
-                  disabled={
-                    !contract.name ||
-                    !contract.votingPeriodIndex ||
-                    contract.options.length == 0
-                  }
-                >
-                  CREATE
-                </IonButton>
-              </div>
-            </IonGrid>
-          </form>
+                    >
+                      <IonIcon icon={addCircleOutline} />
+                    </IonButton>
+                  </IonRow>
+                </IonCardSubtitle>
+              </IonCardHeader>
+
+              <IonCardContent>
+                {" "}
+                <IonList lines="inset" inputMode="text">
+                  {contract.options.map((option: string, index: number) => (
+                    <IonItem key={index}>
+                      <IonLabel>
+                        <IonIcon icon={radioButtonOffOutline} /> &nbsp; {option}
+                      </IonLabel>
+
+                      <IonIcon
+                        color="danger"
+                        icon={trashBinOutline}
+                        onClick={() => {
+                          contract.options.splice(index, 1);
+                          setContract({
+                            ...contract,
+                            options: contract.options,
+                          } as TezosTemplateVotingContract);
+                        }}
+                      />
+                    </IonItem>
+                  ))}
+                </IonList>
+              </IonCardContent>
+            </IonCard>
+          </IonContent>
         </>
       )}
     </IonPage>

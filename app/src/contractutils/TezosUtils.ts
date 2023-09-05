@@ -87,8 +87,15 @@ export abstract class TezosUtils {
       dates.push(startDate);
       const constantsResponse: ConstantsResponse =
         await Tezos.rpc.getConstants();
-      //Provided that at least two thirds of the total active stake participates honestly in consensus, then a decision is eventually taken.2 In the current implementation of Tenderbake the duration of each round increments by 15 seconds, starting from 30 seconds: thus the deadline for participation in round 0 is 30 seconds, that for round 1 is 45 seconds after that, and so on. So in normal conditions, when consensus is reached promptly at round 0 every time, we can expect Tenderbake to add one block every 30 seconds. Note that: Tenderbake has deterministic finality after just two blocks. In normal conditions, when the network is healthy, decisions are made at round 0, after 30 seconds. This means that in normal conditions the time to finality is about one minute.
-      const block_estimated_duration = 30;
+      //Provided that at least two thirds of the total active stake participates honestly in consensus,
+      //then a decision is eventually taken.2 In the current implementation of Tenderbake the duration of each round increments by 15 seconds,
+      // starting from 15 seconds: thus the deadline for participation in round 0 is 15 seconds,
+      //that for round 1 is 45 seconds after that, and so on. So in normal conditions, when consensus is reached
+      //promptly at round 0 every time, we can expect Tenderbake to add one block every 15 seconds.
+      //Note that: Tenderbake has deterministic finality after just two blocks.
+      //In normal conditions, when the network is healthy, decisions are made at round 0, after 15 seconds.
+      //This means that in normal conditions the time to finality is about 30s.
+      const block_estimated_duration = 15;
       for (let i = 0; i < count; i++) {
         let endDate: Date = new Date(
           startDate.getTime() +
@@ -97,6 +104,7 @@ export abstract class TezosUtils {
               constantsResponse.cycles_per_voting_period! *
               block_estimated_duration
         );
+
         dates.push(endDate);
         startDate = endDate;
       }
@@ -110,9 +118,7 @@ export abstract class TezosUtils {
   public static async getVotingPeriodIndex(
     Tezos: TezosToolkit
   ): Promise<number> {
-    return await (
-      await Tezos.rpc.getCurrentPeriod()
-    ).voting_period.index;
+    return (await Tezos.rpc.getCurrentPeriod()).voting_period.index;
   }
 
   /**
@@ -121,9 +127,8 @@ export abstract class TezosUtils {
   public static async getVotingPeriodStartDate(
     Tezos: TezosToolkit
   ): Promise<Date> {
-    const currentPeriodStartBlock = await (
-      await Tezos.rpc.getCurrentPeriod()
-    ).voting_period.start_position;
+    const currentPeriodStartBlock = (await Tezos.rpc.getCurrentPeriod())
+      .voting_period.start_position;
 
     console.log(
       "await Tezos.rpc.getCurrentPeriod()",

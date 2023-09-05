@@ -17,7 +17,6 @@ import {
   IonHeader,
   IonIcon,
   IonImg,
-  IonItem,
   IonLabel,
   IonModal,
   IonPage,
@@ -60,6 +59,7 @@ import * as api from "@tzkt/sdk-api";
 import {
   addCircleOutline,
   barChartOutline,
+  eyeOutline,
   lockClosedOutline,
   personCircleOutline,
   settingsOutline,
@@ -81,7 +81,7 @@ export const Search: React.FC = () => {
     votingTemplateAddresses,
     userAddress,
     bakerPower,
-
+    bakerDeactivated,
     reloadUser,
   } = React.useContext(UserContext) as UserContextType;
 
@@ -281,7 +281,12 @@ export const Search: React.FC = () => {
     if (contract)
       return (
         <>
-          {userCanVoteNow(contract, userAddress as address, bakerPower) ? (
+          {userCanVoteNow(
+            contract,
+            userAddress as address,
+            bakerPower,
+            bakerDeactivated
+          ) ? (
             <>
               <IonButton id={"votePopupId" + contract.address} color="dark">
                 <IonIcon icon="/voting.svg"></IonIcon>
@@ -296,7 +301,12 @@ export const Search: React.FC = () => {
                 <IonHeader>
                   <IonToolbar>
                     <IonButtons slot="start">
-                      <IonButton onClick={() => votePopup.current?.dismiss()}>
+                      <IonButton
+                        onClick={async () => {
+                          console.log("dismiss", votePopup.current?.dismiss);
+                          await votePopup.current?.dismiss();
+                        }}
+                      >
                         Cancel
                       </IonButton>
                     </IonButtons>
@@ -309,20 +319,30 @@ export const Search: React.FC = () => {
                   </IonToolbar>
                 </IonHeader>
                 <IonContent className="ion-padding">
-                  <IonItem>
-                    <IonLabel>Options</IonLabel>
-                    <IonRadioGroup
-                      name="radio-buttons-group"
-                      value={voteValue}
-                      onIonChange={(e) => setVoteValue(e.target.value)}
-                    >
-                      {contract.options.map((option: string) => (
-                        <IonRadio key={option} value={option}>
-                          {option}
-                        </IonRadio>
-                      ))}
-                    </IonRadioGroup>
-                  </IonItem>
+                  <IonCard>
+                    <IonCardHeader>
+                      <IonTitle>Options</IonTitle>
+                      <IonCardSubtitle>
+                        Voting power : {bakerPower}
+                      </IonCardSubtitle>
+                    </IonCardHeader>
+                    <IonCardContent>
+                      <IonRadioGroup
+                        value={voteValue}
+                        onIonChange={(e) => setVoteValue(e.target.value)}
+                      >
+                        {contract.options.map((option: string) => (
+                          <IonRadio
+                            style={{ margin: "1em" }}
+                            key={option}
+                            value={option}
+                          >
+                            {option}
+                          </IonRadio>
+                        ))}
+                      </IonRadioGroup>
+                    </IonCardContent>
+                  </IonCard>
                 </IonContent>
               </IonModal>
             </>
@@ -410,6 +430,18 @@ export const Search: React.FC = () => {
                               : lockClosedOutline
                           }
                         ></IonIcon>
+
+                        <a
+                          href={`https://${
+                            NetworkType[
+                              import.meta.env.VITE_NETWORK.toUpperCase() as keyof typeof NetworkType
+                            ]
+                          }.tzkt.io/${contract.address}/info`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          <IonIcon icon={eyeOutline} />
+                        </a>
                       </IonRow>
                     </IonCardTitle>
                     <IonCardSubtitle style={{ textAlign: "left" }}>
@@ -488,6 +520,7 @@ export const Search: React.FC = () => {
 
                   {contract.status === STATUS.ONGOING ? (
                     <>
+                      <hr />
                       <IonProgressBar
                         title="Period"
                         key={`slider-${contract.address}`}
@@ -499,7 +532,7 @@ export const Search: React.FC = () => {
                         }
                       />
                       {durationToString(
-                        new Date(contract.to).getTime() - Date.now()
+                        new Date(contract.to).getTime() - new Date().getTime()
                       )}
                     </>
                   ) : (
