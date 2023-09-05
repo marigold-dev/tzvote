@@ -282,51 +282,53 @@ export const Search: React.FC = () => {
       return (
         <>
           {userCanVoteNow(contract, userAddress as address, bakerPower) ? (
-            <IonButton id={"votePopupId" + contract.address} color="dark">
-              <IonIcon icon="/voting.svg"></IonIcon>
-              <IonLabel>VOTE</IonLabel>
-            </IonButton>
+            <>
+              <IonButton id={"votePopupId" + contract.address} color="dark">
+                <IonIcon icon="/voting.svg"></IonIcon>
+                <IonLabel>VOTE</IonLabel>
+              </IonButton>
+
+              <IonModal
+                className="container"
+                trigger={"votePopupId" + contract.address}
+                ref={votePopup}
+              >
+                <IonHeader>
+                  <IonToolbar>
+                    <IonButtons slot="start">
+                      <IonButton onClick={() => votePopup.current?.dismiss()}>
+                        Cancel
+                      </IonButton>
+                    </IonButtons>
+                    <IonTitle>Vote</IonTitle>
+                    <IonButtons slot="end">
+                      <IonButton onClick={() => handleVoteSubmit(contract)}>
+                        Confirm
+                      </IonButton>
+                    </IonButtons>
+                  </IonToolbar>
+                </IonHeader>
+                <IonContent className="ion-padding">
+                  <IonItem>
+                    <IonLabel>Options</IonLabel>
+                    <IonRadioGroup
+                      name="radio-buttons-group"
+                      value={voteValue}
+                      onIonChange={(e) => setVoteValue(e.target.value)}
+                    >
+                      {contract.options.map((option: string) => (
+                        <IonRadio key={option} value={option}>
+                          {option}
+                        </IonRadio>
+                      ))}
+                    </IonRadioGroup>
+                  </IonItem>
+                </IonContent>
+              </IonModal>
+            </>
           ) : (
             ""
           )}
-
-          <IonModal
-            className="container"
-            trigger={"votePopupId" + contract.address}
-            ref={votePopup}
-          >
-            <IonHeader>
-              <IonToolbar>
-                <IonButtons slot="start">
-                  <IonButton onClick={() => votePopup.current?.dismiss()}>
-                    Cancel
-                  </IonButton>
-                </IonButtons>
-                <IonTitle>Vote</IonTitle>
-                <IonButtons slot="end">
-                  <IonButton onClick={() => handleVoteSubmit(contract)}>
-                    Confirm
-                  </IonButton>
-                </IonButtons>
-              </IonToolbar>
-            </IonHeader>
-            <IonContent className="ion-padding">
-              <IonItem>
-                <IonLabel>Options</IonLabel>
-                <IonRadioGroup
-                  name="radio-buttons-group"
-                  value={voteValue}
-                  onIonChange={(e) => setVoteValue(e.target.value)}
-                >
-                  {contract.options.map((option: string) => (
-                    <IonRadio key={option} value={option}>
-                      {option}
-                    </IonRadio>
-                  ))}
-                </IonRadioGroup>
-              </IonItem>
-            </IonContent>
-          </IonModal>
         </>
       );
     else return <></>;

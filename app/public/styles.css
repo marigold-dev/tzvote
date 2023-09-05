@@ -233,3 +233,7 @@ ion-datetime::part(.datetime-header) {
   padding-top: 0.5em;
   padding-bottom: 0.5em;
 }
+
+ion-header {
+  background-color: var(--ion-color-primary);
+}

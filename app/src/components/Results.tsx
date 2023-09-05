@@ -8,6 +8,7 @@ import {
   IonGrid,
   IonHeader,
   IonIcon,
+  IonImg,
   IonLabel,
   IonPage,
   IonRow,
@@ -18,13 +19,13 @@ import {
 import * as api from "@tzkt/sdk-api";
 import { BigNumber } from "bignumber.js";
 import {
-  ellipseOutline,
+  radioButtonOnOutline,
   returnUpBackOutline,
   trophyOutline,
 } from "ionicons/icons";
 import React, { FormEvent, useEffect, useState } from "react";
 import { RouteComponentProps, useHistory } from "react-router-dom";
-import { Cell, Pie, PieChart } from "recharts";
+import { Cell, Pie, PieChart, ResponsiveContainer } from "recharts";
 import { UserContext, UserContextType } from "../App";
 import {
   VOTING_TEMPLATE,
@@ -96,11 +97,11 @@ export const Results: React.FC<ResultsProps> = ({ match }) => {
   const [data, setData] = useState<
     {
       name: string;
-      value: int;
+      value: number;
     }[]
   >([]);
 
-  const getColorArray = (dataItems: Array<any>): Map<string, string> => {
+  const initColorArray = (dataItems: Array<any>): void => {
     var result = new Map<string, string>();
     for (let dataitem of dataItems) {
       var letters = "0123456789ABCDEF".split("");
@@ -110,8 +111,10 @@ export const Results: React.FC<ResultsProps> = ({ match }) => {
       }
       result.set(dataitem.name, color);
     }
-    return result;
+    setColorArray(result);
   };
+
+  const [colorArray, setColorArray] = useState<Map<string, string>>(new Map());
 
   useEffect(() => {
     (async () => {
@@ -145,11 +148,17 @@ export const Results: React.FC<ResultsProps> = ({ match }) => {
 
       setSelectedContract(selectedContract);
 
-      setData(
-        Array.from(selectedContract.results.keys()).map((key) => {
-          return { name: key, value: selectedContract.results.get(key) };
-        })
-      );
+      const data = Array.from(selectedContract.results.keys()).map((key) => {
+        return {
+          name: key,
+          value: selectedContract.results.get(key).toNumber(),
+        };
+      });
+      setData(data);
+
+      initColorArray(data);
+
+      console.log("data", data);
     })();
   }, []);
 
@@ -287,9 +296,37 @@ export const Results: React.FC<ResultsProps> = ({ match }) => {
           <IonTitle>Results</IonTitle>
         </IonToolbar>
       </IonHeader>
-      <IonContent fullscreen>
-        <IonGrid>
-          <IonRow>
+      <IonContent fullscreen className="ion-padding">
+        {data.length > 0 ? (
+          <IonGrid>
+            <ResponsiveContainer width="100%" height={400}>
+              <PieChart>
+                <Pie
+                  data={data}
+                  cx="50%"
+                  cy="50%"
+                  labelLine={false}
+                  label={renderCustomizedLabel}
+                  outerRadius="100%"
+                  fill="#8884d8"
+                  dataKey="value"
+                  nameKey="name"
+                >
+                  {data.map((entry, index) => (
+                    <Cell
+                      key={`cell-${index}`}
+                      fill={colorArray.get(entry.name)}
+                    />
+                  ))}
+                </Pie>
+              </PieChart>
+            </ResponsiveContainer>
+          </IonGrid>
+        ) : (
+          <IonImg src="/noresults.png" />
+        )}
+        <IonGrid style={{ border: "1px white solid" }}>
+          <IonRow style={{ borderBottom: "1px white solid" }}>
             <IonCol>Options</IonCol>
             <IonCol>Result</IonCol>
           </IonRow>
@@ -298,10 +335,10 @@ export const Results: React.FC<ResultsProps> = ({ match }) => {
             ? Object.entries<string>(selectedContract?.options).map(
                 ([key, value]) => (
                   <IonRow key={key}>
-                    <IonCol>
+                    <IonCol style={{ textAlign: "left" }}>
                       <IonIcon
-                        icon={ellipseOutline}
-                        color={getColorArray(data).get(value)}
+                        icon={radioButtonOnOutline}
+                        style={{ fill: colorArray.get(value) }}
                       ></IonIcon>
                       {value}
                     </IonCol>
@@ -318,54 +355,27 @@ export const Results: React.FC<ResultsProps> = ({ match }) => {
               )
             : ""}
         </IonGrid>
-        <IonGrid>
-          <PieChart
-            width={window.innerWidth * 0.3}
-            height={window.innerHeight * 0.3}
-          >
-            <Pie
-              data={data}
-              cx="50%"
-              cy="50%"
-              labelLine={false}
-              label={renderCustomizedLabel}
-              outerRadius="100%"
-              fill="#8884d8"
-              dataKey="value"
-              nameKey="name"
-            >
-              {data.map((entry, index) => (
-                <Cell
-                  key={`cell-${index}`}
-                  fill={getColorArray(data).get(entry.name)}
-                />
-              ))}
-            </Pie>
-          </PieChart>
-        </IonGrid>
 
         <IonGrid>
-          <div style={{ padding: "0.2em" }}>
-            <IonChip>
-              <IonAvatar>{selectedContract?.votes.size}</IonAvatar>
-              <IonLabel>Voters</IonLabel>
-            </IonChip>
-          </div>
+          <IonChip>
+            <IonAvatar style={{ fontSize: "initial", marginTop: 0 }}>
+              {selectedContract?.votes.size}
+            </IonAvatar>
+            <IonLabel>Voters</IonLabel>
+          </IonChip>
 
           {selectedContract && type === VOTING_TEMPLATE.TEZOSTEMPLATE.name ? (
-            <div style={{ padding: "0.2em" }}>
-              <IonChip>
-                <IonAvatar>
-                  {Array.from(selectedContract.results.values())
-                    .reduce(
-                      (value: int, acc: int) => value.plus(acc) as int,
-                      new BigNumber(0) as int
-                    )
-                    .toNumber()}
-                </IonAvatar>
-                <IonLabel>Baker power</IonLabel>
-              </IonChip>
-            </div>
+            <IonChip>
+              <IonAvatar style={{ fontSize: "initial", marginTop: 0 }}>
+                {Array.from(selectedContract.results.values())
+                  .reduce(
+                    (value: int, acc: int) => value.plus(acc) as int,
+                    new BigNumber(0) as int
+                  )
+                  .toNumber()}
+              </IonAvatar>
+              <IonLabel>Baker power</IonLabel>
+            </IonChip>
           ) : (
             ""
           )}
