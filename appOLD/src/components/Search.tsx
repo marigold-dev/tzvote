@@ -52,9 +52,10 @@ import { Cell, Pie, PieChart } from "recharts";
 import {
   PermissionedSimplePollVotingContract,
   TezosTemplateVotingContract,
+  VOTING_TEMPLATE,
   VotingContract,
   VotingContractUtils,
-  VOTING_TEMPLATE,
+  getWinner,
 } from "../contractutils/TezosContractUtils";
 import {
   STATUS,
@@ -654,22 +655,6 @@ const Search = ({
   const closeResults = () => {
     setSelectedContract(null);
     setResultPopup(null);
-  };
-
-  const getWinner = (contract: VotingContract): Array<string> => {
-    var winnerList: Array<string> = [];
-    var maxScore: number = 0;
-    for (let [key, value] of contract.results) {
-      if (value == maxScore) {
-        winnerList.push(key);
-      } else if (value > maxScore) {
-        winnerList = [];
-        winnerList.push(key);
-      } else {
-        //pass
-      }
-    }
-    return winnerList;
   };
 
   const resultArea = (contract: VotingContract) => {

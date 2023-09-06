@@ -61,9 +61,9 @@ import {
   barChartOutline,
   eyeOutline,
   lockClosedOutline,
+  lockOpenOutline,
   personCircleOutline,
   settingsOutline,
-  syncCircleOutline,
 } from "ionicons/icons";
 import { useHistory } from "react-router";
 import { PAGES, UserContext, UserContextType } from "../App";
@@ -83,6 +83,7 @@ export const Search: React.FC = () => {
     bakerPower,
     bakerDeactivated,
     reloadUser,
+    BLOCK_TIME,
   } = React.useContext(UserContext) as UserContextType;
 
   const [presentAlert] = useIonAlert();
@@ -105,6 +106,7 @@ export const Search: React.FC = () => {
         await api.contractsGetSame(
           votingTemplateAddresses.get(VOTING_TEMPLATE.TEZOSTEMPLATE)!,
           {
+            includeStorage: true,
             sort: { desc: "id" },
           }
         );
@@ -113,6 +115,8 @@ export const Search: React.FC = () => {
         await api.contractsGetSame(
           votingTemplateAddresses.get(VOTING_TEMPLATE.PERMISSIONEDSIMPLEPOLL)!,
           {
+            includeStorage: true,
+
             sort: { desc: "id" },
           }
         );
@@ -154,6 +158,8 @@ export const Search: React.FC = () => {
       );
 
       event?.detail.complete();
+
+      console.log("refreshData DONE", allContracts);
     })();
   };
 
@@ -198,9 +204,9 @@ export const Search: React.FC = () => {
       .format("d [days] hh:mm:ss left");
   };
 
-  /*************************************/
-  // *********** BUTTON ACTION AREA ******
-  /*************************************/
+  /***/
+  // ** BUTTON ACTION AREA **
+  /***/
 
   //vote popup
   const votePopup = useRef<HTMLIonModalElement>(null);
@@ -219,19 +225,19 @@ export const Search: React.FC = () => {
           );
 
           const op = await c.methods.vote(voteValue).send();
-          await op.confirmation();
+
+          console.log("BLOCK_TIME", BLOCK_TIME);
 
           //refresh info on list
           setTimeout(() => {
-            console.log("the list will refresh soon");
             refreshData();
+            setLoading(false);
             filterOnNewInput(inputValue);
-          }, 2000);
-
-          presentAlert({
-            header: "Success",
-            message: "Your vote has been accepted (wait a bit the refresh)",
-          });
+            presentAlert({
+              header: "Success",
+              message: "Your vote has been accepted",
+            });
+          }, BLOCK_TIME);
         } else if (contract.type == VOTING_TEMPLATE.TEZOSTEMPLATE) {
           const c = await Tezos.wallet.at<TezosTemplate3WalletType>(
             contract.address
@@ -243,10 +249,9 @@ export const Search: React.FC = () => {
 
           //refresh info on list
           setTimeout(() => {
-            console.log("the list will refresh soon");
             refreshData();
             filterOnNewInput(inputValue);
-          }, 2000);
+          }, BLOCK_TIME);
 
           presentAlert({
             header: "Success",
@@ -303,7 +308,6 @@ export const Search: React.FC = () => {
                     <IonButtons slot="start">
                       <IonButton
                         onClick={async () => {
-                          console.log("dismiss", votePopup.current?.dismiss);
                           await votePopup.current?.dismiss();
                         }}
                       >
@@ -321,10 +325,25 @@ export const Search: React.FC = () => {
                 <IonContent className="ion-padding">
                   <IonCard>
                     <IonCardHeader>
+                      <IonTitle>Question</IonTitle>
+                    </IonCardHeader>
+
+                    <IonCardContent>
+                      <IonLabel>{contract.name}</IonLabel>
+                    </IonCardContent>
+                  </IonCard>
+
+                  <IonCard>
+                    <IonCardHeader>
                       <IonTitle>Options</IonTitle>
-                      <IonCardSubtitle>
-                        Voting power : {bakerPower}
-                      </IonCardSubtitle>
+
+                      {bakerPower > 0 ? (
+                        <IonCardSubtitle>
+                          Baker voting power : {bakerPower / 1000000}
+                        </IonCardSubtitle>
+                      ) : (
+                        ""
+                      )}
                     </IonCardHeader>
                     <IonCardContent>
                       <IonRadioGroup
@@ -354,9 +373,7 @@ export const Search: React.FC = () => {
     else return <></>;
   };
 
-  /*************************************/
-  /***  MAIN FRAME *******************
-   *************************************/
+  /*  MAIN FRAME **/
   return (
     <IonPage className="container">
       {loading ? (
@@ -426,7 +443,7 @@ export const Search: React.FC = () => {
                           }
                           icon={
                             contract.status === STATUS.ONGOING
-                              ? syncCircleOutline
+                              ? lockOpenOutline
                               : lockClosedOutline
                           }
                         ></IonIcon>
@@ -520,7 +537,6 @@ export const Search: React.FC = () => {
 
                   {contract.status === STATUS.ONGOING ? (
                     <>
-                      <hr />
                       <IonProgressBar
                         title="Period"
                         key={`slider-${contract.address}`}

@@ -2,6 +2,10 @@ import {
   IonAvatar,
   IonButton,
   IonButtons,
+  IonCard,
+  IonCardContent,
+  IonCardHeader,
+  IonCardSubtitle,
   IonChip,
   IonCol,
   IonContent,
@@ -23,7 +27,7 @@ import {
   returnUpBackOutline,
   trophyOutline,
 } from "ionicons/icons";
-import React, { FormEvent, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { RouteComponentProps, useHistory } from "react-router-dom";
 import { Cell, Pie, PieChart, ResponsiveContainer } from "recharts";
 import { UserContext, UserContextType } from "../App";
@@ -33,11 +37,9 @@ import {
   VotingContractUtils,
   getWinner,
 } from "../contractutils/TezosContractUtils";
-import { PermissionedSimplePollWalletType } from "../permissionedSimplePoll.types";
+import { Storage as TezosTemplateVotingContract } from "../tezosTemplate3.types";
 
-import { WalletContract } from "@taquito/taquito";
-import { TransactionInvalidBeaconError } from "../contractutils/TezosUtils";
-import { address, int } from "../type-aliases";
+import { int } from "../type-aliases";
 
 const RADIAN = Math.PI / 180;
 const renderCustomizedLabel = ({
@@ -120,6 +122,12 @@ export const Results: React.FC<ResultsProps> = ({ match }) => {
     (async () => {
       let selectedContract: VotingContract;
       let contractFromTzkt: api.Contract = await api.contractsGetByAddress(id);
+      let contractStorageFromTzkt: Blob = await api.contractsGetStorage(id);
+
+      contractFromTzkt.storage = JSON.parse(
+        await contractStorageFromTzkt.text()
+      );
+
       switch (type) {
         case VOTING_TEMPLATE.PERMISSIONEDSIMPLEPOLL.name: {
           selectedContract =
@@ -157,131 +165,8 @@ export const Results: React.FC<ResultsProps> = ({ match }) => {
       setData(data);
 
       initColorArray(data);
-
-      console.log("data", data);
     })();
   }, []);
-
-  //add,remove member button
-  const [voterAddress, setVoterAddress] = React.useState<string>("");
-
-  const handleAddVoter = async (
-    event: FormEvent<HTMLFormElement>,
-    contract: VotingContract
-  ) => {
-    event.preventDefault();
-    setLoading(true);
-
-    if (voterAddress !== "") {
-      try {
-        let c: WalletContract = await Tezos.wallet.at("" + contract.address);
-
-        if (contract.type == VOTING_TEMPLATE.PERMISSIONEDSIMPLEPOLL) {
-          const c = await Tezos.wallet.at<PermissionedSimplePollWalletType>(
-            contract.address
-          );
-
-          const op = await c.methods.addVoter(voterAddress as address).send();
-
-          await op.confirmation();
-          //refresh info on list
-          setTimeout(() => {
-            console.log("the list will refresh soon");
-            //TODO refreshData();
-          }, 2000);
-          presentAlert({
-            header: "Success",
-            message: "You have added a new voter (wait a bit the refresh)",
-          });
-        } else if (contract.type == VOTING_TEMPLATE.TEZOSTEMPLATE) {
-          console.error("Cannot add voter to this template ", contract);
-
-          throw new Error(
-            "Cannot add voter to this template " + contract.address
-          );
-        } else {
-          console.error("Cannot find the type for contract ", contract);
-
-          throw new Error(
-            "Cannot find the type for contract " + contract.address
-          );
-        }
-      } catch (error: any) {
-        console.table(`Error: ${JSON.stringify(error, null, 2)}`);
-        let tibe: TransactionInvalidBeaconError =
-          new TransactionInvalidBeaconError(error);
-        presentAlert({
-          header: "Error",
-          message: tibe.data_message,
-        });
-      } finally {
-        setLoading(false);
-      }
-    } else {
-      console.log("Please, enter an address.");
-    }
-
-    setLoading(false);
-  };
-
-  const handleRemoveVoter = async (
-    event: FormEvent<HTMLFormElement>,
-    contract: VotingContract
-  ) => {
-    event.preventDefault();
-    setLoading(true);
-
-    if (voterAddress !== "") {
-      try {
-        let c: WalletContract = await Tezos.wallet.at("" + contract.address);
-
-        if (contract.type == VOTING_TEMPLATE.PERMISSIONEDSIMPLEPOLL) {
-          const c = await Tezos.wallet.at<PermissionedSimplePollWalletType>(
-            contract.address
-          );
-
-          const op = await c.methods
-            .removeVoter(voterAddress as address)
-            .send();
-          await op.confirmation();
-          //refresh info on list
-          setTimeout(() => {
-            console.log("the list will refresh soon");
-            //TODO refreshData();
-          }, 2000);
-          presentAlert({
-            header: "Success",
-            message: "You have removed a voter (wait a bit the refresh)",
-          });
-        } else if (contract.type == VOTING_TEMPLATE.TEZOSTEMPLATE) {
-          console.error("Cannot remove voter to this template ", contract);
-
-          throw new Error(
-            "Cannot remove voter to this template " + contract.address
-          );
-        } else {
-          console.error("Cannot find the type for contract ", contract);
-
-          throw new Error(
-            "Cannot find the type for contract " + contract.address
-          );
-        }
-      } catch (error: any) {
-        console.table(`Error: ${JSON.stringify(error, null, 2)}`);
-        let tibe: TransactionInvalidBeaconError =
-          new TransactionInvalidBeaconError(error);
-        presentAlert({
-          header: "Error",
-          message: tibe.data_message,
-        });
-      } finally {
-        setLoading(false);
-      }
-    } else {
-      console.log("Please, enter an address.");
-    }
-    setLoading(false);
-  };
 
   return (
     <IonPage className="container">
@@ -297,6 +182,48 @@ export const Results: React.FC<ResultsProps> = ({ match }) => {
         </IonToolbar>
       </IonHeader>
       <IonContent fullscreen className="ion-padding">
+        <IonCard>
+          <IonCardHeader>
+            <IonTitle>Question</IonTitle>
+          </IonCardHeader>
+
+          <IonCardContent>
+            <IonLabel>{selectedContract?.name}</IonLabel>
+          </IonCardContent>
+        </IonCard>
+
+        <IonCard>
+          <IonCardHeader>
+            <IonTitle>Dates</IonTitle>
+            {selectedContract?.type === VOTING_TEMPLATE.TEZOSTEMPLATE ? (
+              <IonCardSubtitle>
+                Period index :{" "}
+                {(
+                  selectedContract as TezosTemplateVotingContract
+                ).votingPeriodIndex.toNumber() - 1}
+              </IonCardSubtitle>
+            ) : (
+              ""
+            )}
+          </IonCardHeader>
+          <IonCardContent>
+            <IonRow>
+              {" "}
+              <IonCol>From</IonCol>
+              <IonCol>To</IonCol>
+            </IonRow>
+            <IonRow>
+              <IonCol>
+                {new Date(selectedContract?.from!).toLocaleString()}
+              </IonCol>
+
+              <IonCol>
+                {new Date(selectedContract?.to!).toLocaleString()}
+              </IonCol>
+            </IonRow>
+          </IonCardContent>
+        </IonCard>
+
         {data.length > 0 ? (
           <IonGrid>
             <ResponsiveContainer width="100%" height={400}>
@@ -348,7 +275,13 @@ export const Results: React.FC<ResultsProps> = ({ match }) => {
                       ) : (
                         ""
                       )}
-                      {selectedContract.results.get(value)?.toNumber()}
+                      {selectedContract.results.get(value)
+                        ? selectedContract.results.get(value).toNumber() /
+                          (selectedContract.type ===
+                          VOTING_TEMPLATE.TEZOSTEMPLATE
+                            ? 1000000
+                            : 1)
+                        : 0}
                     </IonCol>
                   </IonRow>
                 )
@@ -366,15 +299,22 @@ export const Results: React.FC<ResultsProps> = ({ match }) => {
 
           {selectedContract && type === VOTING_TEMPLATE.TEZOSTEMPLATE.name ? (
             <IonChip>
-              <IonAvatar style={{ fontSize: "initial", marginTop: 0 }}>
+              <IonAvatar
+                style={{
+                  fontSize: "initial",
+                  marginTop: 0,
+
+                  width: "auto",
+                }}
+              >
                 {Array.from(selectedContract.results.values())
                   .reduce(
                     (value: int, acc: int) => value.plus(acc) as int,
                     new BigNumber(0) as int
                   )
-                  .toNumber()}
+                  .toNumber() / 1000000}
               </IonAvatar>
-              <IonLabel>Baker power</IonLabel>
+              <IonLabel>Total baker power</IonLabel>
             </IonChip>
           ) : (
             ""

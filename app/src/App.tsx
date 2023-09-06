@@ -24,7 +24,7 @@ import { NetworkType } from "@airgap/beacon-types";
 import { BeaconWallet } from "@taquito/beacon-wallet";
 import { DelegatesResponse } from "@taquito/rpc";
 import { TezosToolkit } from "@taquito/taquito";
-import React, { Dispatch, SetStateAction, useState } from "react";
+import React, { Dispatch, SetStateAction, useEffect, useState } from "react";
 import CreatePermissionedSimplePoll from "./components/CreatePermissionedSimplePoll";
 import CreateTezosTemplate from "./components/CreateTezosTemplate";
 import { Results } from "./components/Results";
@@ -53,13 +53,15 @@ export type UserContextType = {
   setBakerDeactivated: Dispatch<SetStateAction<boolean>>;
 
   reloadUser: () => Promise<void>;
+
+  BLOCK_TIME: number;
 };
 
 export const UserContext = React.createContext<UserContextType | null>(null);
 
 const App: React.FC = () => {
   const Tezos = new TezosToolkit("https://ghostnet.tezos.marigold.dev");
-
+  const [BLOCK_TIME, setBLOCK_TIME] = useState<number>(15);
   const wallet = new BeaconWallet({
     name: "TzVote",
     preferredNetwork: import.meta.env.VITE_NETWORK
@@ -91,8 +93,6 @@ const App: React.FC = () => {
   );
 
   const reloadUser = async (): Promise<void> => {
-    console.log("Reload user ********");
-
     const activeAccount = await wallet.client.getActiveAccount();
     let userAddress = activeAccount!.address;
     setUserAddress(userAddress);
@@ -136,6 +136,13 @@ const App: React.FC = () => {
     }
   };
 
+  useEffect(() => {
+    (async () => {
+      const constantsResponse = await Tezos.rpc.getConstants();
+      setBLOCK_TIME(constantsResponse.minimal_block_delay!.toNumber() * 1000);
+    })();
+  }, []);
+
   return (
     <IonApp>
       {" "}
@@ -154,6 +161,7 @@ const App: React.FC = () => {
           reloadUser,
           bakerDeactivated,
           setBakerDeactivated,
+          BLOCK_TIME,
         }}
       >
         <IonReactRouter>

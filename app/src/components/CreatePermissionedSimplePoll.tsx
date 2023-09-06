@@ -104,8 +104,6 @@ const CreatePermissionedSimplePoll: React.FC = () => {
 
     setLoading(true);
 
-    console.log("contract", contract);
-
     Tezos.wallet
       .originate({
         code: jsonContractTemplate,
@@ -241,7 +239,6 @@ const CreatePermissionedSimplePoll: React.FC = () => {
               <IonCardHeader>
                 <IonTitle>Dates</IonTitle>
               </IonCardHeader>
-              {contract.from_} {userTimeZone}
               <IonCardContent>
                 <IonItem>
                   <IonLabel>Start date</IonLabel>

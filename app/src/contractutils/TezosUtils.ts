@@ -95,14 +95,13 @@ export abstract class TezosUtils {
       //Note that: Tenderbake has deterministic finality after just two blocks.
       //In normal conditions, when the network is healthy, decisions are made at round 0, after 15 seconds.
       //This means that in normal conditions the time to finality is about 30s.
-      const block_estimated_duration = 15;
       for (let i = 0; i < count; i++) {
         let endDate: Date = new Date(
           startDate.getTime() +
             1000 *
               constantsResponse.blocks_per_cycle *
               constantsResponse.cycles_per_voting_period! *
-              block_estimated_duration
+              constantsResponse.minimal_block_delay!.toNumber()
         );
 
         dates.push(endDate);
@@ -129,11 +128,6 @@ export abstract class TezosUtils {
   ): Promise<Date> {
     const currentPeriodStartBlock = (await Tezos.rpc.getCurrentPeriod())
       .voting_period.start_position;
-
-    console.log(
-      "await Tezos.rpc.getCurrentPeriod()",
-      await Tezos.rpc.getCurrentPeriod()
-    );
 
     return new Date(
       await (

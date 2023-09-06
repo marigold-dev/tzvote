@@ -86,7 +86,10 @@ export const userCanVoteNow = (
 };
 
 export const getWinner = (
-  contract: PermissionedSimplePollVotingContract | TezosTemplateVotingContract
+  contract:
+    | PermissionedSimplePollVotingContract
+    | TezosTemplateVotingContract
+    | VotingContract
 ): Array<string> => {
   var winnerList: Array<string> = [];
   var maxScore: number = 0;
@@ -96,6 +99,7 @@ export const getWinner = (
     } else if (value.gt(maxScore)) {
       winnerList = [];
       winnerList.push(key);
+      maxScore = value.toNumber();
     } else {
       //pass
     }
@@ -108,6 +112,11 @@ export abstract class VotingContractUtils {
     Tezos: TezosToolkit,
     tzktContract: Contract
   ): Promise<VotingContract> {
+    if (!tzktContract.storage) {
+      console.error("TZKT Storage not loaded", tzktContract);
+      throw new Error("TZKT Storage not loaded");
+    }
+
     const tezosTemplate3WalletType: TezosTemplate3WalletType =
       await Tezos.wallet.at<TezosTemplate3WalletType>(tzktContract.address!);
 
@@ -116,70 +125,35 @@ export abstract class VotingContractUtils {
     tezosTemplateVotingContract.type = VOTING_TEMPLATE.TEZOSTEMPLATE;
     tezosTemplateVotingContract.address = tzktContract.address as address;
 
-    let votingPeriodBlockResult = await Tezos.rpc.getCurrentPeriod();
-
-    const currentPeriodStartBlock =
-      votingPeriodBlockResult.voting_period.start_position;
-
-    let dateFrom = new Date(
-      (
-        await Tezos.rpc.getBlockHeader({ block: "" + currentPeriodStartBlock })
-      ).timestamp
+    //index
+    let tzktVotingPeriod: api.VotingPeriod = await api.votingGetPeriod(
+      Number(tzktContract.storage.votingPeriodIndex as string)
     );
 
-    const constantsResponse = await Tezos.rpc.getConstants();
+    (
+      tezosTemplateVotingContract as TezosTemplateVotingContract
+    ).votingPeriodIndex = new BigNumber(tzktVotingPeriod.index!) as nat;
 
-    let blocksUntilTheEnd: number =
-      constantsResponse.cycles_per_voting_period! *
-      constantsResponse.blocks_per_cycle;
-
-    //Provided that at least two thirds of the total active stake participates honestly in consensus,
-    //then a decision is eventually taken.2 In the current implementation of Tenderbake the duration of each round increments by 15 seconds,
-    // starting from 15 seconds: thus the deadline for participation in round 0 is 15 seconds,
-    //that for round 1 is 45 seconds after that, and so on. So in normal conditions, when consensus is reached
-    //promptly at round 0 every time, we can expect Tenderbake to add one block every 15 seconds.
-    //Note that: Tenderbake has deterministic finality after just two blocks.
-    //In normal conditions, when the network is healthy, decisions are made at round 0, after 15 seconds.
-    //This means that in normal conditions the time to finality is about 30s.
-    const block_estimated_duration = 15;
-
-    let dateTo = new Date(
-      dateFrom.getTime() + 1000 * blocksUntilTheEnd * block_estimated_duration
-    );
-
-    if (
-      (tezosTemplateVotingContract as TezosTemplateVotingContract)
-        .votingPeriodIndex ==
-      (new BigNumber(votingPeriodBlockResult.voting_period.index) as nat)
-    ) {
-      //if current, we can have more accurate thatns to remaining blocks data
-      blocksUntilTheEnd = votingPeriodBlockResult.remaining;
-      dateTo = new Date(
-        Date.now() + 1000 * blocksUntilTheEnd * block_estimated_duration
-      );
-    }
-
-    //FIXME
     // Get the time zone set on the user's device
     const userTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
     tezosTemplateVotingContract.from = format(
-      utcToZonedTime(dateFrom, userTimeZone),
+      utcToZonedTime(new Date(tzktVotingPeriod.startTime!), userTimeZone),
       "yyyy-MM-dd'T'HH:mm:ssXXX",
       { timeZone: userTimeZone }
     ) as timestamp;
 
     tezosTemplateVotingContract.to = format(
-      utcToZonedTime(dateTo, userTimeZone),
+      utcToZonedTime(new Date(tzktVotingPeriod.endTime!), userTimeZone),
       "yyyy-MM-dd'T'HH:mm:ssXXX",
       { timeZone: userTimeZone }
     ) as timestamp;
 
-    tezosTemplateVotingContract.status = (
-      tezosTemplateVotingContract as TezosTemplateVotingContract
-    ).votingPeriodIndex.eq(votingPeriodBlockResult.voting_period.index)
-      ? STATUS.ONGOING
-      : STATUS.LOCKED;
+    const currentVotingPeriod = await Tezos.rpc.getCurrentPeriod();
+    tezosTemplateVotingContract.status =
+      currentVotingPeriod.voting_period.index === tzktVotingPeriod.index!
+        ? STATUS.ONGOING
+        : STATUS.LOCKED;
 
     tezosTemplateVotingContract.creator = tzktContract.creator?.address!;
 

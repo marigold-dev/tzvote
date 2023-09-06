@@ -66,9 +66,8 @@ export const Settings: React.FC<SettingsProps> = ({ match }) => {
   const [contract, setContract] = useState<VotingContract>();
 
   //CONTEXT
-  const { Tezos, bakerDelegators, userAddress, reloadUser } = React.useContext(
-    UserContext
-  ) as UserContextType;
+  const { Tezos, bakerDelegators, userAddress, reloadUser, BLOCK_TIME } =
+    React.useContext(UserContext) as UserContextType;
 
   const refreshData = async (): Promise<void> => {
     let contract: VotingContract;
@@ -149,7 +148,7 @@ export const Settings: React.FC<SettingsProps> = ({ match }) => {
         setTimeout(async () => {
           await refreshData();
           setLoading(false);
-        }, 7000);
+        }, BLOCK_TIME);
       } else {
         presentAlert({
           header: "Wanning",
@@ -184,12 +183,15 @@ export const Settings: React.FC<SettingsProps> = ({ match }) => {
 
           const op = await c.methods.addVoter(inputVoter as address).send();
 
-          await op.confirmation();
           //refresh info on list
+
+          console.log("op sent ...");
+
           setTimeout(async () => {
             await refreshData();
             setLoading(false);
-          }, 7000);
+            console.log("refresh done ...");
+          }, BLOCK_TIME);
         } else if (contract!.type == VOTING_TEMPLATE.TEZOSTEMPLATE) {
           console.error("Cannot add voter to this template ", contract);
 
@@ -234,10 +236,9 @@ export const Settings: React.FC<SettingsProps> = ({ match }) => {
         await op.confirmation();
         //refresh info on list
         setTimeout(async () => {
-          console.log("the list will refresh soon");
           await refreshData();
           setLoading(false);
-        }, 7000);
+        }, BLOCK_TIME);
       } else if (contract!.type == VOTING_TEMPLATE.TEZOSTEMPLATE) {
         console.error("Cannot remove voter to this template ", contract);
 
