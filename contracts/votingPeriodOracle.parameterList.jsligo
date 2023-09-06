@@ -1,0 +1,2 @@
+#import "votingPeriodOracle.jsligo" "VPO"
+const default_parameter: parameter_of VPO = UpdateCurrentVotingPeriod(6 as nat);

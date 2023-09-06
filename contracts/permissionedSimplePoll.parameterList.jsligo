@@ -1,0 +1,2 @@
+#import "permissionedSimplePoll.jsligo" "TZ"
+const default_parameter: parameter_of TZ = Vote("Pikachu");

@@ -1,493 +1,202 @@
-import { NetworkType } from "@airgap/beacon-sdk";
-import { AccountCircle, ArrowDropDownCircleRounded } from "@mui/icons-material";
-import {
-  Box,
-  Button,
-  ButtonGroup,
-  ClickAwayListener,
-  Grow,
-  MenuItem,
-  MenuList,
-  Paper,
-  Popper,
-} from "@mui/material";
+import { IonApp, IonRouterOutlet, setupIonicReact } from "@ionic/react";
+import { IonReactRouter } from "@ionic/react-router";
+import { Redirect, Route } from "react-router-dom";
+import Home from "./pages/Home";
+
+/* Core CSS required for Ionic components to work properly */
+import "@ionic/react/css/core.css";
+
+/* Basic CSS for apps built with Ionic */
+import "@ionic/react/css/normalize.css";
+import "@ionic/react/css/structure.css";
+import "@ionic/react/css/typography.css";
+
+/* Optional CSS utils that can be commented out */
+import "@ionic/react/css/display.css";
+import "@ionic/react/css/flex-utils.css";
+import "@ionic/react/css/float-elements.css";
+import "@ionic/react/css/padding.css";
+import "@ionic/react/css/text-alignment.css";
+import "@ionic/react/css/text-transformation.css";
+
+/* Theme variables */
+import { NetworkType } from "@airgap/beacon-types";
 import { BeaconWallet } from "@taquito/beacon-wallet";
+import { DelegatesResponse } from "@taquito/rpc";
 import { TezosToolkit } from "@taquito/taquito";
-import { Tzip16Module } from "@taquito/tzip16";
-import qrcode from "qrcode-generator";
-import React, { useEffect, useState } from "react";
-import Popup from "reactjs-popup";
-import "./App.css";
-import ConnectButton from "./components/ConnectWallet";
+import React, { Dispatch, SetStateAction, useEffect, useState } from "react";
 import CreatePermissionedSimplePoll from "./components/CreatePermissionedSimplePoll";
 import CreateTezosTemplate from "./components/CreateTezosTemplate";
-import DisconnectButton from "./components/DisconnectWallet";
-import Search from "./components/Search";
-import { VOTING_TEMPLATE } from "./contractutils/TezosContractUtils";
+import { Results } from "./components/Results";
+import { Search } from "./components/Search";
+import { Settings } from "./components/Settings";
+import { VOTING_TEMPLATE } from "./contractutils/TezosUtils";
+import "./theme/variables.css";
 
-let votingTemplateAddresses: Map<VOTING_TEMPLATE, string> = new Map();
-if (process.env["REACT_APP_TEMPLATE_ADDRESS_TEZOSTEMPLATE"])
-  votingTemplateAddresses.set(
-    VOTING_TEMPLATE.TEZOSTEMPLATE,
-    "" + process.env["REACT_APP_TEMPLATE_ADDRESS_TEZOSTEMPLATE"]
-  );
-else new Error("Env var REACT_APP_TEMPLATE_ADDRESS_TEZOSTEMPLATE is mandatory");
-if (process.env["REACT_APP_TEMPLATE_ADDRESS_PERMISSIONEDSIMPLEPOLL"])
-  votingTemplateAddresses.set(
-    VOTING_TEMPLATE.PERMISSIONEDSIMPLEPOLL,
-    "" + process.env["REACT_APP_TEMPLATE_ADDRESS_PERMISSIONEDSIMPLEPOLL"]
-  );
-else
-  new Error(
-    "Env var REACT_APP_TEMPLATE_ADDRESS_PERMISSIONEDSIMPLEPOLL is mandatory"
+setupIonicReact();
+
+export type UserContextType = {
+  Tezos: TezosToolkit;
+  userAddress: string | undefined;
+  setUserAddress: Dispatch<SetStateAction<string | undefined>>;
+  wallet: BeaconWallet;
+  votingTemplateAddresses: Map<VOTING_TEMPLATE, string>;
+  setVotingTemplateAddresses: Dispatch<
+    SetStateAction<Map<VOTING_TEMPLATE, string>>
+  >;
+  bakerPower: number;
+  setBakerPower: Dispatch<SetStateAction<number>>;
+  bakerDelegators: string[];
+  setBakerDelegators: Dispatch<SetStateAction<string[]>>;
+
+  bakerDeactivated: boolean;
+  setBakerDeactivated: Dispatch<SetStateAction<boolean>>;
+
+  reloadUser: () => Promise<void>;
+
+  BLOCK_TIME: number;
+};
+
+export const UserContext = React.createContext<UserContextType | null>(null);
+
+const App: React.FC = () => {
+  const Tezos = new TezosToolkit("https://ghostnet.tezos.marigold.dev");
+  const [BLOCK_TIME, setBLOCK_TIME] = useState<number>(15);
+  const wallet = new BeaconWallet({
+    name: "TzVote",
+    preferredNetwork: import.meta.env.VITE_NETWORK
+      ? NetworkType[
+          import.meta.env.VITE_NETWORK.toUpperCase() as keyof typeof NetworkType
+        ]
+      : NetworkType.GHOSTNET,
+  });
+  Tezos.setWalletProvider(wallet);
+  const [userAddress, setUserAddress] = useState<string | undefined>();
+  const [bakerPower, setBakerPower] = useState<number>(0);
+  const [bakerDelegators, setBakerDelegators] = useState<string[]>([]);
+
+  const [bakerDeactivated, setBakerDeactivated] = useState<boolean>(true);
+
+  const [votingTemplateAddresses, setVotingTemplateAddresses] = useState<
+    Map<VOTING_TEMPLATE, string>
+  >(
+    new Map([
+      [
+        VOTING_TEMPLATE.TEZOSTEMPLATE,
+        import.meta.env.VITE_TEMPLATE_ADDRESS_TEZOSTEMPLATE!,
+      ],
+      [
+        VOTING_TEMPLATE.PERMISSIONEDSIMPLEPOLL,
+        import.meta.env.VITE_TEMPLATE_ADDRESS_PERMISSIONEDSIMPLEPOLL,
+      ],
+    ])
   );
 
-const votingPeriodOracle: string =
-  process.env["REACT_APP_ORACLE_ADDRESS"] ||
-  "KT1GLuqbSEoaRb3GE4UtUgGkDukVS766V53A";
+  const reloadUser = async (): Promise<void> => {
+    const activeAccount = await wallet.client.getActiveAccount();
+    let userAddress = activeAccount!.address;
+    setUserAddress(userAddress);
 
-const App = () => {
-  const [Tezos, setTezos] = useState<TezosToolkit>(
-    new TezosToolkit(process.env["REACT_APP_TEZOS_NODE"]!)
-  );
+    console.log("userAddress", userAddress);
 
-  const [wallet, setWallet] = useState<BeaconWallet>(
-    new BeaconWallet({
-      name: "Training",
-      preferredNetwork: process.env["REACT_APP_NETWORK"]
-        ? NetworkType[
-            process.env[
-              "REACT_APP_NETWORK"
-            ].toUpperCase() as keyof typeof NetworkType
-          ]
-        : NetworkType.GHOSTNET,
-    })
-  );
+    //update baker power
+    try {
+      const delegatesResponse: DelegatesResponse = await Tezos.rpc.getDelegates(
+        userAddress
+      );
+
+      if (
+        delegatesResponse !== undefined &&
+        delegatesResponse.delegated_contracts !== undefined &&
+        delegatesResponse.staking_balance !== undefined
+      ) {
+        setBakerDelegators(delegatesResponse.delegated_contracts);
+        setBakerPower(
+          delegatesResponse.voting_power
+            ? delegatesResponse.voting_power.toNumber()
+            : 0
+        );
+        setBakerDeactivated(delegatesResponse.deactivated);
+        console.log(
+          "We have a baker with power ",
+          delegatesResponse.staking_balance.toNumber(),
+          " and delegators ",
+          delegatesResponse.delegated_contracts,
+          " and status deactivated  ",
+          delegatesResponse.deactivated,
+          " and voting_power  ",
+          delegatesResponse.voting_power
+        );
+      } else {
+        setBakerPower(0);
+        console.log("We have a baker with no power");
+      }
+    } catch (error) {
+      console.log("We have a simple user");
+    }
+  };
 
   useEffect(() => {
-    Tezos.setWalletProvider(wallet);
-  }, [wallet]);
+    (async () => {
+      const constantsResponse = await Tezos.rpc.getConstants();
+      setBLOCK_TIME(constantsResponse.minimal_block_delay!.toNumber() * 1000);
+    })();
+  }, []);
 
-  Tezos.addExtension(new Tzip16Module());
-  const [publicToken, setPublicToken] = useState<string | null>("");
-  const [userAddress, setUserAddress] = useState<string>("");
-  const [userBalance, setUserBalance] = useState<number>(0);
-  const [bakerDelegators, setBakerDelegators] = useState<string[]>(
-    new Array<string>()
+  return (
+    <IonApp>
+      {" "}
+      <UserContext.Provider
+        value={{
+          Tezos,
+          userAddress,
+          setUserAddress,
+          wallet,
+          votingTemplateAddresses,
+          setVotingTemplateAddresses,
+          bakerPower,
+          setBakerPower,
+          bakerDelegators,
+          setBakerDelegators,
+          reloadUser,
+          bakerDeactivated,
+          setBakerDeactivated,
+          BLOCK_TIME,
+        }}
+      >
+        <IonReactRouter>
+          <IonRouterOutlet>
+            <Route exact path={PAGES.HOME}>
+              <Home />
+            </Route>
+            <Route exact path={PAGES.SEARCH}>
+              <Search />
+            </Route>
+            <Route path={`${PAGES.RESULTS}/:type/:id`} component={Results} />
+            <Route path={`${PAGES.SETTINGS}/:type/:id`} component={Settings} />
+            <Route exact path={PAGES.CreatePermissionedSimplePoll}>
+              <CreatePermissionedSimplePoll />
+            </Route>
+            <Route exact path={PAGES.CreateTezosTemplate}>
+              <CreateTezosTemplate />
+            </Route>
+            <Route exact path="/">
+              <Redirect to="/home" />
+            </Route>
+          </IonRouterOutlet>
+        </IonReactRouter>
+      </UserContext.Provider>
+    </IonApp>
   );
-  const [bakerPower, setBakerPower] = useState<number>(0);
-  const [copiedPublicToken, setCopiedPublicToken] = useState<boolean>(false);
-  const [beaconConnection, setBeaconConnection] = useState<boolean>(false);
-  const [activeTab, setActiveTab] = useState<string>("search");
-
-  const generateQrCode = (): { __html: string } => {
-    const qr = qrcode(0, "L");
-    qr.addData(publicToken || "");
-    qr.make();
-
-    return { __html: qr.createImgTag(4) };
-  };
-
-  /**CREATE BUTTON SECTION */
-  const votingTemplateOptions = [
-    VOTING_TEMPLATE.PERMISSIONEDSIMPLEPOLL.name,
-    VOTING_TEMPLATE.TEZOSTEMPLATE.name,
-  ];
-  const [openVotingTemplateOptions, setOpenVotingTemplateOptions] =
-    React.useState(false);
-  const anchorRefVotingOptionsComboBox = React.useRef<HTMLDivElement>(null);
-  const [
-    selectedIndexVotingTemplateOption,
-    setSelectedIndexVotingTemplateOption,
-  ] = React.useState(0);
-
-  const handleMenuItemVotingTemplateOptionsClick = (index: number) => {
-    setSelectedIndexVotingTemplateOption(index);
-    setOpenVotingTemplateOptions(false);
-  };
-
-  const handleToggleMenuItemVotingTemplateOptions = () => {
-    setOpenVotingTemplateOptions((prevOpen) => !prevOpen);
-  };
-
-  const handleCloseMenuItemVotingTemplateOptions = (
-    event: MouseEvent | TouchEvent
-  ) => {
-    if (
-      anchorRefVotingOptionsComboBox.current &&
-      anchorRefVotingOptionsComboBox.current.contains(event.target as Node)
-    ) {
-      return;
-    }
-
-    setOpenVotingTemplateOptions(false);
-  };
-  /** END OF CREATE BUTTON SECTION */
-
-  /**
-   * LANDING PAGE FIRST TIME
-   *  */
-  //console.log("firstTime",firstTime,"publicToken",publicToken,"userAddress",userAddress,"userBalance",userBalance);
-  let network = process.env["REACT_APP_NETWORK"]
-    ? NetworkType[
-        process.env[
-          "REACT_APP_NETWORK"
-        ].toUpperCase() as keyof typeof NetworkType
-      ]
-    : NetworkType.GHOSTNET;
-
-  if (false && !userAddress && (!publicToken || publicToken == null))
-    return (
-      <div className="main-box-login">
-        {network != NetworkType.MAINNET ? (
-          <div className="banner">WARNING: TEST ONLY {network}</div>
-        ) : (
-          <span />
-        )}
-        <div className="title">
-          <div id="title">TzVote</div>
-        </div>
-
-        <div id="dialog-login">
-          <header>Free voting Dapp</header>
-          <div id="content-login">
-            <div>
-              Voting session journey :
-              <div>
-                <p>
-                  Login : connect to your wallet, or just skip and continue read
-                  only
-                </p>
-                <p>
-                  On Search page and select your voting session. Vote on it.
-                  Click on status icon to display the chart and details
-                </p>
-                <p>
-                  On Create page, create a new voting session from one of the
-                  templates : title, tezos voting period or dates, options
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <div className="buttons">
-            <ConnectButton
-              Tezos={Tezos}
-              setPublicToken={setPublicToken}
-              setWallet={setWallet}
-              setUserAddress={setUserAddress}
-              setUserBalance={setUserBalance}
-              setBakerDelegators={setBakerDelegators}
-              setBakerPower={setBakerPower}
-              setBeaconConnection={setBeaconConnection}
-              wallet={wallet}
-            />
-          </div>
-
-          <div className="buttons">
-            <Button sx={{ marginTop: 1 }} variant="contained">
-              Continue without wallet
-            </Button>
-          </div>
-        </div>
-
-        <div id="footer-login">Copyright Marigold 2022</div>
-      </div>
-    );
-  /**
-   * CONNECTION PAGE
-   *  */ else if (publicToken && (!userAddress || isNaN(userBalance))) {
-    return (
-      <div className="main-box-login">
-        {network != NetworkType.MAINNET ? (
-          <div className="banner">WARNING: TEST ONLY {network}</div>
-        ) : (
-          <span />
-        )}
-        <div className="title">
-          <div id="title">Wallet connection</div>
-        </div>
-        <div id="dialog-login">
-          <header>Please connect</header>
-          <div id="content">
-            <p className="text-align-center">
-              <i className="fas fa-broadcast-tower"></i>&nbsp; Connecting to
-              your wallet
-            </p>
-            <div
-              dangerouslySetInnerHTML={generateQrCode()}
-              className="text-align-center"
-            ></div>
-            <p id="public-token">
-              {copiedPublicToken ? (
-                <span id="public-token-copy__copied">
-                  <i className="far fa-thumbs-up"></i>
-                </span>
-              ) : (
-                <span
-                  id="public-token-copy"
-                  onClick={() => {
-                    if (publicToken) {
-                      navigator.clipboard.writeText(publicToken);
-                      setCopiedPublicToken(true);
-                      setTimeout(() => setCopiedPublicToken(false), 2000);
-                    }
-                  }}
-                >
-                  <i className="far fa-copy"></i>
-                </span>
-              )}
-
-              <span>
-                Public token: <span>{publicToken}</span>
-              </span>
-            </p>
-            <p className="text-align-center">
-              Status: {beaconConnection ? "Connected" : "Disconnected"}
-            </p>
-          </div>
-        </div>
-        <div id="footer-login">
-          <img src="built-with-taquito.png" alt="Built with Taquito" />
-        </div>
-      </div>
-    );
-  } else if (true || userAddress) {
-    /**
-     * HOME MAIN PAGE
-     *  */
-    return (
-      <div className="main-box">
-        {network != NetworkType.MAINNET ? (
-          <div className="banner">WARNING: TEST ONLY {network}</div>
-        ) : (
-          <span />
-        )}
-        <Box
-          sx={{
-            height: "6vh",
-            display: "flex",
-            backgroundColor: "var(--main-bg-color)",
-            color: "white",
-            justifyContent: "space-between",
-            textAlign: "center",
-            fontSize: "1.5em",
-            padding: "0.2em",
-          }}
-        >
-          <img className="logo" src="/logo_white.png" alt="marigold-button" />
-
-          <Button
-            variant="contained"
-            sx={{ marginRight: 0.5 }}
-            id="search"
-            onClick={() => setActiveTab("search")}
-          >
-            Search
-          </Button>
-
-          {userAddress ? (
-            <React.Fragment>
-              <ButtonGroup
-                variant="contained"
-                ref={anchorRefVotingOptionsComboBox}
-                aria-label="split button"
-              >
-                <Button
-                  onClick={() =>
-                    setActiveTab(
-                      votingTemplateOptions[selectedIndexVotingTemplateOption]
-                    )
-                  }
-                >
-                  {votingTemplateOptions[selectedIndexVotingTemplateOption]}
-                </Button>
-                <Button
-                  size="small"
-                  aria-controls={
-                    openVotingTemplateOptions ? "split-button-menu" : undefined
-                  }
-                  aria-expanded={openVotingTemplateOptions ? "true" : undefined}
-                  aria-label="select merge strategy"
-                  aria-haspopup="menu"
-                  onClick={handleToggleMenuItemVotingTemplateOptions}
-                >
-                  <ArrowDropDownCircleRounded />
-                </Button>
-              </ButtonGroup>
-              <Popper
-                sx={{ zIndex: "99999" }}
-                open={openVotingTemplateOptions}
-                anchorEl={anchorRefVotingOptionsComboBox.current}
-                role={undefined}
-                transition
-                disablePortal
-              >
-                {({ TransitionProps, placement }) => (
-                  <Grow
-                    {...TransitionProps}
-                    style={{
-                      transformOrigin:
-                        placement === "bottom" ? "center top" : "center bottom",
-                    }}
-                  >
-                    <Paper>
-                      <ClickAwayListener
-                        onClickAway={handleCloseMenuItemVotingTemplateOptions}
-                      >
-                        <MenuList id="split-button-menu">
-                          {votingTemplateOptions.map((option, index) => (
-                            <MenuItem
-                              key={option}
-                              disabled={index === 2}
-                              selected={
-                                index === selectedIndexVotingTemplateOption
-                              }
-                              onClick={(event) =>
-                                handleMenuItemVotingTemplateOptionsClick(index)
-                              }
-                            >
-                              Create {option} voting template
-                            </MenuItem>
-                          ))}
-                        </MenuList>
-                      </ClickAwayListener>
-                    </Paper>
-                  </Grow>
-                )}
-              </Popper>
-            </React.Fragment>
-          ) : (
-            ""
-          )}
-
-          {userAddress ? (
-            <Popup
-              trigger={<AccountCircle fontSize="large" />}
-              position="bottom right"
-            >
-              <p>
-                <i className="far fa-address-card"></i>&nbsp; {userAddress}
-              </p>
-              <p>
-                <i className="fas fa-piggy-bank"></i>&nbsp;
-                {(userBalance / 1000000).toLocaleString("en-US")} ꜩ
-              </p>
-
-              {bakerDelegators.length > 0 ? (
-                <p>
-                  <i className="fas fa-bolt"></i>&nbsp;
-                  {bakerPower} from {bakerDelegators.length} delegators
-                </p>
-              ) : (
-                ""
-              )}
-
-              <hr></hr>
-              <DisconnectButton
-                wallet={wallet}
-                setPublicToken={setPublicToken}
-                setUserAddress={setUserAddress}
-                setUserBalance={setUserBalance}
-                setBakerDelegators={setBakerDelegators}
-                setWallet={setWallet}
-                setTezos={setTezos}
-                setBeaconConnection={setBeaconConnection}
-                setActiveTab={setActiveTab}
-              />
-            </Popup>
-          ) : (
-            <ConnectButton
-              Tezos={Tezos}
-              setPublicToken={setPublicToken}
-              setWallet={setWallet}
-              setUserAddress={setUserAddress}
-              setUserBalance={setUserBalance}
-              setBakerDelegators={setBakerDelegators}
-              setBakerPower={setBakerPower}
-              setBeaconConnection={setBeaconConnection}
-              wallet={wallet}
-            />
-          )}
-        </Box>
-        <div id="dialog">
-          <div id="content">
-            {activeTab === "search" ? (
-              <div id="search">
-                <h3 className="text-align-center">Search voting sessions</h3>
-                <Search
-                  Tezos={Tezos}
-                  userAddress={userAddress}
-                  bakerPower={bakerPower}
-                  votingTemplateAddresses={votingTemplateAddresses}
-                  beaconConnection={beaconConnection}
-                />
-              </div>
-            ) : activeTab == VOTING_TEMPLATE.TEZOSTEMPLATE.name ? (
-              <div>
-                <h3 className="text-align-center">
-                  Create new {VOTING_TEMPLATE.TEZOSTEMPLATE.name} voting session
-                </h3>
-                <CreateTezosTemplate
-                  Tezos={Tezos}
-                  userAddress={userAddress}
-                  votingPeriodOracle={votingPeriodOracle}
-                  wallet={wallet}
-                  setActiveTab={setActiveTab}
-                />
-              </div>
-            ) : (
-              <div>
-                <h3 className="text-align-center">
-                  Create new {VOTING_TEMPLATE.PERMISSIONEDSIMPLEPOLL.name}{" "}
-                  voting session
-                </h3>
-                <CreatePermissionedSimplePoll
-                  Tezos={Tezos}
-                  userAddress={userAddress}
-                  bakerDelegators={bakerDelegators}
-                  setActiveTab={setActiveTab}
-                />
-              </div>
-            )}
-          </div>
-        </div>
-
-        <div id="footer-phantom" />
-        <div id="footer-login">
-          <Box
-            sx={{
-              justifyContent: "space-between",
-              textAlign: "center",
-              display: "flex",
-            }}
-          >
-            <a href="https://github.com/marigold-dev/tzvote">
-              <img
-                height={15}
-                src="https://github.githubassets.com/images/modules/logos_page/Octocat.png"
-              />
-              <img
-                height={15}
-                src="https://github.githubassets.com/images/modules/logos_page/GitHub-Logo.png"
-              />
-            </a>
-            Marigold 2022
-          </Box>
-        </div>
-      </div>
-    );
-  } else {
-    console.log(
-      "publicToken",
-      publicToken,
-      "userAddress",
-      userAddress,
-      "userBalance",
-      userBalance
-    );
-    return "An error occured !";
-  }
 };
 
 export default App;
+
+export enum PAGES {
+  SEARCH = "/search",
+  HOME = "/home",
+  RESULTS = "/results",
+  SETTINGS = "/settings",
+  CreatePermissionedSimplePoll = "/createPermissionedSimplePoll",
+  CreateTezosTemplate = "/createTezosTemplate",
+}

@@ -1,37 +1,26 @@
 import { NetworkType } from "@airgap/beacon-sdk";
-import { Button } from "@mui/material";
-import { BeaconWallet } from "@taquito/beacon-wallet";
+import { IonButton, IonIcon, IonLabel } from "@ionic/react";
 import { DelegatesResponse } from "@taquito/rpc";
-import { TezosToolkit } from "@taquito/taquito";
-import { Dispatch, SetStateAction } from "react";
+import { walletOutline } from "ionicons/icons";
+import React from "react";
+import { useHistory } from "react-router";
+import { PAGES, UserContext, UserContextType } from "../App";
 
-type ButtonProps = {
-  Tezos: TezosToolkit;
-  setWallet: Dispatch<SetStateAction<any>>;
-  setUserAddress: Dispatch<SetStateAction<string>>;
-  setUserBalance: Dispatch<SetStateAction<number>>;
-  setBakerDelegators: Dispatch<SetStateAction<string[]>>;
-  setBakerPower: Dispatch<SetStateAction<number>>;
-  setBeaconConnection: Dispatch<SetStateAction<boolean>>;
-  setPublicToken: Dispatch<SetStateAction<string | null>>;
-  wallet: BeaconWallet;
-};
+const ConnectButton = (): JSX.Element => {
+  const {
+    Tezos,
+    setUserAddress,
+    wallet,
+    setBakerDelegators,
+    setBakerPower,
+    setBakerDeactivated,
+  } = React.useContext(UserContext) as UserContextType;
 
-const ConnectButton = ({
-  Tezos,
-  setWallet,
-  setUserAddress,
-  setUserBalance,
-  setBakerDelegators,
-  setBakerPower,
-  setBeaconConnection,
-  wallet,
-}: ButtonProps): JSX.Element => {
+  const { replace } = useHistory();
+
   const setup = async (userAddress: string): Promise<void> => {
     setUserAddress(userAddress);
-    // updates balance
-    const balance = await Tezos.tz.getBalance(userAddress);
-    setUserBalance(balance.toNumber());
+
     //update baker power
     try {
       const delegatesResponse: DelegatesResponse = await Tezos.rpc.getDelegates(
@@ -43,9 +32,23 @@ const ConnectButton = ({
         delegatesResponse.delegated_contracts !== undefined &&
         delegatesResponse.staking_balance !== undefined
       ) {
-        console.log("We have a baker");
         setBakerDelegators(delegatesResponse.delegated_contracts);
-        setBakerPower(delegatesResponse.staking_balance.toNumber());
+        setBakerPower(
+          delegatesResponse.voting_power
+            ? delegatesResponse.voting_power.toNumber()
+            : 0
+        );
+        setBakerDeactivated(delegatesResponse.deactivated);
+        console.log(
+          "We have a baker with power ",
+          delegatesResponse.staking_balance.toNumber(),
+          " and delegators ",
+          delegatesResponse.delegated_contracts,
+          " and status deactivated  ",
+          delegatesResponse.deactivated,
+          " and voting_power  ",
+          delegatesResponse.voting_power
+        );
       } else {
         setBakerPower(0);
         console.log("We have a baker with no power");
@@ -59,29 +62,29 @@ const ConnectButton = ({
     try {
       await wallet.requestPermissions({
         network: {
-          type: process.env["REACT_APP_NETWORK"]
+          type: import.meta.env.VITE_NETWORK
             ? NetworkType[
-                process.env[
-                  "REACT_APP_NETWORK"
-                ].toUpperCase() as keyof typeof NetworkType
+                import.meta.env.VITE_NETWORK.toUpperCase() as keyof typeof NetworkType
               ]
             : NetworkType.GHOSTNET,
-          rpcUrl: process.env["REACT_APP_TEZOS_NODE"],
+          rpcUrl: import.meta.env.VITE_TEZOS_NODE,
         },
       });
       // gets user's address
       const userAddress = await wallet.getPKH();
       await setup(userAddress);
-      setBeaconConnection(true);
+
+      replace(PAGES.SEARCH);
     } catch (error) {
       console.log(error);
     }
   };
 
   return (
-    <Button variant="contained" onClick={connectWallet}>
-      <i className="fas fa-wallet"></i>&nbsp; Connect with wallet
-    </Button>
+    <IonButton color="dark" onClick={connectWallet}>
+      <IonIcon icon={walletOutline} />
+      <IonLabel>&nbsp; Login</IonLabel>
+    </IonButton>
   );
 };
 
