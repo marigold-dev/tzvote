@@ -284,7 +284,7 @@ export const Settings: React.FC<SettingsProps> = ({ match }) => {
               <IonTitle>Settings</IonTitle>
             </IonToolbar>
           </IonHeader>
-          <IonContent fullscreen>
+          <IonContent fullscreen className="ionContentBg">
             {contract &&
             contract.type == VOTING_TEMPLATE.PERMISSIONEDSIMPLEPOLL ? (
               <>

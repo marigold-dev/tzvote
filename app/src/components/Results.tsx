@@ -182,7 +182,7 @@ export const Results: React.FC<ResultsProps> = ({ match }) => {
           <IonTitle>Results</IonTitle>
         </IonToolbar>
       </IonHeader>
-      <IonContent fullscreen className="ion-padding">
+      <IonContent fullscreen className="ion-padding ionContentBg">
         <IonCard>
           <IonCardHeader>
             <IonTitle>Question</IonTitle>

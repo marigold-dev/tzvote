@@ -9,11 +9,13 @@ import {
   IonCardSubtitle,
   IonCardTitle,
   IonChip,
+  IonCol,
   IonContent,
   IonFab,
   IonFabButton,
   IonFabList,
   IonFooter,
+  IonGrid,
   IonHeader,
   IonIcon,
   IonImg,
@@ -27,6 +29,8 @@ import {
   IonRefresherContent,
   IonRow,
   IonSearchbar,
+  IonSelect,
+  IonSelectOption,
   IonSpinner,
   IonText,
   IonTitle,
@@ -95,6 +99,7 @@ export const Search: React.FC = () => {
     votableOnly: boolean;
     openOnly: boolean;
     mineOnly: boolean;
+    template: string[];
   };
 
   const [filter, setFilter] = React.useState<Filter>({
@@ -102,6 +107,7 @@ export const Search: React.FC = () => {
     votableOnly: false,
     openOnly: false,
     mineOnly: false,
+    template: [],
   });
 
   //LIST
@@ -165,7 +171,7 @@ export const Search: React.FC = () => {
   };
 
   const filterContracts = (newFilter: Filter) => {
-    console.log("filteredContract srtas", allContracts);
+    //console.log("filteredContract srtas", allContracts);
     let filteredContract = allContracts;
     //input value
     if (
@@ -205,6 +211,18 @@ export const Search: React.FC = () => {
       filteredContract = filteredContract.filter(
         (c: VotingContract) => c.creator === userAddress
       );
+    }
+
+    //template
+    if (newFilter.template && newFilter.template.length > 0) {
+      filteredContract = filteredContract.filter(
+        (c: VotingContract) => newFilter.template.indexOf(c.type.name) >= 0
+      );
+      /* console.log(
+        filteredContract,
+        "After filteredContract",
+        newFilter.template
+      );*/
     }
 
     setContracts(filteredContract);
@@ -350,7 +368,7 @@ export const Search: React.FC = () => {
                     </IonButtons>
                   </IonToolbar>
                 </IonHeader>
-                <IonContent className="ion-padding">
+                <IonContent className="ion-padding ionContentBg">
                   <IonCard>
                     <IonCardHeader>
                       <IonTitle>Question</IonTitle>
@@ -450,7 +468,7 @@ export const Search: React.FC = () => {
                 >
                   Votable
                 </IonToggle>
-                &nbsp;&nbsp;
+                &nbsp;&nbsp;&nbsp;
                 <IonToggle
                   enableOnOffLabels
                   checked={filter.openOnly}
@@ -465,7 +483,7 @@ export const Search: React.FC = () => {
                 >
                   Open
                 </IonToggle>
-                &nbsp;&nbsp;
+                &nbsp;&nbsp;&nbsp;
                 <IonToggle
                   enableOnOffLabels
                   checked={filter.mineOnly}
@@ -480,10 +498,33 @@ export const Search: React.FC = () => {
                 >
                   Mine
                 </IonToggle>
+                <IonSelect
+                  placeholder="Filter by template"
+                  onIonChange={(ev) => {
+                    const newFilter = { ...filter, template: ev.detail.value };
+                    setFilter(newFilter);
+                    filterContracts(newFilter);
+                  }}
+                  multiple={true}
+                  value={filter.template}
+                >
+                  <IonSelectOption
+                    key={VOTING_TEMPLATE.PERMISSIONEDSIMPLEPOLL.name}
+                    value={VOTING_TEMPLATE.PERMISSIONEDSIMPLEPOLL.name}
+                  >
+                    {VOTING_TEMPLATE.PERMISSIONEDSIMPLEPOLL.name}
+                  </IonSelectOption>
+                  <IonSelectOption
+                    key={VOTING_TEMPLATE.TEZOSTEMPLATE.name}
+                    value={VOTING_TEMPLATE.TEZOSTEMPLATE.name}
+                  >
+                    {VOTING_TEMPLATE.TEZOSTEMPLATE.name}
+                  </IonSelectOption>
+                </IonSelect>
               </IonRow>{" "}
             </IonToolbar>
           </IonHeader>
-          <IonContent fullscreen>
+          <IonContent fullscreen className="ionContentBg">
             <IonRefresher slot="fixed" onIonRefresh={refreshData}>
               <IonRefresherContent></IonRefresherContent>
             </IonRefresher>
@@ -491,145 +532,154 @@ export const Search: React.FC = () => {
             {contracts.length === 0 ? (
               <IonTitle> No results ...</IonTitle>
             ) : (
-              contracts.map((contract, _) => (
-                <IonCard key={contract.address}>
-                  <IonCardHeader>
-                    <IonCardTitle>
-                      <IonRow>
-                        <IonText>{contract.name}</IonText>
-                        <IonAvatar style={{ height: "20px", width: "20px" }}>
-                          <IonImg
-                            alt="Silhouette of a person's head"
-                            src={
-                              contract.type.name ==
-                              VOTING_TEMPLATE.PERMISSIONEDSIMPLEPOLL.name
-                                ? "/permissioned.png"
-                                : "/baker.png"
-                            }
-                          />
-                        </IonAvatar>
+              <IonGrid>
+                <IonRow>
+                  {contracts.map((contract, _) => (
+                    <IonCol sizeSm="12" sizeXs="12" sizeMd="6" sizeXl="4">
+                      <IonCard key={contract.address}>
+                        <IonCardHeader>
+                          <IonCardTitle>
+                            <IonRow>
+                              <IonText>{contract.name}</IonText>
+                              <IonAvatar
+                                style={{ height: "20px", width: "20px" }}
+                              >
+                                <IonImg
+                                  alt="Silhouette of a person's head"
+                                  src={
+                                    contract.type.name ==
+                                    VOTING_TEMPLATE.PERMISSIONEDSIMPLEPOLL.name
+                                      ? "/permissioned.png"
+                                      : "/baker.png"
+                                  }
+                                />
+                              </IonAvatar>
 
-                        <IonIcon
-                          color={
-                            contract.status === STATUS.ONGOING
-                              ? "success"
-                              : "danger"
-                          }
-                          icon={
-                            contract.status === STATUS.ONGOING
-                              ? lockOpenOutline
-                              : lockClosedOutline
-                          }
-                        ></IonIcon>
+                              <IonIcon
+                                color={
+                                  contract.status === STATUS.ONGOING
+                                    ? "success"
+                                    : "danger"
+                                }
+                                icon={
+                                  contract.status === STATUS.ONGOING
+                                    ? lockOpenOutline
+                                    : lockClosedOutline
+                                }
+                              ></IonIcon>
 
-                        <a
-                          href={`https://${
-                            NetworkType[
-                              import.meta.env.VITE_NETWORK.toUpperCase() as keyof typeof NetworkType
-                            ]
-                          }.tzkt.io/${contract.address}/info`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                        >
-                          <IonIcon icon={eyeOutline} />
-                        </a>
-                      </IonRow>
-                    </IonCardTitle>
-                    <IonCardSubtitle style={{ textAlign: "left" }}>
-                      {" "}
-                      <IonChip
-                        style={{
-                          fontSize: "x-small",
-                        }}
-                      >
-                        <IonIcon icon={personCircleOutline}></IonIcon>
-                        <IonLabel>
-                          <a
-                            href={
-                              `https://` +
-                              (import.meta.env.VITE_NETWORK
-                                ? NetworkType[
-                                    import.meta.env[
-                                      "VITE_NETWORK"
-                                    ].toUpperCase() as keyof typeof NetworkType
+                              <a
+                                href={`https://${
+                                  NetworkType[
+                                    import.meta.env.VITE_NETWORK.toUpperCase() as keyof typeof NetworkType
                                   ]
-                                : NetworkType.GHOSTNET) +
-                              `.tzkt.io/${contract.creator}/info`
-                            }
-                            target="_blank"
-                          >
-                            {contract.creator}
-                          </a>
-                        </IonLabel>
-                      </IonChip>
-                    </IonCardSubtitle>
-                  </IonCardHeader>
+                                }.tzkt.io/${contract.address}/info`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                              >
+                                <IonIcon icon={eyeOutline} />
+                              </a>
+                            </IonRow>
+                          </IonCardTitle>
+                          <IonCardSubtitle style={{ textAlign: "left" }}>
+                            {" "}
+                            <IonChip
+                              style={{
+                                fontSize: "x-small",
+                              }}
+                            >
+                              <IonIcon icon={personCircleOutline}></IonIcon>
+                              <IonLabel>
+                                <a
+                                  href={
+                                    `https://` +
+                                    (import.meta.env.VITE_NETWORK
+                                      ? NetworkType[
+                                          import.meta.env[
+                                            "VITE_NETWORK"
+                                          ].toUpperCase() as keyof typeof NetworkType
+                                        ]
+                                      : NetworkType.GHOSTNET) +
+                                    `.tzkt.io/${contract.creator}/info`
+                                  }
+                                  target="_blank"
+                                >
+                                  {contract.creator}
+                                </a>
+                              </IonLabel>
+                            </IonChip>
+                          </IonCardSubtitle>
+                        </IonCardHeader>
 
-                  <IonCardContent>
-                    <IonRow>
-                      {buttonChoices(contract)}
+                        <IonCardContent>
+                          <IonRow>
+                            {buttonChoices(contract)}
 
-                      <IonButton
-                        color="dark"
-                        onClick={() =>
-                          push(
-                            PAGES.RESULTS +
-                              "/" +
-                              contract.type.name +
-                              "/" +
-                              contract.address
-                          )
-                        }
-                      >
-                        <IonIcon icon={barChartOutline}></IonIcon>
-                        <IonLabel>&nbsp; Results</IonLabel>
-                      </IonButton>
+                            <IonButton
+                              color="dark"
+                              onClick={() =>
+                                push(
+                                  PAGES.RESULTS +
+                                    "/" +
+                                    contract.type.name +
+                                    "/" +
+                                    contract.address
+                                )
+                              }
+                            >
+                              <IonIcon icon={barChartOutline}></IonIcon>
+                              <IonLabel>&nbsp; Results</IonLabel>
+                            </IonButton>
 
-                      {contract.creator === userAddress &&
-                      contract.type ===
-                        VOTING_TEMPLATE.PERMISSIONEDSIMPLEPOLL ? (
-                        <IonButton
-                          color="dark"
-                          onClick={() =>
-                            push(
-                              PAGES.SETTINGS +
-                                "/" +
-                                contract.type.name +
-                                "/" +
-                                contract.address
-                            )
-                          }
-                        >
-                          <IonIcon icon={settingsOutline}></IonIcon>
-                          <IonLabel>&nbsp; Settings</IonLabel>
-                        </IonButton>
-                      ) : (
-                        ""
-                      )}
-                    </IonRow>
-                  </IonCardContent>
+                            {contract.creator === userAddress &&
+                            contract.type ===
+                              VOTING_TEMPLATE.PERMISSIONEDSIMPLEPOLL ? (
+                              <IonButton
+                                color="dark"
+                                onClick={() =>
+                                  push(
+                                    PAGES.SETTINGS +
+                                      "/" +
+                                      contract.type.name +
+                                      "/" +
+                                      contract.address
+                                  )
+                                }
+                              >
+                                <IonIcon icon={settingsOutline}></IonIcon>
+                                <IonLabel>&nbsp; Settings</IonLabel>
+                              </IonButton>
+                            ) : (
+                              ""
+                            )}
+                          </IonRow>
+                        </IonCardContent>
 
-                  {contract.status === STATUS.ONGOING ? (
-                    <>
-                      <IonProgressBar
-                        title="Period"
-                        key={`slider-${contract.address}`}
-                        value={
-                          (new Date().getTime() -
-                            new Date(contract.from).getTime()) /
-                          (new Date(contract.to).getTime() -
-                            new Date(contract.from).getTime())
-                        }
-                      />
-                      {durationToString(
-                        new Date(contract.to).getTime() - new Date().getTime()
-                      )}
-                    </>
-                  ) : (
-                    ""
-                  )}
-                </IonCard>
-              ))
+                        {contract.status === STATUS.ONGOING ? (
+                          <>
+                            <IonProgressBar
+                              title="Period"
+                              key={`slider-${contract.address}`}
+                              value={
+                                (new Date().getTime() -
+                                  new Date(contract.from).getTime()) /
+                                (new Date(contract.to).getTime() -
+                                  new Date(contract.from).getTime())
+                              }
+                            />
+                            {durationToString(
+                              new Date(contract.to).getTime() -
+                                new Date().getTime()
+                            )}
+                          </>
+                        ) : (
+                          ""
+                        )}
+                      </IonCard>
+                    </IonCol>
+                  ))}
+                </IonRow>
+              </IonGrid>
             )}
 
             <IonFab slot="fixed" vertical="bottom" horizontal="end">

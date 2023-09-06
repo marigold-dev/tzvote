@@ -23,10 +23,9 @@ import {
   constructOutline,
   fileTrayFullOutline,
 } from "ionicons/icons";
-import React, { useRef, useState } from "react";
+import React, { useState } from "react";
 import { UserContext, UserContextType } from "../App";
 import ConnectButton from "../components/ConnectWallet";
-import { VOTING_TEMPLATE } from "../contractutils/TezosUtils";
 import "./Home.css";
 
 const Home: React.FC = () => {
@@ -44,53 +43,14 @@ const Home: React.FC = () => {
   const [beaconConnection, setBeaconConnection] = useState<boolean>(false);
   const [activeTab, setActiveTab] = useState<string>("search");
 
-  /**CREATE BUTTON SECTION */
-  const votingTemplateOptions = [
-    VOTING_TEMPLATE.PERMISSIONEDSIMPLEPOLL.name,
-    VOTING_TEMPLATE.TEZOSTEMPLATE.name,
-  ];
-  const [openVotingTemplateOptions, setOpenVotingTemplateOptions] =
-    React.useState(false);
-  const anchorRefVotingOptionsComboBox = React.useRef<HTMLDivElement>(null);
-  const [
-    selectedIndexVotingTemplateOption,
-    setSelectedIndexVotingTemplateOption,
-  ] = React.useState(0);
-
-  const handleMenuItemVotingTemplateOptionsClick = (index: number) => {
-    setSelectedIndexVotingTemplateOption(index);
-    setOpenVotingTemplateOptions(false);
-  };
-
-  const handleToggleMenuItemVotingTemplateOptions = () => {
-    setOpenVotingTemplateOptions((prevOpen) => !prevOpen);
-  };
-
-  const handleCloseMenuItemVotingTemplateOptions = (
-    event: MouseEvent | TouchEvent
-  ) => {
-    if (
-      anchorRefVotingOptionsComboBox.current &&
-      anchorRefVotingOptionsComboBox.current.contains(event.target as Node)
-    ) {
-      return;
-    }
-
-    setOpenVotingTemplateOptions(false);
-  };
-  /** END OF CREATE BUTTON SECTION */
-
   /**
-   * LANDING PAGE FIRST TIME
+   * LANDING PAGE
    *  */
-  //console.log("firstTime",firstTime,"publicToken",publicToken,"userAddress",userAddress,"userBalance",userBalance);
   let network = import.meta.env.VITE_NETWORK
     ? NetworkType[
         import.meta.env.VITE_NETWORK.toUpperCase() as keyof typeof NetworkType
       ]
     : NetworkType.GHOSTNET;
-
-  const modal = useRef<HTMLIonModalElement>(null);
 
   return (
     <IonPage className="container">
@@ -102,17 +62,7 @@ const Home: React.FC = () => {
           </IonChip>
         </IonToolbar>
       </IonHeader>
-      <IonContent
-        fullscreen
-        style={{
-          "--background": "none",
-          backgroundImage: "url(/vote.jpg)",
-          backgroundPosition: "center",
-          backgroundSize: "cover",
-          backgroundBlendMode: "overlay",
-          backgroundColor: "rgba(0, 0, 0, 0.8)",
-        }}
-      >
+      <IonContent fullscreen className="ionContentBg">
         {network != NetworkType.MAINNET ? (
           <div className="banner">WARNING: You are on {network}</div>
         ) : (
@@ -127,7 +77,7 @@ const Home: React.FC = () => {
           <IonGrid>
             <IonRow>
               <IonCol sizeSm="12" sizeXs="12" sizeMd="6" sizeXl="6">
-                <IonCard style={{ backgroundColor: "rgba(0, 0, 0, 0.5)" }}>
+                <IonCard>
                   <IonCardHeader>
                     <IonCardTitle>
                       <IonIcon icon={albumsOutline}></IonIcon>

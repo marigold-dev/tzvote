@@ -28,7 +28,10 @@ const DisconnectButton = (): JSX.Element => {
   return (
     <IonButton color="dark" onClick={disconnectWallet}>
       <IonIcon icon={logOutOutline} />
-      <IonLabel>&nbsp; Logout {userAddress}</IonLabel>
+      <IonLabel>
+        &nbsp; Logout{" "}
+        <IonLabel style={{ fontSize: "xx-small" }}>{userAddress}</IonLabel>
+      </IonLabel>
     </IonButton>
   );
 };

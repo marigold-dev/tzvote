@@ -167,7 +167,7 @@ const CreateTezosTemplate: React.FC = () => {
               </IonButtons>
 
               <IonTitle>
-                <IonRow>
+                <IonRow className="container">
                   Create &nbsp;
                   <IonAvatar style={{ height: "20px", width: "20px" }}>
                     <IonImg src="/baker.png" />
@@ -178,7 +178,7 @@ const CreateTezosTemplate: React.FC = () => {
             </IonToolbar>
           </IonHeader>
 
-          <IonContent fullscreen>
+          <IonContent fullscreen className="ionContentBg">
             <IonCard>
               <IonCardHeader>
                 <IonTitle>Description</IonTitle>
