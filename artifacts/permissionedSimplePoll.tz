@@ -1,0 +1,267 @@
+{ parameter (or (or (address %addVoter) (address %removeVoter)) (string %vote)) ;
+  storage
+    (pair (pair (pair (timestamp %from_) (string %name)) (list %options string) (address %owner))
+          (pair (list %registeredVoters address) (map %results string int))
+          (timestamp %to)
+          (map %votes address string)) ;
+  code { UNPAIR ;
+         IF_LEFT
+           { IF_LEFT
+               { DUP 2 ;
+                 CAR ;
+                 CDR ;
+                 CDR ;
+                 SOURCE ;
+                 COMPARE ;
+                 NEQ ;
+                 IF { DROP 2 ; PUSH string "User has to be owner" ; FAILWITH }
+                    { NONE address ;
+                      DUP 3 ;
+                      CDR ;
+                      CAR ;
+                      CAR ;
+                      NIL address ;
+                      SWAP ;
+                      ITER { CONS } ;
+                      ITER { PAIR ;
+                             DUP 2 ;
+                             DUP 2 ;
+                             CAR ;
+                             COMPARE ;
+                             EQ ;
+                             IF { CAR ; SOME } { CDR } } ;
+                      NONE address ;
+                      SWAP ;
+                      COMPARE ;
+                      NEQ ;
+                      IF { DROP 2 ; PUSH string "User is already registered" ; FAILWITH }
+                         { DUP 2 ;
+                           CDR ;
+                           CDR ;
+                           CAR ;
+                           NOW ;
+                           COMPARE ;
+                           GT ;
+                           IF { DROP 2 ; PUSH string "Too late to add voter" ; FAILWITH }
+                              { DUP 2 ;
+                                DUP 3 ;
+                                CDR ;
+                                DUP ;
+                                CAR ;
+                                DIG 4 ;
+                                CDR ;
+                                CAR ;
+                                CAR ;
+                                DIG 4 ;
+                                CONS ;
+                                UPDATE 1 ;
+                                UPDATE 1 ;
+                                UPDATE 2 ;
+                                NIL operation ;
+                                PAIR } } } }
+               { DUP 2 ;
+                 CAR ;
+                 CDR ;
+                 CDR ;
+                 SOURCE ;
+                 COMPARE ;
+                 NEQ ;
+                 IF { DROP 2 ; PUSH string "User has to be owner" ; FAILWITH }
+                    { NONE address ;
+                      DUP 3 ;
+                      CDR ;
+                      CAR ;
+                      CAR ;
+                      NIL address ;
+                      SWAP ;
+                      ITER { CONS } ;
+                      ITER { PAIR ;
+                             DUP 2 ;
+                             DUP 2 ;
+                             CAR ;
+                             COMPARE ;
+                             EQ ;
+                             IF { CAR ; SOME } { CDR } } ;
+                      NONE address ;
+                      SWAP ;
+                      COMPARE ;
+                      EQ ;
+                      IF { DROP 2 ; PUSH string "User not found" ; FAILWITH }
+                         { DUP 2 ;
+                           CDR ;
+                           CDR ;
+                           CAR ;
+                           NOW ;
+                           COMPARE ;
+                           GT ;
+                           IF { DROP 2 ; PUSH string "Too late to remove voter" ; FAILWITH }
+                              { DUP 2 ;
+                                CDR ;
+                                CDR ;
+                                CDR ;
+                                DUP 2 ;
+                                GET ;
+                                IF_NONE
+                                  {}
+                                  { PUSH string "  already exists for this user, we cannot remove it" ;
+                                    SWAP ;
+                                    PUSH string "A vote with option " ;
+                                    CONCAT ;
+                                    CONCAT ;
+                                    FAILWITH } ;
+                                DUP 2 ;
+                                DUP 3 ;
+                                CDR ;
+                                DUP ;
+                                CAR ;
+                                NIL address ;
+                                DIG 5 ;
+                                CDR ;
+                                CAR ;
+                                CAR ;
+                                NIL address ;
+                                SWAP ;
+                                ITER { CONS } ;
+                                ITER { PAIR ;
+                                       DUP ;
+                                       CAR ;
+                                       DUP 6 ;
+                                       DUP 2 ;
+                                       COMPARE ;
+                                       EQ ;
+                                       IF { DROP ; NONE address } { SOME } ;
+                                       IF_NONE { CDR } { SWAP ; CDR ; SWAP ; CONS } } ;
+                                DIG 4 ;
+                                DROP ;
+                                UPDATE 1 ;
+                                UPDATE 1 ;
+                                UPDATE 2 ;
+                                NIL operation ;
+                                PAIR } } } } }
+           { NONE address ;
+             DUP 3 ;
+             CDR ;
+             CAR ;
+             CAR ;
+             NIL address ;
+             SWAP ;
+             ITER { CONS } ;
+             ITER { PAIR ;
+                    SOURCE ;
+                    DUP 2 ;
+                    CAR ;
+                    COMPARE ;
+                    EQ ;
+                    IF { CAR ; SOME } { CDR } } ;
+             NONE address ;
+             SWAP ;
+             COMPARE ;
+             EQ ;
+             IF { DROP 2 ; PUSH string "User is not registered" ; FAILWITH }
+                { NONE string ;
+                  DUP 3 ;
+                  CAR ;
+                  CDR ;
+                  CAR ;
+                  NIL string ;
+                  SWAP ;
+                  ITER { CONS } ;
+                  ITER { PAIR ;
+                         DUP 2 ;
+                         DUP 2 ;
+                         CAR ;
+                         COMPARE ;
+                         EQ ;
+                         IF { CAR ; SOME } { CDR } } ;
+                  NONE string ;
+                  SWAP ;
+                  COMPARE ;
+                  EQ ;
+                  IF { DROP 2 ; PUSH string "Option does not exist" ; FAILWITH }
+                     { DUP 2 ;
+                       CDR ;
+                       CDR ;
+                       CDR ;
+                       SOURCE ;
+                       GET ;
+                       IF_NONE
+                         {}
+                         { PUSH string "  already exists for this user" ;
+                           SWAP ;
+                           PUSH string "A vote with option " ;
+                           CONCAT ;
+                           CONCAT ;
+                           FAILWITH } ;
+                       DUP 2 ;
+                       CDR ;
+                       CDR ;
+                       CAR ;
+                       NOW ;
+                       COMPARE ;
+                       GT ;
+                       DUP 3 ;
+                       CAR ;
+                       CAR ;
+                       CAR ;
+                       NOW ;
+                       COMPARE ;
+                       LT ;
+                       OR ;
+                       IF { DROP 2 ; PUSH string "Not yet the time to vote" ; FAILWITH }
+                          { DUP 2 ;
+                            DUP 3 ;
+                            CDR ;
+                            DUP ;
+                            CAR ;
+                            DUP 5 ;
+                            CDR ;
+                            CAR ;
+                            CDR ;
+                            DUP 5 ;
+                            GET ;
+                            IF_NONE
+                              { DUP 5 ;
+                                CDR ;
+                                CAR ;
+                                CDR ;
+                                PUSH int 1 ;
+                                DUP 6 ;
+                                SWAP ;
+                                SOME ;
+                                SWAP ;
+                                UPDATE }
+                              { DUP 6 ;
+                                CDR ;
+                                CAR ;
+                                CDR ;
+                                PUSH int 1 ;
+                                DIG 2 ;
+                                ADD ;
+                                DUP 6 ;
+                                SWAP ;
+                                SOME ;
+                                SWAP ;
+                                UPDATE } ;
+                            UPDATE 2 ;
+                            UPDATE 1 ;
+                            UPDATE 2 ;
+                            DUP ;
+                            CDR ;
+                            DUP ;
+                            CDR ;
+                            DIG 4 ;
+                            CDR ;
+                            CDR ;
+                            CDR ;
+                            DIG 4 ;
+                            SOURCE ;
+                            SWAP ;
+                            SOME ;
+                            SWAP ;
+                            UPDATE ;
+                            UPDATE 2 ;
+                            UPDATE 2 ;
+                            UPDATE 2 ;
+                            NIL operation ;
+                            PAIR } } } } } }
+

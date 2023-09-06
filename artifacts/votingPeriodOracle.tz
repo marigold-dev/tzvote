@@ -1,0 +1,12 @@
+{ parameter nat ;
+  storage (pair (address %admin) (nat %votingPeriodIndex)) ;
+  code { UNPAIR ;
+         DUP 2 ;
+         CAR ;
+         SENDER ;
+         COMPARE ;
+         NEQ ;
+         IF { DROP 2 ; PUSH string "You are not the admin !!!" ; FAILWITH }
+            { UPDATE 2 ; NIL operation ; PAIR } } ;
+  view "currentVotingPeriod" unit nat { CDR ; CDR } }
+
