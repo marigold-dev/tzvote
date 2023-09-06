@@ -23,7 +23,7 @@ import CreatePermissionedSimplePoll from "./components/CreatePermissionedSimpleP
 import CreateTezosTemplate from "./components/CreateTezosTemplate";
 import DisconnectButton from "./components/DisconnectWallet";
 import Search from "./components/Search";
-import { VOTING_TEMPLATE } from "./contractutils/TezosContractUtils";
+import { VOTING_TEMPLATE } from "./contractutils/TezosUtils";
 
 let votingTemplateAddresses: Map<VOTING_TEMPLATE, string> = new Map();
 if (process.env["REACT_APP_TEMPLATE_ADDRESS_TEZOSTEMPLATE"])

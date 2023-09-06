@@ -32,8 +32,9 @@ import { UserContext, UserContextType } from "../App";
 import {
   VOTING_TEMPLATE,
   VotingContract,
-  VotingContractUtils,
-} from "../contractutils/TezosContractUtils";
+  convertFromTZKTTezosContractToPermissionnedSimplePollTemplateVotingContract,
+  convertFromTZKTTezosContractToTezosTemplateVotingContract,
+} from "../contractutils/TezosUtils";
 import {
   Storage as PermissionedSimplePollVotingContract,
   PermissionedSimplePollWalletType,
@@ -75,7 +76,7 @@ export const Settings: React.FC<SettingsProps> = ({ match }) => {
     switch (type) {
       case VOTING_TEMPLATE.PERMISSIONEDSIMPLEPOLL.name: {
         contract =
-          await VotingContractUtils.convertFromTZKTTezosContractToPermissionnedSimplePollTemplateVotingContract(
+          await convertFromTZKTTezosContractToPermissionnedSimplePollTemplateVotingContract(
             Tezos,
             contractFromTzkt
           );
@@ -84,7 +85,7 @@ export const Settings: React.FC<SettingsProps> = ({ match }) => {
       }
       case VOTING_TEMPLATE.TEZOSTEMPLATE.name: {
         contract =
-          await VotingContractUtils.convertFromTZKTTezosContractToTezosTemplateVotingContract(
+          await convertFromTZKTTezosContractToTezosTemplateVotingContract(
             Tezos,
             contractFromTzkt
           );

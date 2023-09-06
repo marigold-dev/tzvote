@@ -30,7 +30,7 @@ import CreateTezosTemplate from "./components/CreateTezosTemplate";
 import { Results } from "./components/Results";
 import { Search } from "./components/Search";
 import { Settings } from "./components/Settings";
-import { VOTING_TEMPLATE } from "./contractutils/TezosContractUtils";
+import { VOTING_TEMPLATE } from "./contractutils/TezosUtils";
 import "./theme/variables.css";
 
 setupIonicReact();

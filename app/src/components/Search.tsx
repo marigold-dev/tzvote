@@ -30,6 +30,7 @@ import {
   IonSpinner,
   IonText,
   IonTitle,
+  IonToggle,
   IonToolbar,
   RefresherEventDetail,
   useIonAlert,
@@ -41,14 +42,13 @@ import moment from "moment";
 import momentDurationFormatSetup from "moment-duration-format";
 import React, { useRef, useState } from "react";
 import {
-  VOTING_TEMPLATE,
-  VotingContract,
-  VotingContractUtils,
-  userCanVoteNow,
-} from "../contractutils/TezosContractUtils";
-import {
   STATUS,
   TransactionInvalidBeaconError,
+  VOTING_TEMPLATE,
+  VotingContract,
+  convertFromTZKTTezosContractToPermissionnedSimplePollTemplateVotingContract,
+  convertFromTZKTTezosContractToTezosTemplateVotingContract,
+  userCanVoteNow,
 } from "../contractutils/TezosUtils";
 
 import { PermissionedSimplePollWalletType } from "../permissionedSimplePoll.types";
@@ -89,9 +89,20 @@ export const Search: React.FC = () => {
   const [presentAlert] = useIonAlert();
   const { push } = useHistory();
 
-  //SEARCH
-  const [options, setOptions] = useState<Array<string>>([]);
-  const [inputValue, setInputValue] = React.useState<string>("");
+  //FILTERS
+  type Filter = {
+    inputValue: string;
+    votableOnly: boolean;
+    openOnly: boolean;
+    mineOnly: boolean;
+  };
+
+  const [filter, setFilter] = React.useState<Filter>({
+    inputValue: "*",
+    votableOnly: false,
+    openOnly: false,
+    mineOnly: false,
+  });
 
   //LIST
   const [allContracts, setAllContracts] = useState<Array<VotingContract>>([]);
@@ -125,7 +136,7 @@ export const Search: React.FC = () => {
         await Promise.all(
           allTEZOSTEMPLATEContractFromTzkt.map(
             async (tzktObject: Contract) =>
-              await VotingContractUtils.convertFromTZKTTezosContractToTezosTemplateVotingContract(
+              await convertFromTZKTTezosContractToTezosTemplateVotingContract(
                 Tezos,
                 tzktObject
               )
@@ -136,7 +147,7 @@ export const Search: React.FC = () => {
         await Promise.all(
           allPERMISSIONEDSIMPLEPOLLContractFromTzkt.map(
             async (tzktObject: Contract) =>
-              await VotingContractUtils.convertFromTZKTTezosContractToPermissionnedSimplePollTemplateVotingContract(
+              await convertFromTZKTTezosContractToPermissionnedSimplePollTemplateVotingContract(
                 Tezos,
                 tzktObject
               )
@@ -146,16 +157,6 @@ export const Search: React.FC = () => {
         ...allConvertertedTEZOSTEMPLATEContractContracts,
         ...allConvertertedPERMISSIONEDSIMPLEPOLLContractContracts,
       ]);
-      setOptions(
-        Array.from(
-          new Set(
-            [
-              ...allConvertertedTEZOSTEMPLATEContractContracts,
-              ...allConvertertedPERMISSIONEDSIMPLEPOLLContractContracts,
-            ].map((c: VotingContract) => c.name)
-          )
-        )
-      );
 
       event?.detail.complete();
 
@@ -163,22 +164,50 @@ export const Search: React.FC = () => {
     })();
   };
 
-  const filterOnNewInput = (filterValue: string | null) => {
-    if (filterValue == null || filterValue === "") setContracts([]);
-    else {
-      let filteredContract = allContracts.filter((c: VotingContract) => {
+  const filterContracts = (newFilter: Filter) => {
+    console.log("filteredContract srtas", allContracts);
+    let filteredContract = allContracts;
+    //input value
+    if (
+      newFilter.inputValue &&
+      newFilter.inputValue !== "" &&
+      newFilter.inputValue !== "*"
+    ) {
+      filteredContract = filteredContract.filter((c: VotingContract) => {
         //console.log(filterValue.replace(/[^a-zA-Z0-9]/gi, ".")); //avoid issue of special char on the regex
         return (
           c.name.search(
-            new RegExp(filterValue.replace(/[^a-zA-Z0-9]/gi, "."), "gi")
+            new RegExp(
+              newFilter.inputValue.replace(/[^a-zA-Z0-9]/gi, "."),
+              "gi"
+            )
           ) >= 0
         );
       });
-
-      //console.log("filteredContract", filteredContract);
-
-      setContracts(filteredContract);
     }
+
+    //votable
+    if (newFilter.votableOnly) {
+      filteredContract = filteredContract.filter((c: VotingContract) =>
+        userCanVoteNow(c, userAddress! as address, bakerPower, bakerDeactivated)
+      );
+    }
+
+    //open
+    if (newFilter.openOnly) {
+      filteredContract = filteredContract.filter(
+        (c: VotingContract) => c.status === STATUS.ONGOING
+      );
+    }
+
+    //mine
+    if (newFilter.mineOnly) {
+      filteredContract = filteredContract.filter(
+        (c: VotingContract) => c.creator === userAddress
+      );
+    }
+
+    setContracts(filteredContract);
   };
 
   //EFFECTS
@@ -194,8 +223,7 @@ export const Search: React.FC = () => {
   }, []); //init load
 
   React.useEffect(() => {
-    setInputValue("*");
-    filterOnNewInput(inputValue);
+    filterContracts(filter);
   }, [allContracts]); //if data refreshed, need to refresh the filtered list too
 
   const durationToString = (value: number): string => {
@@ -232,7 +260,7 @@ export const Search: React.FC = () => {
           setTimeout(() => {
             refreshData();
             setLoading(false);
-            filterOnNewInput(inputValue);
+            filterContracts(filter);
             presentAlert({
               header: "Success",
               message: "Your vote has been accepted",
@@ -250,7 +278,7 @@ export const Search: React.FC = () => {
           //refresh info on list
           setTimeout(() => {
             refreshData();
-            filterOnNewInput(inputValue);
+            filterContracts(filter);
           }, BLOCK_TIME);
 
           presentAlert({
@@ -384,35 +412,81 @@ export const Search: React.FC = () => {
         <>
           <IonHeader>
             <IonToolbar>
-              <IonTitle>Search</IonTitle>
+              <IonTitle style={{ margin: "0.5em" }}>Search</IonTitle>
+              <IonSearchbar
+                color="dark"
+                animated
+                debounce={1000}
+                id="searchInput"
+                placeholder="Filter here ..."
+                value={filter.inputValue}
+                onIonChange={(e) => {
+                  let inputValue = e.target.value;
+                  if (
+                    inputValue === undefined ||
+                    !inputValue ||
+                    inputValue === ""
+                  ) {
+                    inputValue = "*";
+                  }
+                  const newFilter = { ...filter, inputValue: inputValue };
+                  setFilter(newFilter); //search all
+                  console.log("onIonChange searchbar", inputValue);
+                  filterContracts(newFilter); //filter
+                }}
+              />
+              <IonRow style={{ margin: "0.5em" }}>
+                <IonToggle
+                  enableOnOffLabels
+                  checked={filter.votableOnly}
+                  onClick={(e) => {
+                    const newFilter = {
+                      ...filter,
+                      votableOnly: e.currentTarget.checked,
+                    };
+                    setFilter(newFilter);
+                    filterContracts(newFilter);
+                  }}
+                >
+                  Votable
+                </IonToggle>
+                &nbsp;&nbsp;
+                <IonToggle
+                  enableOnOffLabels
+                  checked={filter.openOnly}
+                  onClick={(e) => {
+                    const newFilter = {
+                      ...filter,
+                      openOnly: e.currentTarget.checked,
+                    };
+                    setFilter(newFilter);
+                    filterContracts(newFilter);
+                  }}
+                >
+                  Open
+                </IonToggle>
+                &nbsp;&nbsp;
+                <IonToggle
+                  enableOnOffLabels
+                  checked={filter.mineOnly}
+                  onClick={(e) => {
+                    const newFilter = {
+                      ...filter,
+                      mineOnly: e.currentTarget.checked,
+                    };
+                    setFilter(newFilter);
+                    filterContracts(newFilter);
+                  }}
+                >
+                  Mine
+                </IonToggle>
+              </IonRow>{" "}
             </IonToolbar>
           </IonHeader>
           <IonContent fullscreen>
             <IonRefresher slot="fixed" onIonRefresh={refreshData}>
               <IonRefresherContent></IonRefresherContent>
             </IonRefresher>
-
-            <IonSearchbar
-              animated
-              debounce={1000}
-              id="searchInput"
-              placeholder="Filter here ..."
-              value={inputValue}
-              onIonChange={(e) => {
-                let inputValue = e.target.value;
-                if (
-                  inputValue === undefined ||
-                  !inputValue ||
-                  inputValue === ""
-                ) {
-                  inputValue = "*";
-                }
-
-                setInputValue(inputValue); //search all
-
-                filterOnNewInput(inputValue); //filter
-              }}
-            />
 
             {contracts.length === 0 ? (
               <IonTitle> No results ...</IonTitle>

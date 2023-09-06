@@ -26,7 +26,7 @@ import {
 import React, { useRef, useState } from "react";
 import { UserContext, UserContextType } from "../App";
 import ConnectButton from "../components/ConnectWallet";
-import { VOTING_TEMPLATE } from "../contractutils/TezosContractUtils";
+import { VOTING_TEMPLATE } from "../contractutils/TezosUtils";
 import "./Home.css";
 
 const Home: React.FC = () => {

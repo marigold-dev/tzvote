@@ -41,15 +41,14 @@ import { Storage as PermissionedSimplePollVotingContract } from "../permissioned
 import { address, asMap, int, timestamp } from "../type-aliases";
 
 import jsonContractTemplate from "../contracttemplates/permissionedSimplePoll.json";
-import { VOTING_TEMPLATE } from "../contractutils/TezosContractUtils";
+import { VOTING_TEMPLATE } from "../contractutils/TezosUtils";
 
 // Get the time zone set on the user's device
 const userTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
 const CreatePermissionedSimplePoll: React.FC = () => {
-  const { Tezos, userAddress, bakerDelegators, reloadUser } = React.useContext(
-    UserContext
-  ) as UserContextType;
+  const { Tezos, userAddress, bakerDelegators, reloadUser, BLOCK_TIME } =
+    React.useContext(UserContext) as UserContextType;
 
   const { push, goBack } = useHistory();
 
@@ -104,44 +103,44 @@ const CreatePermissionedSimplePoll: React.FC = () => {
 
     setLoading(true);
 
-    Tezos.wallet
-      .originate({
-        code: jsonContractTemplate,
-        storage: {
-          name: contract.name,
-          from_: new Date(contract.from_).toISOString(),
-          to: new Date(contract.to).toISOString(),
-          options: contract.options,
-          owner: contract.owner,
-          registeredVoters: contract.registeredVoters,
-          results: contract.results, //MichelsonMap<string, int>
-          votes: contract.votes, //MichelsonMap<address, string>
-        },
-      })
-      .send()
-      .then((originationOp) => {
-        console.log(`Waiting for confirmation of origination...`);
-        return originationOp.contract();
-      })
-      .then((contract) => {
-        push(PAGES.SEARCH);
+    try {
+      const op = await Tezos.wallet
+        .originate({
+          code: jsonContractTemplate,
+          storage: {
+            name: contract.name,
+            from_: new Date(contract.from_).toISOString(),
+            to: new Date(contract.to).toISOString(),
+            options: contract.options,
+            owner: contract.owner,
+            registeredVoters: contract.registeredVoters,
+            results: contract.results, //MichelsonMap<string, int>
+            votes: contract.votes, //MichelsonMap<address, string>
+          },
+        })
+        .send();
+
+      setTimeout(async () => {
+        setLoading(false);
         presentAlert({
           header: "Success",
-          message: `Origination completed for ${contract.address}.`,
+          message: `Origination completed for ${
+            (await op.contract()).address
+          }.`,
         });
-      })
-      .catch((error) => {
-        console.table(`Error: ${JSON.stringify(error, null, 2)}`);
-        let tibe: TransactionInvalidBeaconError =
-          new TransactionInvalidBeaconError(error);
-        presentAlert({
-          header: "Error",
-          message: tibe.data_message,
-        });
-      })
-      .finally(() => {
-        setLoading(false);
+        push(PAGES.SEARCH);
+      }, BLOCK_TIME);
+    } catch (error) {
+      console.table(`Error: ${JSON.stringify(error, null, 2)}`);
+      let tibe: TransactionInvalidBeaconError =
+        new TransactionInvalidBeaconError(error);
+      presentAlert({
+        header: "Error",
+        message: tibe.data_message,
       });
+    } finally {
+      setLoading(false);
+    }
   };
 
   //EFFECTS

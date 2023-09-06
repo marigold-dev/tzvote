@@ -36,14 +36,15 @@ import React, { useState } from "react";
 import { useHistory } from "react-router";
 import { PAGES, UserContext, UserContextType } from "../App";
 import {
-  TezosUtils,
   TransactionInvalidBeaconError,
+  getCurrentAndNextAtBestVotingPeriodDates,
+  getVotingPeriodIndex,
 } from "../contractutils/TezosUtils";
 import { Storage as TezosTemplateVotingContract } from "../tezosTemplate3.types";
 import { address, asMap, int, nat } from "../type-aliases";
 
 import jsonContractTemplate from "../contracttemplates/tezosTemplate3.json";
-import { VOTING_TEMPLATE } from "../contractutils/TezosContractUtils";
+import { VOTING_TEMPLATE } from "../contractutils/TezosUtils";
 
 const CreateTezosTemplate: React.FC = () => {
   const { Tezos, userAddress } = React.useContext(
@@ -78,14 +79,12 @@ const CreateTezosTemplate: React.FC = () => {
   React.useEffect(() => {
     (async () => {
       contract.votingPeriodIndex = new BigNumber(
-        await TezosUtils.getVotingPeriodIndex(Tezos)
+        await getVotingPeriodIndex(Tezos)
       ) as nat;
       console.log("votingPeriodIndex", contract.votingPeriodIndex);
 
       setCurrentVotingPeriodIndex(contract.votingPeriodIndex);
-      setPeriodDates(
-        await TezosUtils.getCurrentAndNextAtBestVotingPeriodDates(Tezos, 5)
-      );
+      setPeriodDates(await getCurrentAndNextAtBestVotingPeriodDates(Tezos, 5));
       setContract(contract);
     })();
   }, []);
