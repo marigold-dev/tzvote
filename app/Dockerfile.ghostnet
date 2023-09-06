@@ -1,0 +1,24 @@
+ARG RUNNER_IMAGE="node:latest"
+
+FROM ${RUNNER_IMAGE} as builder
+
+WORKDIR /tzvote
+
+# Install functionnal Taq
+COPY --from=docker:dind /usr/local/bin/docker /bin/docker
+ADD https://github.com/ecadlabs/taqueria/releases/download/v0.39.0/taq-linux /bin/taq
+RUN chmod +x /bin/taq && apt-get update && apt-get install -y jq
+COPY . .
+RUN rm app/.env
+COPY app/.env.ghostnet app/.env
+
+
+RUN npm ci && taq init
+RUN cd app && npm ci 
+
+# Install serve globally
+RUN npm install -g serve
+
+WORKDIR /tzvote/app
+
+ENTRYPOINT ["npm", "run" , "dev"]
