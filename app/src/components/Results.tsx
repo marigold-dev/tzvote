@@ -251,7 +251,7 @@ export const Results: React.FC<ResultsProps> = ({ match }) => {
             </ResponsiveContainer>
           </IonGrid>
         ) : (
-          <IonImg src="/noresults.png" />
+          <IonImg style={{ height: "30vh" }} src="/noresults.png" />
         )}
         <IonGrid style={{ border: "1px white solid" }}>
           <IonRow style={{ borderBottom: "1px white solid" }}>

@@ -535,7 +535,13 @@ export const Search: React.FC = () => {
               <IonGrid>
                 <IonRow>
                   {contracts.map((contract, _) => (
-                    <IonCol sizeSm="12" sizeXs="12" sizeMd="6" sizeXl="4">
+                    <IonCol
+                      key={contract.address}
+                      sizeSm="12"
+                      sizeXs="12"
+                      sizeMd="6"
+                      sizeXl="4"
+                    >
                       <IonCard key={contract.address}>
                         <IonCardHeader>
                           <IonCardTitle>
