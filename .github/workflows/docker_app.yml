@@ -50,6 +50,6 @@ jobs:
           context: .
           push: true
           tags: |
-            ghcr.io/marigold-dev/tzvote-:${{ steps.vars.outputs.date }}-${{ steps.vars.outputs.sha_short }}-${{ steps.vars.outputs.branch  }}
+            ghcr.io/marigold-dev/tzvote:${{ steps.vars.outputs.date }}-${{ steps.vars.outputs.sha_short }}-${{ steps.vars.outputs.branch  }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
