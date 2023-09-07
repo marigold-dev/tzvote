@@ -4,6 +4,9 @@ on:
   push:
     branches:
       - "main"
+    paths:
+      - "app/**"
+  workflow_dispatch:
 
 jobs:
   docker:
@@ -12,6 +15,14 @@ jobs:
         network: [mainnet, ghostnet]
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v3.0.0
+      - name: Set outputs
+        id: vars
+        run: |
+          echo "date=$(date +%Y-%m-%dT%H-%M-%S)" >> "${GITHUB_OUTPUT}"
+          echo "sha_short=$(git rev-parse --short HEAD)" >> "${GITHUB_OUTPUT}"
+          echo "branch=${GITHUB_REF#refs/heads/}" >> "${GITHUB_OUTPUT}"
+
       - name: Checkout
         uses: actions/checkout@v3
 
@@ -53,7 +64,7 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
           # Only push if on main branch
-          push: ${{ github.ref == 'refs/heads/main' && github.event_name == 'push' }}
+          push: ${{ github.ref == 'refs/heads/main' }}
           tags: |
-            ghcr.io/marigold-dev/tzvote-${{ matrix.network }}:latest
-            ghcr.io/marigold-dev/tzvote-${{ matrix.network }}:${{ github.sha }}
+            ghcr.io/marigold-dev/tzvote:${{ steps.vars.outputs.date }}-${{ steps.vars.outputs.sha_short }}-${{ steps.vars.outputs.branch  }}
+
