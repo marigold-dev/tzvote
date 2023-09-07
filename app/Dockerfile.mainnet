@@ -2,7 +2,7 @@ ARG RUNNER_IMAGE="node:latest"
 
 FROM ${RUNNER_IMAGE} as builder
 
-WORKDIR /tzvote
+# WORKDIR /tzvote
 
 # Install functionnal Taq
 COPY --from=docker:dind /usr/local/bin/docker /bin/docker
