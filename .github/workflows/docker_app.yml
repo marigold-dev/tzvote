@@ -4,6 +4,8 @@ on:
   push:
     branches:
       - "main"
+      - "mainnet"
+      - "ghostnet"
     paths:
       - "app/**"
   workflow_dispatch:
@@ -49,7 +51,7 @@ jobs:
           # Only push if on main branch
           push: ${{ github.ref == 'refs/heads/main' || github.ref == 'refs/heads/mainnet' }}
           tags: |
-            ghcr.io/marigold-dev/tzvote:${{ steps.vars.outputs.date }}-${{ steps.vars.outputs.sha_short }}-${{ matrix.network }}
+            ghcr.io/marigold-dev/tzvote:${{ steps.vars.outputs.date }}-${{ steps.vars.outputs.sha_short }}-mainnet
 
       - name: Build and push testnet
         if: ${{ matrix.network != 'mainnet' }}
@@ -64,5 +66,5 @@ jobs:
           # Only push if on main branch
           push: ${{ github.ref == 'refs/heads/ghostnet' }}
           tags: |
-            ghcr.io/marigold-dev/tzvote:${{ steps.vars.outputs.date }}-${{ steps.vars.outputs.sha_short }}-${{ matrix.network }}
+            ghcr.io/marigold-dev/tzvote:${{ steps.vars.outputs.date }}-${{ steps.vars.outputs.sha_short }}-ghostnet
 
