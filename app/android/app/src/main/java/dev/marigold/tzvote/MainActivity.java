@@ -1,4 +1,4 @@
-package io.ionic.starter;
+package dev.marigold.tzvote;
 
 import com.getcapacitor.BridgeActivity;
 

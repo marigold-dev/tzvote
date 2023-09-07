@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="app_name">app</string>
-    <string name="title_activity_main">app</string>
-    <string name="package_name">io.ionic.starter</string>
-    <string name="custom_url_scheme">io.ionic.starter</string>
+    <string name="app_name">TzVote</string>
+    <string name="title_activity_main">TzVote</string>
+    <string name="package_name">dev.marigold.tzvote</string>
+    <string name="custom_url_scheme">dev.marigold.tzvote</string>
 </resources>
