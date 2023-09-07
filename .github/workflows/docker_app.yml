@@ -11,9 +11,6 @@ on:
 
 jobs:
   docker:
-    strategy:
-      matrix:
-        network: [mainnet, ghostnet]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3.0.0
@@ -38,32 +35,30 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build and push mainnet
-        if: ${{ matrix.network == 'mainnet' }}
+        if: ${{ github.ref == 'refs/heads/mainnet' }}
         id: docker_build_tzvotes_mainnet
         uses: docker/build-push-action@v3
         with:
-          file: ./app/Dockerfile
+          file: ./app/Dockerfile.mainnet
           context: ./app/
           platforms: linux/amd64
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-          # Only push if on main branch
-          push: ${{ github.ref == 'refs/heads/main' || github.ref == 'refs/heads/mainnet' }}
+          # cache-from: type=gha
+          no-cache: true
+          push: true
           tags: |
             ghcr.io/marigold-dev/tzvote:${{ steps.vars.outputs.date }}-${{ steps.vars.outputs.sha_short }}-mainnet
 
       - name: Build and push testnet
-        if: ${{ matrix.network != 'mainnet' }}
+        if: ${{ github.ref == 'refs/heads/ghostnet' }}
         id: docker_build_tzvotes_testnet
         uses: docker/build-push-action@v3
         with:
-          file: ./app/Dockerfile.${{ matrix.network }}
+          file: ./app/Dockerfile.ghostnet
           context: ./app/
           platforms: linux/amd64
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-          # Only push if on main branch
-          push: ${{ github.ref == 'refs/heads/ghostnet' }}
+          # cache-from: type=gha
+          no-cache: true
+          push: true
           tags: |
             ghcr.io/marigold-dev/tzvote:${{ steps.vars.outputs.date }}-${{ steps.vars.outputs.sha_short }}-ghostnet
 
