@@ -36,7 +36,7 @@ jobs:
 
       - name: Build and push mainnet cronjob
         if: ${{ github.ref == 'mainnet' }}
-        id: docker_build_delegator-votes-cronjob
+        id: docker-build-delegator-votes-cronjob-mainnet
         uses: docker/build-push-action@v2
         with:
           context: ./cronjob/
@@ -50,7 +50,7 @@ jobs:
 
       - name: Build and push ghostnet cronjob
         if: ${{ github.ref == 'ghostnet' }}
-        id: docker_build_delegator-votes-cronjob
+        id: docker-build-delegator-votes-cronjob-ghostnet
         uses: docker/build-push-action@v2
         with:
           context: ./cronjob/
