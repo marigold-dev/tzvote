@@ -3,7 +3,6 @@ name: Create App Docker Images
 on:
   push:
     branches:
-      - "main"
       - "mainnet"
       - "ghostnet"
     paths:

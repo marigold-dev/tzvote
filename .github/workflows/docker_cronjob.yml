@@ -3,35 +3,61 @@ name: Create Cronjob Docker Image
 on:
   push:
     branches:
-      - "main"
+      - "mainnet"
+      - "ghostnet"
+    paths-ignore:
+      - "app/**"
+  workflow_dispatch:
 
 jobs:
   docker:
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v3.0.0
+      - name: Set outputs
+        id: vars
+        run: |
+          echo "date=$(date +%Y-%m-%dT%H-%M-%S)" >> "${GITHUB_OUTPUT}"
+          echo "sha_short=$(git rev-parse --short HEAD)" >> "${GITHUB_OUTPUT}"
+          echo "branch=${GITHUB_REF#refs/heads/}" >> "${GITHUB_OUTPUT}"
+
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v2
 
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
+        uses: docker/setup-buildx-action@v1
 
       - name: Login to GitHub Container Registry
-        uses: docker/login-action@v2
+        uses: docker/login-action@v1
         with:
           registry: ghcr.io
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build and push
+      - name: Build and push mainnet cronjob
+        if: ${{ github.ref == 'mainnet' }}
         id: docker_build_delegator-votes-cronjob
-        uses: docker/build-push-action@v3
+        uses: docker/build-push-action@v2
         with:
           context: ./cronjob/
           platforms: linux/amd64
           cache-from: type=gha
           cache-to: type=gha,mode=max
           # Only push if on main branch
-          push: ${{ github.ref == 'refs/heads/main' && github.event_name == 'push' }}
+          push: ${{ github.ref == 'refs/heads/mainnet' }}
           tags: |
-            ghcr.io/marigold-dev/tzvote-cronjob:latest
-            ghcr.io/marigold-dev/tzvote-cronjob:${{ github.sha }}
+            ghcr.io/marigold-dev/tzvote-cronjob:${{ steps.vars.outputs.date }}-${{ steps.vars.outputs.sha_short }}-mainnet
+
+      - name: Build and push ghostnet cronjob
+        if: ${{ github.ref == 'ghostnet' }}
+        id: docker_build_delegator-votes-cronjob
+        uses: docker/build-push-action@v2
+        with:
+          context: ./cronjob/
+          platforms: linux/amd64
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          # Only push if on main branch
+          push: ${{ github.ref == 'refs/heads/ghostnet' }}
+          tags: |
+            ghcr.io/marigold-dev/tzvote-cronjob:${{ steps.vars.outputs.date }}-${{ steps.vars.outputs.sha_short }}-ghostnet
