@@ -1,0 +1,6 @@
+import { TezosActivateAccountOperation, TezosBallotOperation, TezosDelegationOperation, TezosDoubleBakingEvidenceOperation, TezosEndorsementOperation, TezosOriginationOperation, TezosProposalOperation, TezosRevealOperation, TezosSeedNonceRevelationOperation, TezosTransactionOperation } from '../..';
+/**
+ * @internalapi
+ * @category Tezos
+ */
+export declare type TezosOperation = TezosActivateAccountOperation | TezosBallotOperation | TezosDelegationOperation | TezosDoubleBakingEvidenceOperation | TezosEndorsementOperation | TezosOriginationOperation | TezosProposalOperation | TezosRevealOperation | TezosSeedNonceRevelationOperation | TezosTransactionOperation;
