@@ -1,3 +1,14 @@
 {
-    "networkName": "mainnet"
+  "contracts": {
+    "votingPeriodOracle": {
+      "address": "KT1C8Varn3RWkSk6jJBVSRUHkmmXArGefifp"
+    }
+  },
+  "networkName": "mainnet",
+  "accounts": {
+    "taqOperatorAccount": {
+      "publicKeyHash": "tz1QYD1zbK2gTUu1YWX8m7hPcKNkuXoxPo73",
+      "privateKey": ""
+    }
+  }
 }

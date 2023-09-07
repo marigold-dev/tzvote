@@ -1,4 +1,4 @@
-#include "votingPeriodOracle.jsligo"
+#import "votingPeriodOracle.jsligo" "Contract"
 const default_storage =
     {
         votingPeriodIndex: 0 as nat,

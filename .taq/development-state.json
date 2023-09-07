@@ -100,47 +100,6 @@
                 }
             ]
         },
-        "@taqueria/plugin-ligo.compile.1693226414757": {
-            "task": "compile",
-            "plugin": "@taqueria/plugin-ligo",
-            "time": 1693226414757,
-            "output": [
-                {
-                    "contract": "tezosTemplate3.jsligo",
-                    "artifact": "Not compiled"
-                }
-            ]
-        },
-        "@taqueria/plugin-ligo.compile.1693226487278": {
-            "task": "compile",
-            "plugin": "@taqueria/plugin-ligo",
-            "time": 1693226487278,
-            "output": [
-                {
-                    "contract": "tezosTemplate3.jsligo",
-                    "artifact": "Not compiled"
-                }
-            ]
-        },
-        "@taqueria/plugin-ligo.compile.1693226532076": {
-            "task": "compile",
-            "plugin": "@taqueria/plugin-ligo",
-            "time": 1693226532076,
-            "output": [
-                {
-                    "contract": "tezosTemplate3.jsligo",
-                    "artifact": "artifacts/tezosTemplate3.tz"
-                },
-                {
-                    "contract": "tezosTemplate3.storageList.jsligo",
-                    "artifact": "artifacts/tezosTemplate3.default_storage.tz\nartifacts/tezosTemplate3.storage.mainnet.tz\nartifacts/tezosTemplate3.storage.ghostnet.tz\n"
-                },
-                {
-                    "contract": "tezosTemplate3.parameterList.jsligo",
-                    "artifact": ""
-                }
-            ]
-        },
         "@taqueria/plugin-ligo.test.1693226714561": {
             "task": "test",
             "plugin": "@taqueria/plugin-ligo",
@@ -152,41 +111,58 @@
                 }
             ]
         },
-        "@taqueria/plugin-ligo.compile.1693226727040": {
+        "@taqueria/plugin-ligo.compile.1694088575403": {
             "task": "compile",
             "plugin": "@taqueria/plugin-ligo",
-            "time": 1693226727040,
+            "time": 1694088575403,
             "output": [
                 {
-                    "contract": "tezosTemplate3.jsligo",
-                    "artifact": "artifacts/tezosTemplate3.json"
-                },
-                {
-                    "contract": "tezosTemplate3.storageList.jsligo",
-                    "artifact": "artifacts/tezosTemplate3.default_storage.json\nartifacts/tezosTemplate3.storage.mainnet.json\nartifacts/tezosTemplate3.storage.ghostnet.json\n"
-                },
-                {
-                    "contract": "tezosTemplate3.parameterList.jsligo",
-                    "artifact": ""
+                    "source": "votingPeriodOracle.jsligo",
+                    "artifact": "artifacts/votingPeriodOracle.tz\nvotingPeriodOracle.storageList.jsligo not compiled\nvotingPeriodOracle.storageList.jsligo not compiled\nvotingPeriodOracle.storageList.jsligo not compiled\nvotingPeriodOracle.parameterList.jsligo not compiled"
                 }
             ]
         },
-        "@taqueria/plugin-ligo.compile.1693226738199": {
+        "@taqueria/plugin-ligo.compile.1694088647187": {
             "task": "compile",
             "plugin": "@taqueria/plugin-ligo",
-            "time": 1693226738199,
+            "time": 1694088647187,
             "output": [
                 {
-                    "contract": "permissionedSimplePoll.jsligo",
-                    "artifact": "artifacts/permissionedSimplePoll.json"
-                },
+                    "source": "votingPeriodOracle.jsligo",
+                    "artifact": "artifacts/votingPeriodOracle.tz\nartifacts/votingPeriodOracle.default_storage.tz\nartifacts/votingPeriodOracle.storage.mainnet.tz\nartifacts/votingPeriodOracle.storage.ghostnet.tz\nvotingPeriodOracle.parameterList.jsligo not compiled"
+                }
+            ]
+        },
+        "@taqueria/plugin-ligo.compile.1694088670045": {
+            "task": "compile",
+            "plugin": "@taqueria/plugin-ligo",
+            "time": 1694088670045,
+            "output": [
                 {
-                    "contract": "permissionedSimplePoll.storageList.jsligo",
-                    "artifact": "artifacts/permissionedSimplePoll.default_storage.json\nartifacts/permissionedSimplePoll.storage.mainnet.json\nartifacts/permissionedSimplePoll.storage.ghostnet.json\n"
-                },
+                    "source": "votingPeriodOracle.jsligo",
+                    "artifact": "artifacts/votingPeriodOracle.tz\nartifacts/votingPeriodOracle.default_storage.tz\nartifacts/votingPeriodOracle.storage.mainnet.tz\nartifacts/votingPeriodOracle.storage.ghostnet.tz\nvotingPeriodOracle.parameterList.jsligo not compiled"
+                }
+            ]
+        },
+        "@taqueria/plugin-ligo.compile.1694088698971": {
+            "task": "compile",
+            "plugin": "@taqueria/plugin-ligo",
+            "time": 1694088698971,
+            "output": [
                 {
-                    "contract": "permissionedSimplePoll.parameterList.jsligo",
-                    "artifact": ""
+                    "source": "votingPeriodOracle.jsligo",
+                    "artifact": "artifacts/votingPeriodOracle.tz\nartifacts/votingPeriodOracle.default_storage.tz\nartifacts/votingPeriodOracle.storage.mainnet.tz\nartifacts/votingPeriodOracle.storage.ghostnet.tz\nvotingPeriodOracle.parameterList.jsligo not compiled"
+                }
+            ]
+        },
+        "@taqueria/plugin-ligo.compile.1694088723831": {
+            "task": "compile",
+            "plugin": "@taqueria/plugin-ligo",
+            "time": 1694088723831,
+            "output": [
+                {
+                    "source": "votingPeriodOracle.jsligo",
+                    "artifact": "artifacts/votingPeriodOracle.tz\nartifacts/votingPeriodOracle.default_storage.tz\nartifacts/votingPeriodOracle.storage.mainnet.tz\nartifacts/votingPeriodOracle.storage.ghostnet.tz\nvotingPeriodOracle.parameterList.jsligo not compiled"
                 }
             ]
         }

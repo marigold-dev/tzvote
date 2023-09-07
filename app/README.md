@@ -38,7 +38,8 @@ taq deploy votingPeriodOracle.tz -e "testing" --storage votingPeriodOracle.stora
 taq deploy votingPeriodOracle.tz -e "production" --storage votingPeriodOracle.storage.mainnet.tz
 ```
 
-output : KT19cxHuiRiKktLb5bj9MWGrmHzncjreExcY
+ghostnet : KT1ACfH87dohx1bAVc4PigcNBAFSTdxrRwj7
+mainnet : KT1C8Varn3RWkSk6jJBVSRUHkmmXArGefifp
 
 ### initialize some data
 
@@ -117,7 +118,7 @@ Install dependencies:
 
 ```bash
 npm i
-npm run dev
+npm run local
 ```
 
 # TIPS
