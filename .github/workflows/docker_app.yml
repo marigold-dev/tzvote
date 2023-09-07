@@ -47,11 +47,9 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
           # Only push if on main branch
-          push: ${{ github.ref == 'refs/heads/main' && github.event_name == 'push' }}
+          push: ${{ github.ref == 'refs/heads/main' || github.ref == 'refs/heads/mainnet' }}
           tags: |
-            ghcr.io/marigold-dev/tzvote:latest
-            ghcr.io/marigold-dev/tzvote-${{ matrix.network }}:latest
-            ghcr.io/marigold-dev/tzvote-${{ matrix.network }}:${{ github.sha }}
+            ghcr.io/marigold-dev/tzvote:${{ steps.vars.outputs.date }}-${{ steps.vars.outputs.sha_short }}-${{ matrix.network }}
 
       - name: Build and push testnet
         if: ${{ matrix.network != 'mainnet' }}
@@ -64,7 +62,7 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
           # Only push if on main branch
-          push: ${{ github.ref == 'refs/heads/main' }}
+          push: ${{ github.ref == 'refs/heads/ghostnet' }}
           tags: |
-            ghcr.io/marigold-dev/tzvote:${{ steps.vars.outputs.date }}-${{ steps.vars.outputs.sha_short }}-${{ steps.vars.outputs.branch  }}
+            ghcr.io/marigold-dev/tzvote:${{ steps.vars.outputs.date }}-${{ steps.vars.outputs.sha_short }}-${{ matrix.network }}
 
