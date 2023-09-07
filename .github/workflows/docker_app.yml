@@ -4,12 +4,17 @@ on:
   push:
     branches:
       - "main"
+      - "mainnet"
       - "ghostnet"
     paths:
       - "app/**"
+  workflow_dispatch:
 
 jobs:
-  ui:
+  docker:
+    strategy:
+      matrix:
+        network: [mainnet, ghostnet]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3.0.0
@@ -20,7 +25,9 @@ jobs:
           echo "sha_short=$(git rev-parse --short HEAD)" >> "${GITHUB_OUTPUT}"
           echo "branch=${GITHUB_REF#refs/heads/}" >> "${GITHUB_OUTPUT}"
 
-      - uses: actions/checkout@v3.0.0
+      - name: Checkout
+        uses: actions/checkout@v3
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
 
@@ -31,25 +38,33 @@ jobs:
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - run: echo "{}" > esy.json
-      - run: npm ci
-
-      - name: Build
-        uses: docker/build-push-action@v4
+      - name: Build and push mainnet
+        if: ${{ matrix.network == 'mainnet' }}
+        id: docker_build_tzvotes_mainnet
+        uses: docker/build-push-action@v3
         with:
-          file: ./app/Dockerfile.${{ steps.vars.outputs.branch  }}
-          context: .
-          push: false
+          file: ./app/Dockerfile
+          context: ./app/
+          platforms: linux/amd64
           cache-from: type=gha
           cache-to: type=gha,mode=max
-
-      - name: UI build and push version
-        uses: docker/build-push-action@v4
-        with:
-          file: ./app/Dockerfile.${{ steps.vars.outputs.branch  }}
-          context: .
-          push: true
+          # Only push if on main branch
+          push: ${{ github.ref == 'refs/heads/main' || github.ref == 'refs/heads/mainnet' }}
           tags: |
-            ghcr.io/marigold-dev/tzvote:${{ steps.vars.outputs.date }}-${{ steps.vars.outputs.sha_short }}-${{ steps.vars.outputs.branch  }}
+            ghcr.io/marigold-dev/tzvote:${{ steps.vars.outputs.date }}-${{ steps.vars.outputs.sha_short }}-mainnet
+
+      - name: Build and push testnet
+        if: ${{ matrix.network != 'mainnet' }}
+        id: docker_build_tzvotes_testnet
+        uses: docker/build-push-action@v3
+        with:
+          file: ./app/Dockerfile.${{ matrix.network }}
+          context: ./app/
+          platforms: linux/amd64
           cache-from: type=gha
           cache-to: type=gha,mode=max
+          # Only push if on main branch
+          push: ${{ github.ref == 'refs/heads/ghostnet' }}
+          tags: |
+            ghcr.io/marigold-dev/tzvote:${{ steps.vars.outputs.date }}-${{ steps.vars.outputs.sha_short }}-ghostnet
+
