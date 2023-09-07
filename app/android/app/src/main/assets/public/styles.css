@@ -1,0 +1,285 @@
+:root {
+  --startFixedChars: 15;
+  --endFixedChars: 10;
+  --startWidth: 1em * 1 * var(--startFixedChars);
+  --endWidth: 1em * 1 * (var(--endFixedChars));
+}
+
+.container {
+  display: flex;
+  align-items: center;
+  text-align: center;
+  justify-content: center;
+  font-family: Roboto;
+}
+
+.image {
+  display: flex;
+  resize: cover;
+  justify-content: center;
+  width: 100%;
+}
+
+.logo {
+  height: 70px;
+  width: 50px;
+  object-fit: contain;
+  margin: 10px;
+}
+
+.logo-XXL.mobile {
+  max-height: 60vh;
+  max-width: 60vw;
+  object-fit: contain;
+  margin: 20vh 20vw;
+}
+
+.logo-XXL {
+  max-height: 70vh;
+  max-width: 30vw;
+  object-fit: contain;
+  margin: 20vh 40vw;
+}
+
+.centeredView {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 22px;
+}
+
+.modalView {
+  margin: 20px;
+  background-color: #2b2a2e;
+  border-radius: 20px;
+  padding: 35px;
+  align-items: center;
+}
+
+.loading {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  opacity: 0.5;
+  background-color: transparent;
+  justify-content: center;
+  align-items: center;
+}
+
+.spin {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+ion-spinner {
+  width: 10em;
+  height: 10em;
+}
+
+.nopm {
+  padding: 0;
+  margin: 0;
+}
+
+.tiny {
+  font-size: 0.8em;
+}
+.title {
+  font-size: 35px;
+  font-weight: bold;
+}
+.input {
+  height: 40px;
+  margin: 12px;
+  border-width: 1px;
+  padding: 10px;
+  background-color: white;
+}
+
+.buttons {
+  padding: 20px;
+}
+
+#beacon-toast-wrapper {
+  color: black;
+}
+
+.split-pane-visible {
+  --border: 0;
+}
+
+.split-pane-visible > #main {
+  top: 56px;
+  bottom: 56px;
+}
+
+.split-pane-visible > ion-menu {
+  top: 56px;
+  bottom: 56px;
+  --side-min-width: 50px !important;
+}
+
+.split-pane-visible > ion-menu > ion-content {
+  background-color: red;
+}
+
+.address {
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.address1,
+.address2 {
+  display: inline-block;
+  vertical-align: middle;
+  white-space: nowrap;
+  overflow: hidden;
+  font-size: 0.9em;
+}
+
+.address1 {
+  max-width: calc(100% - var(--startWidth));
+  min-width: 3em;
+}
+.address2 {
+  text-overflow: ellipsis;
+  min-width: 5em;
+  max-width: calc(100% - var(--endWidth));
+  direction: rtl;
+}
+
+ion-thumbnail {
+  --size: 2em;
+}
+
+/*
+.in-toolbar {
+  background-color: var(--ion-color-secondary);
+}
+
+*/
+ion-header {
+  --background: "none";
+  background-image: url(/vote.jpg);
+  background-position: center;
+  background-size: cover;
+  background-blend-mode: darken;
+  background-color: rgba(0, 0, 0, 0.9);
+}
+
+ion-footer {
+  --background: "none";
+  background-image: url(/vote.jpg);
+  background-position: center;
+  background-size: cover;
+  background-blend-mode: darken;
+  background-color: rgba(0, 0, 0, 0.9);
+}
+
+.ionContentBg {
+  --background: "none";
+  background-image: url(/vote.jpg);
+  background-position: center;
+  background-size: cover;
+  background-blend-mode: overlay;
+  background-color: rgba(0, 0, 0, 0.8);
+}
+
+.item-fill-outline {
+  --border-width: 1px !important;
+}
+
+.ion-delegate-host {
+  width: 100%;
+  height: 100%;
+}
+
+@media only screen and (min-width: 768px) and (min-height: 768px) {
+  .ion-delegate-host {
+    --width: 80vw !important;
+    --height: 80vh !important;
+  }
+
+  .show-modal {
+    --width: 80vw !important;
+  }
+}
+
+.sc-ion-textarea-md-h,
+.sc-ion-input-md-h {
+  --border-color: var(--ion-color-primary);
+}
+
+.readonly {
+  --border-width: 0px;
+}
+
+.checkbox-disabled {
+  opacity: 1;
+}
+
+.banner {
+  height: 3vh;
+  text-align: center;
+  color: #fff;
+  text-shadow: 0 0 7px #fff, 0 0 10px #fff, 0 0 21px #fff, 0 0 42px #0fa,
+    0 0 82px #0fa, 0 0 92px #0fa, 0 0 102px #0fa, 0 0 151px #0fa;
+  background-color: transparent;
+}
+
+a:link {
+  text-decoration: none;
+}
+
+a:visited {
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: none;
+}
+
+a:active {
+  text-decoration: none;
+}
+
+ion-datetime::part(.datetime-header) {
+  padding-top: 5px;
+  padding-bottom: 5px;
+}
+
+:host .datetime-selected-date {
+  margin-top: 5px;
+  font-size: medium;
+}
+
+.item {
+  padding-top: 0.5em;
+  padding-bottom: 0.5em;
+}
+
+a:link,
+a:visited {
+  background-color: transparent;
+  color: var(--ion-color-primary-tint);
+}
+
+ion-card {
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+.ion-datetime-button-overlay ion-datetime.datetime-grid {
+  height: 100% !important;
+  width: 100% !important;
+  max-width: 100% !important;
+}
+
+.datetime-size-fixed {
+  height: 100% !important;
+  width: 100% !important;
+  max-width: 100% !important;
+}

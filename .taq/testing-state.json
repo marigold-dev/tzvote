@@ -1,0 +1,77 @@
+{
+  "operations": {},
+  "tasks": {
+    "@taqueria/plugin-taquito.deploy.1693232122668": {
+      "task": "deploy",
+      "plugin": "@taqueria/plugin-taquito",
+      "time": 1693232122668,
+      "output": [
+        {
+          "contract": "permissionedSimplePoll.tz",
+          "address": "KT1EyH723fyV7AQb5WUSXprGNSFBHmnt1VsR",
+          "alias": "permissionedSimplePoll",
+          "balanceInMutez": "0",
+          "destination": "https://ghostnet.ecadinfra.com"
+        }
+      ]
+    },
+
+    "@taqueria/plugin-taquito.deploy.1691674631011": {
+      "task": "deploy",
+      "plugin": "@taqueria/plugin-taquito",
+      "time": 1691674631011,
+      "output": [
+        {
+          "contract": "votingPeriodOracle.tz",
+          "address": "KT1Sk9pckZQp98uJYv3oRkE5cGxNYj7tivJT",
+          "alias": "votingPeriodOracle",
+          "balanceInMutez": "0",
+          "destination": "https://ghostnet.ecadinfra.com"
+        }
+      ]
+    },
+    "@taqueria/plugin-taquito.transfer.1691676243337": {
+      "task": "transfer",
+      "plugin": "@taqueria/plugin-taquito",
+      "time": 1691676243337,
+      "output": [
+        {
+          "contractAlias": "votingPeriodOracle",
+          "contractAddress": "KT1Sk9pckZQp98uJYv3oRkE5cGxNYj7tivJT",
+          "parameter": "6",
+          "entrypoint": "default",
+          "mutezTransfer": "0",
+          "destination": "https://ghostnet.ecadinfra.com"
+        }
+      ]
+    },
+    "@taqueria/plugin-taquito.deploy.1691762245425": {
+      "task": "deploy",
+      "plugin": "@taqueria/plugin-taquito",
+      "time": 1691762245425,
+      "output": [
+        {
+          "contract": "votingPeriodOracle.tz",
+          "address": "KT1ACfH87dohx1bAVc4PigcNBAFSTdxrRwj7",
+          "alias": "votingPeriodOracle",
+          "balanceInMutez": "0",
+          "destination": "https://ghostnet.ecadinfra.com"
+        }
+      ]
+    },
+    "@taqueria/plugin-taquito.deploy.1691762554882": {
+      "task": "deploy",
+      "plugin": "@taqueria/plugin-taquito",
+      "time": 1691762554882,
+      "output": [
+        {
+          "contract": "tezosTemplate3.tz",
+          "address": "KT1G4DCjT2SviF7T6Ji9zB5m65DR67Mw91nZ",
+          "alias": "tezosTemplate3",
+          "balanceInMutez": "0",
+          "destination": "https://ghostnet.ecadinfra.com"
+        }
+      ]
+    }
+  }
+}

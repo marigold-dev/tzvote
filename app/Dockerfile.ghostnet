@@ -1,16 +1,24 @@
-# pull official base image
-FROM node:16-alpine as build
-WORKDIR /app
-ENV PATH /app/node_modules/.bin:$PATH
-COPY package.json ./
-COPY yarn.lock ./
-RUN yarn install --frozen-lockfile
-RUN yarn global add react-scripts@4.0.2
-COPY . ./
-RUN yarn build:ghostnet
+ARG RUNNER_IMAGE="node:latest"
 
-# production environment
-FROM nginx:stable-alpine
-COPY --from=build /app/build /usr/share/nginx/html
-EXPOSE 80
-CMD ["nginx", "-g", "daemon off;"]
+FROM ${RUNNER_IMAGE} as builder
+
+WORKDIR /tzvote
+
+# Install functionnal Taq
+COPY --from=docker:dind /usr/local/bin/docker /bin/docker
+ADD https://github.com/ecadlabs/taqueria/releases/download/v0.39.0/taq-linux /bin/taq
+RUN chmod +x /bin/taq && apt-get update && apt-get install -y jq
+COPY . .
+RUN rm app/.env
+COPY app/.env.ghostnet app/.env
+
+
+RUN npm ci && taq init
+RUN cd app && npm ci 
+
+# Install serve globally
+RUN npm install -g serve
+
+WORKDIR /tzvote/app
+
+ENTRYPOINT ["npm", "run" , "dev"]

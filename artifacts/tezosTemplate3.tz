@@ -1,0 +1,127 @@
+{ parameter (pair string key_hash) ;
+  storage
+    (pair (pair (pair (string %name) (list %options string))
+                (map %results string int)
+                (map %votes address string))
+          (nat %votingPeriodIndex)
+          (address %votingPeriodOracle)) ;
+  code { UNPAIR ;
+         UNPAIR ;
+         PUSH int 0 ;
+         DUP 3 ;
+         VOTING_POWER ;
+         INT ;
+         COMPARE ;
+         EQ ;
+         IF { DROP 3 ; PUSH string "Sender has no rolls and cannot vote" ; FAILWITH }
+            { NONE string ;
+              DUP 4 ;
+              CAR ;
+              CAR ;
+              CDR ;
+              NIL string ;
+              SWAP ;
+              ITER { CONS } ;
+              ITER { PAIR ;
+                     DUP 2 ;
+                     DUP 2 ;
+                     CAR ;
+                     COMPARE ;
+                     EQ ;
+                     IF { CAR ; SOME } { CDR } } ;
+              NONE string ;
+              SWAP ;
+              COMPARE ;
+              EQ ;
+              IF { DROP 3 ; PUSH string "Option does not exist" ; FAILWITH }
+                 { DUP 3 ;
+                   CAR ;
+                   CDR ;
+                   CDR ;
+                   SOURCE ;
+                   GET ;
+                   IF_NONE
+                     {}
+                     { PUSH string "  already exists for this user" ;
+                       SWAP ;
+                       PUSH string "A vote with option " ;
+                       CONCAT ;
+                       CONCAT ;
+                       FAILWITH } ;
+                   DUP 3 ;
+                   CDR ;
+                   CDR ;
+                   UNIT ;
+                   VIEW "currentVotingPeriod" nat ;
+                   IF_NONE
+                     { DROP 3 ;
+                       PUSH string "Cannot find view currentVotingPeriod on given oracle address" ;
+                       FAILWITH }
+                     { DUP 4 ;
+                       CDR ;
+                       CAR ;
+                       SWAP ;
+                       COMPARE ;
+                       NEQ ;
+                       IF { DROP 3 ; PUSH string "Not yet the time to vote" ; FAILWITH }
+                          { DUP 3 ;
+                            DUP 4 ;
+                            CAR ;
+                            DUP ;
+                            CDR ;
+                            DUP 6 ;
+                            CAR ;
+                            CDR ;
+                            CAR ;
+                            DUP 5 ;
+                            GET ;
+                            IF_NONE
+                              { DUP 6 ;
+                                CAR ;
+                                CDR ;
+                                CAR ;
+                                DIG 5 ;
+                                VOTING_POWER ;
+                                INT ;
+                                DUP 6 ;
+                                SWAP ;
+                                SOME ;
+                                SWAP ;
+                                UPDATE }
+                              { DUP 7 ;
+                                CAR ;
+                                CDR ;
+                                CAR ;
+                                DIG 6 ;
+                                VOTING_POWER ;
+                                INT ;
+                                DIG 2 ;
+                                ADD ;
+                                DUP 6 ;
+                                SWAP ;
+                                SOME ;
+                                SWAP ;
+                                UPDATE } ;
+                            UPDATE 1 ;
+                            UPDATE 2 ;
+                            UPDATE 1 ;
+                            DUP ;
+                            CAR ;
+                            DUP ;
+                            CDR ;
+                            DIG 4 ;
+                            CAR ;
+                            CDR ;
+                            CDR ;
+                            DIG 4 ;
+                            SOURCE ;
+                            SWAP ;
+                            SOME ;
+                            SWAP ;
+                            UPDATE ;
+                            UPDATE 2 ;
+                            UPDATE 2 ;
+                            UPDATE 1 ;
+                            NIL operation ;
+                            PAIR } } } } } }
+

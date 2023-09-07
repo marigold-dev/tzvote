@@ -1,0 +1,170 @@
+{
+    "operations": {},
+    "tasks": {
+        "@taqueria/plugin-tezos-client.simulate.1691674320900": {
+            "task": "simulate",
+            "plugin": "@taqueria/plugin-tezos-client",
+            "time": 1691674320901,
+            "output": [
+                {
+                    "contract": "votingPeriodOracle.tz",
+                    "result": "Invalid"
+                }
+            ]
+        },
+        "@taqueria/plugin-tezos-client.simulate.1691674364305": {
+            "task": "simulate",
+            "plugin": "@taqueria/plugin-tezos-client",
+            "time": 1691674364305,
+            "output": [
+                {
+                    "contract": "votingPeriodOracle.tz",
+                    "result": "Invalid"
+                }
+            ]
+        },
+        "@taqueria/plugin-tezos-client.simulate.1691674590450": {
+            "task": "simulate",
+            "plugin": "@taqueria/plugin-tezos-client",
+            "time": 1691674590450,
+            "output": [
+                {
+                    "contract": "votingPeriodOracle.tz",
+                    "result": "Invalid"
+                }
+            ]
+        },
+        "@taqueria/plugin-tezos-client.simulate.1691675278244": {
+            "task": "simulate",
+            "plugin": "@taqueria/plugin-tezos-client",
+            "time": 1691675278244,
+            "output": [
+                {
+                    "contract": "votingPeriodOracle.tz",
+                    "result": "Invalid"
+                }
+            ]
+        },
+        "@taqueria/plugin-tezos-client.simulate.1691681397705": {
+            "task": "simulate",
+            "plugin": "@taqueria/plugin-tezos-client",
+            "time": 1691681397705,
+            "output": [
+                {
+                    "contract": "votingPeriodOracle.tz",
+                    "result": "Invalid"
+                }
+            ]
+        },
+        "@taqueria/plugin-ligo.test.1691765719644": {
+            "task": "test",
+            "plugin": "@taqueria/plugin-ligo",
+            "time": 1691765719644,
+            "output": [
+                {
+                    "contract": "unit_tezosTemplate3.jsligo",
+                    "testResults": "Some tests failed :("
+                }
+            ]
+        },
+        "@taqueria/plugin-ligo.test.1691765754366": {
+            "task": "test",
+            "plugin": "@taqueria/plugin-ligo",
+            "time": 1691765754366,
+            "output": [
+                {
+                    "contract": "unit_tezosTemplate3.jsligo",
+                    "testResults": "Some tests failed :("
+                }
+            ]
+        },
+        "@taqueria/plugin-ligo.test.1691765761869": {
+            "task": "test",
+            "plugin": "@taqueria/plugin-ligo",
+            "time": 1691765761869,
+            "output": [
+                {
+                    "contract": "unit_tezosTemplate3.jsligo",
+                    "testResults": "\"For keypair :\"\n(\"p2sk2W4SFmF618vSUe1QB7he2FYxTZohLs32DWYaDuYsmddUmrPNqb\" , p2pk66vyoyJeEMNdgdXYqmGsPy3pggUGmt4xXS7MX5zPped2bfHRrLE)\n\"New account\"\ntz3LsEtSKqTXYyjw1XxtGwnSARN1xQ26L7AY\n7175000000mutez\n\"with voting power :\"\n6500000000n\n\"For keypair :\"\n(\"edsk3NNq2Eyo8ryy7Qm2HnQd3FdJSzTboNckDHwDWDWdpmj3kMcNeE\" , edpkvZqxk49MKWNkbGKH5RY4UDemh78zAjcrWnUZzPbyojWwcYbHD3)\n\"New account\"\ntz1XEkgHxWdnLnW1BN4sQinAWUMtm9MqUTi6\n12875000000mutez\n\"with voting power :\"\n12500000000n\n\"For keypair :\"\n(\"spsk39HtsDSsFV4REbw39jec6AV7W8h6qTVTwx9XdVvgdpdk5SWroH\" , sppk7cDmzGHFRt7X83bipmeHuSHuPTv8Tyq5tFUfzabnRqQLqojSBGW)\n\"New account\"\ntz2Hxey8yE47jtdQr8s9PrieE57CYssmkXfm\n18575000000mutez\n\"with voting power :\"\n18500000000n\n\"For keypair :\"\n(\"edsk3WcRt8DyHewykgxx2hhdfMhLuLCuzeyCPWbt68QUpoqBYHFU5p\" , edpkuHzbrLNoYZPZNaazs2Ah9VNpQDKdigN5ozd3WgNqiyTr2tGoRP)\n\"New account\"\ntz1PpQjC3NFraLAHkqaFnwUhQxtG2KPyBnQd\n1000000000mutez\n\"with voting power :\"\n0n\n\"oracleContract\"\nKT1FVyej7MKGmhRogHjJnTqTpkRyFf1RC5PB(None)\n\"voteContract\"\nKT1ANkWysmW2cw5njTWDuAf6G71FqG6fwMmY(None)\n\"************* testSender1VoteUnknownOption *************\"\n(\"expected error : \" , \"Option does not exist\" , \" Actual : \")\n\"Option does not exist\"\n\"************* testSender1VotePikachu *************\"\n\"BEFORE RUN\"\ntz3LsEtSKqTXYyjw1XxtGwnSARN1xQ26L7AY\n7172581250mutez\nSuccess (3977n)\n\"AFTER RUN\"\n7171565999mutez\n{name = \"Which is the cutiest pokemon?\" ; options = [\"Mew\" ; \"Pikachu\"] ; results = [\"Pikachu\" -> 6500000000] ; votes = [tz3LsEtSKqTXYyjw1XxtGwnSARN1xQ26L7AY -> \"Pikachu\"] ; votingPeriodIndex = 25n ; votingPeriodOracle = KT1FVyej7MKGmhRogHjJnTqTpkRyFf1RC5PB}\n(\"expected voteCount : \" , 6500000000)\n(\"actual voteCount : \" , 6500000000)\n\"************* testSender1VotePikachuAgainAndFail *************\"\n(\"expected error : \" , \"A vote with option Pikachu  already exists for this user\" , \" Actual : \")\n\"A vote with option Pikachu  already exists for this user\"\n\"************* testSender2VotePikachu *************\"\n\"BEFORE RUN\"\ntz1XEkgHxWdnLnW1BN4sQinAWUMtm9MqUTi6\n12875000000mutez\nSuccess (1978n)\n\"AFTER RUN\"\n12873989499mutez\n{name = \"Which is the cutiest pokemon?\" ; options = [\"Mew\" ; \"Pikachu\"] ; results = [\"Pikachu\" -> 19000000000] ; votes = [tz1XEkgHxWdnLnW1BN4sQinAWUMtm9MqUTi6 -> \"Pikachu\" ; tz3LsEtSKqTXYyjw1XxtGwnSARN1xQ26L7AY -> \"Pikachu\"] ; votingPeriodIndex = 25n ; votingPeriodOracle = KT1FVyej7MKGmhRogHjJnTqTpkRyFf1RC5PB}\n(\"expected voteCount : \" , 19000000000)\n(\"actual voteCount : \" , 19000000000)\n\"************* testSender2VoteMewAndFail *************\"\n(\"expected error : \" , \"A vote with option Pikachu  already exists for this user\" , \" Actual : \")\n\"A vote with option Pikachu  already exists for this user\"\n\"************* testSender3VoteMew *************\"\n\"BEFORE RUN\"\ntz2Hxey8yE47jtdQr8s9PrieE57CYssmkXfm\n18575000000mutez\nSuccess (1966n)\n\"AFTER RUN\"\n18573986499mutez\n{name = \"Which is the cutiest pokemon?\" ; options = [\"Mew\" ; \"Pikachu\"] ; results = [\"Mew\" -> 18500000000 ; \"Pikachu\" -> 19000000000] ; votes = [tz1XEkgHxWdnLnW1BN4sQinAWUMtm9MqUTi6 -> \"Pikachu\" ; tz2Hxey8yE47jtdQr8s9PrieE57CYssmkXfm -> \"Mew\" ; tz3LsEtSKqTXYyjw1XxtGwnSARN1xQ26L7AY -> \"Pikachu\"] ; votingPeriodIndex = 25n ; votingPeriodOracle = KT1FVyej7MKGmhRogHjJnTqTpkRyFf1RC5PB}\n(\"expected voteCount : \" , 18500000000)\n(\"actual voteCount : \" , 18500000000)\n\"************* testjohndoeNotABaker *************\"\n(\"expected error : \" , \"Sender has no rolls and cannot vote\" , \" Actual : \")\n\"Sender has no rolls and cannot vote\"\n\"************* testVoteOutOfDate *************\"\n(\"expected error : \" , \"Not yet the time to vote\" , \" Actual : \")\n\"Not yet the time to vote\"\nEverything at the top-level was executed.\n- testOriginate exited with value true.\n- testSender1VoteUnknownOption exited with value true.\n- testSender1VotePikachu exited with value true.\n- testSender1VotePikachuAgainAndFail exited with value true.\n- testSender2VotePikachu exited with value true.\n- testSender2VoteMewAndFail exited with value true.\n- testSender3VoteMew exited with value true.\n- testjohndoeNotABaker exited with value true.\n- testVoteOutOfDate exited with value true.\n\n🎉 All tests passed 🎉"
+                }
+            ]
+        },
+        "@taqueria/plugin-ligo.test.1691765849019": {
+            "task": "test",
+            "plugin": "@taqueria/plugin-ligo",
+            "time": 1691765849019,
+            "output": [
+                {
+                    "contract": "unit_tezosTemplate3.jsligo",
+                    "testResults": "\"For keypair :\"\n(\"p2sk3wAbDckVfHSoMDn1ZbzmU6V5Wtsqa15bfThkwm8vazH7SEsE7U\" , p2pk673YtZ3GVFrAsRuuSW1cpjn5YCANVisAXUa59cfVXTcKBhoY6by)\n\"New account\"\ntz3WtBJNuf1Bmakj3aNtU7FYhLHDp7nkAmVC\n7175000000mutez\n\"with voting power :\"\n6500000000n\n\"For keypair :\"\n(\"edsk2yQJtAzGVBf4NSzmT1VDgs1m1kDpo6p8J9XnUpLaVqKFoiFiDP\" , edpktviZVE3vDZ9wE4Xvb5y8aiGRdNApfiXALRNdJ6TMpzK1TwRZVM)\n\"New account\"\ntz1LzduWMTXcKxBebhzNS2iMZZZgt82NtBA1\n12875000000mutez\n\"with voting power :\"\n12500000000n\n\"For keypair :\"\n(\"p2sk2WbFo6abfNKBFhQfacjCqpqLvKZfnN4stXhyR1w9FVPYAhtPZ1\" , p2pk66eTLBsHt4XaRAHrKzhiRybcbUatWTAvRjo1dTXyBNBPvb77Ysp)\n\"New account\"\ntz3bRJczwucVVtdkhMoFUHcw7nrFnXFVfyjQ\n18575000000mutez\n\"with voting power :\"\n18500000000n\n\"For keypair :\"\n(\"edsk3pvCkTDnhp9u3NFn9jVMXWpUBCthfctezmCWS92zVtjfwg3oCt\" , edpkvZEztVLzHAeVowmRkFP3zjs3GrQEoBg4CksaoQgN6zguKd431M)\n\"New account\"\ntz1eD8ySqZ2ZMY6wC5Yg2jE71BYmSPHDdp6L\n1000000000mutez\n\"with voting power :\"\n0n\n\"oracleContract\"\nKT1MEA1MubDbxx6Xgdjy5wC7gCLwu1JNpXQL(None)\n\"voteContract\"\nKT1UL5WQ8Dyw6BqAkHDTgATsZ9VdW3iBMXsC(None)\n\"************* testSender1VoteUnknownOption *************\"\n(\"expected error : \" , \"Option does not exist\" , \" Actual : \")\n\"Option does not exist\"\n\"************* testSender1VotePikachu *************\"\n\"BEFORE RUN\"\ntz3WtBJNuf1Bmakj3aNtU7FYhLHDp7nkAmVC\n7172581250mutez\nSuccess (3977n)\n\"AFTER RUN\"\n7171565999mutez\n{name = \"Which is the cutiest pokemon?\" ; options = [\"Mew\" ; \"Pikachu\"] ; results = [\"Pikachu\" -> 6500000000] ; votes = [tz3WtBJNuf1Bmakj3aNtU7FYhLHDp7nkAmVC -> \"Pikachu\"] ; votingPeriodIndex = 25n ; votingPeriodOracle = KT1MEA1MubDbxx6Xgdjy5wC7gCLwu1JNpXQL}\n(\"expected voteCount : \" , 6500000000)\n(\"actual voteCount : \" , 6500000000)\n\"************* testSender1VotePikachuAgainAndFail *************\"\n(\"expected error : \" , \"A vote with option Pikachu  already exists for this user\" , \" Actual : \")\n\"A vote with option Pikachu  already exists for this user\"\n\"************* testSender2VotePikachu *************\"\n\"BEFORE RUN\"\ntz1LzduWMTXcKxBebhzNS2iMZZZgt82NtBA1\n12875000000mutez\nSuccess (1978n)\n\"AFTER RUN\"\n12873989499mutez\n{name = \"Which is the cutiest pokemon?\" ; options = [\"Mew\" ; \"Pikachu\"] ; results = [\"Pikachu\" -> 19000000000] ; votes = [tz1LzduWMTXcKxBebhzNS2iMZZZgt82NtBA1 -> \"Pikachu\" ; tz3WtBJNuf1Bmakj3aNtU7FYhLHDp7nkAmVC -> \"Pikachu\"] ; votingPeriodIndex = 25n ; votingPeriodOracle = KT1MEA1MubDbxx6Xgdjy5wC7gCLwu1JNpXQL}\n(\"expected voteCount : \" , 19000000000)\n(\"actual voteCount : \" , 19000000000)\n\"************* testSender2VoteMewAndFail *************\"\n(\"expected error : \" , \"A vote with option Pikachu  already exists for this user\" , \" Actual : \")\n\"A vote with option Pikachu  already exists for this user\"\n\"************* testSender3VoteMew *************\"\n\"BEFORE RUN\"\ntz3bRJczwucVVtdkhMoFUHcw7nrFnXFVfyjQ\n18575000000mutez\nSuccess (2905n)\n\"AFTER RUN\"\n18573986499mutez\n{name = \"Which is the cutiest pokemon?\" ; options = [\"Mew\" ; \"Pikachu\"] ; results = [\"Mew\" -> 18500000000 ; \"Pikachu\" -> 19000000000] ; votes = [tz1LzduWMTXcKxBebhzNS2iMZZZgt82NtBA1 -> \"Pikachu\" ; tz3WtBJNuf1Bmakj3aNtU7FYhLHDp7nkAmVC -> \"Pikachu\" ; tz3bRJczwucVVtdkhMoFUHcw7nrFnXFVfyjQ -> \"Mew\"] ; votingPeriodIndex = 25n ; votingPeriodOracle = KT1MEA1MubDbxx6Xgdjy5wC7gCLwu1JNpXQL}\n(\"expected voteCount : \" , 18500000000)\n(\"actual voteCount : \" , 18500000000)\n\"************* testjohndoeNotABaker *************\"\n(\"expected error : \" , \"Sender has no rolls and cannot vote\" , \" Actual : \")\n\"Sender has no rolls and cannot vote\"\n\"************* testVoteOutOfDate *************\"\n(\"expected error : \" , \"Not yet the time to vote\" , \" Actual : \")\n\"Not yet the time to vote\"\nEverything at the top-level was executed.\n- testOriginate exited with value true.\n- testSender1VoteUnknownOption exited with value true.\n- testSender1VotePikachu exited with value true.\n- testSender1VotePikachuAgainAndFail exited with value true.\n- testSender2VotePikachu exited with value true.\n- testSender2VoteMewAndFail exited with value true.\n- testSender3VoteMew exited with value true.\n- testjohndoeNotABaker exited with value true.\n- testVoteOutOfDate exited with value true.\n\n🎉 All tests passed 🎉"
+                }
+            ]
+        },
+        "@taqueria/plugin-ligo.test.1693226714561": {
+            "task": "test",
+            "plugin": "@taqueria/plugin-ligo",
+            "time": 1693226714561,
+            "output": [
+                {
+                    "contract": "unit_tezosTemplate3.jsligo",
+                    "testResults": "\"For keypair :\"\n(\"edsk2terFooMsBFwLkHapDyKwkfmfbtkZA1DHLs6vAv96Mx6qxhY3P\" , edpkvMsFHQ5eY9JVfzpAr6xus8LMK69K1KMtt68GRRjuWPEiL1AM4Z)\n\"New account\"\ntz1hUGmosxYEEnUCKwuMZiVcCDamFDhP3uCM\n7175000000mutez\n\"with voting power :\"\n6500000000n\n\"For keypair :\"\n(\"spsk21p1BBncdWaK3QnGomA9tFrJoE5cHayiLTdEL6ZQVNSEUHnT5P\" , sppk7cTozUUur7AJk3jA4tQUqkF6EbVHFyBLGG4zyscDdBGPGMxMkMX)\n\"New account\"\ntz2N9vR9tib89MbCMSw8cYtu4sQy4rH7Wgwj\n12875000000mutez\n\"with voting power :\"\n12500000000n\n\"For keypair :\"\n(\"spsk2WLMwFYsmtuGCqjB8JLaCBBp9nDgAD9vD2jouDy8LDVymZv2mj\" , sppk7arxhdL6GmMbqgZoywqQRx51KJ4FFPn4oDE3c169UeHFjEahPrM)\n\"New account\"\ntz2PRLM4KKPqhQWk6TMKYDaiEVXQ26arPg1m\n18575000000mutez\n\"with voting power :\"\n18500000000n\n\"For keypair :\"\n(\"p2sk2UpxDDKUB7yuTogXyccyVnirZNRYAutnwTFPvG8dvWHkLkVZf8\" , p2pk64rrUqCk3WqNzTVD7BkgcDFezJpiW2RzXrQV2wAk8qts4RtafFT)\n\"New account\"\ntz3NMdLcrHjyAJMG3sM1kpWwrPJE5bb1phic\n1000000000mutez\n\"with voting power :\"\n0n\n\"oracleContract\"\nKT1GexZ6czKASqwPsHPSu6iYxqycEJ7fU77c(None)\n\"voteContract\"\nKT1S4h3eoLdor4xcnfPrT4jPeQdenM6s4mua(None)\n\"************* testSender1VoteUnknownOption *************\"\n(\"expected error : \" , \"Option does not exist\" , \" Actual : \")\n\"Option does not exist\"\n\"************* testSender1VotePikachu *************\"\n\"BEFORE RUN\"\ntz1hUGmosxYEEnUCKwuMZiVcCDamFDhP3uCM\n7172581250mutez\nSuccess (3052n)\n\"AFTER RUN\"\n7171565999mutez\n{name = \"Which is the cutiest pokemon?\" ; options = [\"Mew\" ; \"Pikachu\"] ; results = [\"Pikachu\" -> 6500000000] ; votes = [tz1hUGmosxYEEnUCKwuMZiVcCDamFDhP3uCM -> \"Pikachu\"] ; votingPeriodIndex = 25n ; votingPeriodOracle = KT1GexZ6czKASqwPsHPSu6iYxqycEJ7fU77c}\n(\"expected voteCount : \" , 6500000000)\n(\"actual voteCount : \" , 6500000000)\n\"************* testSender1VotePikachuAgainAndFail *************\"\n(\"expected error : \" , \"A vote with option Pikachu  already exists for this user\" , \" Actual : \")\n\"A vote with option Pikachu  already exists for this user\"\n\"************* testSender2VotePikachu *************\"\n\"BEFORE RUN\"\ntz2N9vR9tib89MbCMSw8cYtu4sQy4rH7Wgwj\n12875000000mutez\nSuccess (1963n)\n\"AFTER RUN\"\n12873989499mutez\n{name = \"Which is the cutiest pokemon?\" ; options = [\"Mew\" ; \"Pikachu\"] ; results = [\"Pikachu\" -> 19000000000] ; votes = [tz1hUGmosxYEEnUCKwuMZiVcCDamFDhP3uCM -> \"Pikachu\" ; tz2N9vR9tib89MbCMSw8cYtu4sQy4rH7Wgwj -> \"Pikachu\"] ; votingPeriodIndex = 25n ; votingPeriodOracle = KT1GexZ6czKASqwPsHPSu6iYxqycEJ7fU77c}\n(\"expected voteCount : \" , 19000000000)\n(\"actual voteCount : \" , 19000000000)\n\"************* testSender2VoteMewAndFail *************\"\n(\"expected error : \" , \"A vote with option Pikachu  already exists for this user\" , \" Actual : \")\n\"A vote with option Pikachu  already exists for this user\"\n\"************* testSender3VoteMew *************\"\n\"BEFORE RUN\"\ntz2PRLM4KKPqhQWk6TMKYDaiEVXQ26arPg1m\n18575000000mutez\nSuccess (1966n)\n\"AFTER RUN\"\n18573986499mutez\n{name = \"Which is the cutiest pokemon?\" ; options = [\"Mew\" ; \"Pikachu\"] ; results = [\"Mew\" -> 18500000000 ; \"Pikachu\" -> 19000000000] ; votes = [tz1hUGmosxYEEnUCKwuMZiVcCDamFDhP3uCM -> \"Pikachu\" ; tz2N9vR9tib89MbCMSw8cYtu4sQy4rH7Wgwj -> \"Pikachu\" ; tz2PRLM4KKPqhQWk6TMKYDaiEVXQ26arPg1m -> \"Mew\"] ; votingPeriodIndex = 25n ; votingPeriodOracle = KT1GexZ6czKASqwPsHPSu6iYxqycEJ7fU77c}\n(\"expected voteCount : \" , 18500000000)\n(\"actual voteCount : \" , 18500000000)\n\"************* testjohndoeNotABaker *************\"\n(\"expected error : \" , \"Sender has no rolls and cannot vote\" , \" Actual : \")\n\"Sender has no rolls and cannot vote\"\n\"************* testVoteOutOfDate *************\"\n(\"expected error : \" , \"Not yet the time to vote\" , \" Actual : \")\n\"Not yet the time to vote\"\nEverything at the top-level was executed.\n- testOriginate exited with value true.\n- testSender1VoteUnknownOption exited with value true.\n- testSender1VotePikachu exited with value true.\n- testSender1VotePikachuAgainAndFail exited with value true.\n- testSender2VotePikachu exited with value true.\n- testSender2VoteMewAndFail exited with value true.\n- testSender3VoteMew exited with value true.\n- testjohndoeNotABaker exited with value true.\n- testVoteOutOfDate exited with value true.\n\n🎉 All tests passed 🎉"
+                }
+            ]
+        },
+        "@taqueria/plugin-ligo.compile.1694088575403": {
+            "task": "compile",
+            "plugin": "@taqueria/plugin-ligo",
+            "time": 1694088575403,
+            "output": [
+                {
+                    "source": "votingPeriodOracle.jsligo",
+                    "artifact": "artifacts/votingPeriodOracle.tz\nvotingPeriodOracle.storageList.jsligo not compiled\nvotingPeriodOracle.storageList.jsligo not compiled\nvotingPeriodOracle.storageList.jsligo not compiled\nvotingPeriodOracle.parameterList.jsligo not compiled"
+                }
+            ]
+        },
+        "@taqueria/plugin-ligo.compile.1694088647187": {
+            "task": "compile",
+            "plugin": "@taqueria/plugin-ligo",
+            "time": 1694088647187,
+            "output": [
+                {
+                    "source": "votingPeriodOracle.jsligo",
+                    "artifact": "artifacts/votingPeriodOracle.tz\nartifacts/votingPeriodOracle.default_storage.tz\nartifacts/votingPeriodOracle.storage.mainnet.tz\nartifacts/votingPeriodOracle.storage.ghostnet.tz\nvotingPeriodOracle.parameterList.jsligo not compiled"
+                }
+            ]
+        },
+        "@taqueria/plugin-ligo.compile.1694088670045": {
+            "task": "compile",
+            "plugin": "@taqueria/plugin-ligo",
+            "time": 1694088670045,
+            "output": [
+                {
+                    "source": "votingPeriodOracle.jsligo",
+                    "artifact": "artifacts/votingPeriodOracle.tz\nartifacts/votingPeriodOracle.default_storage.tz\nartifacts/votingPeriodOracle.storage.mainnet.tz\nartifacts/votingPeriodOracle.storage.ghostnet.tz\nvotingPeriodOracle.parameterList.jsligo not compiled"
+                }
+            ]
+        },
+        "@taqueria/plugin-ligo.compile.1694088698971": {
+            "task": "compile",
+            "plugin": "@taqueria/plugin-ligo",
+            "time": 1694088698971,
+            "output": [
+                {
+                    "source": "votingPeriodOracle.jsligo",
+                    "artifact": "artifacts/votingPeriodOracle.tz\nartifacts/votingPeriodOracle.default_storage.tz\nartifacts/votingPeriodOracle.storage.mainnet.tz\nartifacts/votingPeriodOracle.storage.ghostnet.tz\nvotingPeriodOracle.parameterList.jsligo not compiled"
+                }
+            ]
+        },
+        "@taqueria/plugin-ligo.compile.1694088723831": {
+            "task": "compile",
+            "plugin": "@taqueria/plugin-ligo",
+            "time": 1694088723831,
+            "output": [
+                {
+                    "source": "votingPeriodOracle.jsligo",
+                    "artifact": "artifacts/votingPeriodOracle.tz\nartifacts/votingPeriodOracle.default_storage.tz\nartifacts/votingPeriodOracle.storage.mainnet.tz\nartifacts/votingPeriodOracle.storage.ghostnet.tz\nvotingPeriodOracle.parameterList.jsligo not compiled"
+                }
+            ]
+        }
+    }
+}

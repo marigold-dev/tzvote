@@ -1,48 +1,38 @@
-import { BeaconWallet } from "@taquito/beacon-wallet";
-import { TezosToolkit } from "@taquito/taquito";
-import { Dispatch, SetStateAction } from "react";
+import { IonButton, IonIcon, IonLabel } from "@ionic/react";
+import { logOutOutline } from "ionicons/icons";
+import React from "react";
+import { useHistory } from "react-router";
+import { PAGES, UserContext, UserContextType } from "../App";
 
-interface ButtonProps {
-  wallet: BeaconWallet;
-  setPublicToken: Dispatch<SetStateAction<string | null>>;
-  setUserAddress: Dispatch<SetStateAction<string>>;
-  setUserBalance: Dispatch<SetStateAction<number>>;
-  setBakerDelegators: Dispatch<SetStateAction<string[]>>;
-  setWallet: Dispatch<SetStateAction<any>>;
-  setTezos: Dispatch<SetStateAction<TezosToolkit>>;
-  setBeaconConnection: Dispatch<SetStateAction<boolean>>;
-  setActiveTab: Dispatch<SetStateAction<string>>;
-}
+const DisconnectButton = (): JSX.Element => {
+  const {
+    userAddress,
+    setUserAddress,
+    wallet,
+    setBakerDelegators,
+    setBakerPower,
+  } = React.useContext(UserContext) as UserContextType;
 
-const DisconnectButton = ({
-  wallet,
-  setPublicToken,
-  setUserAddress,
-  setUserBalance,
-  setBakerDelegators,
-  setWallet,
-  setTezos,
-  setBeaconConnection,
-  setActiveTab,
-}: ButtonProps): JSX.Element => {
+  const { replace } = useHistory();
   const disconnectWallet = async (): Promise<void> => {
-    //window.localStorage.clear();
-    setUserAddress("");
-    setUserBalance(0);
+    setUserAddress(undefined);
+    setBakerPower(0);
     setBakerDelegators(new Array<string>());
-    setBeaconConnection(false);
-    setPublicToken(null);
-    setActiveTab("search"); //only possible option
     console.log("disconnecting wallet");
+
+    replace(PAGES.HOME);
+
     await wallet.clearActiveAccount();
   };
 
   return (
-    <div className="buttons">
-      <button className="button" onClick={disconnectWallet}>
-        <i className="fas fa-times"></i>&nbsp; Disconnect wallet
-      </button>
-    </div>
+    <IonButton color="dark" onClick={disconnectWallet}>
+      <IonIcon icon={logOutOutline} />
+      <IonLabel>
+        &nbsp; Logout{" "}
+        <IonLabel style={{ fontSize: "xx-small" }}>{userAddress}</IonLabel>
+      </IonLabel>
+    </IonButton>
   );
 };
 

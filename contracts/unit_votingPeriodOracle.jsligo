@@ -1,0 +1,124 @@
+#import "votingPeriodOracle.jsligo" "VPO"
+//util function
+
+const assert_failure = (result: test_exec_result, message: string): bool => {
+  return match(
+    result,
+    {
+      Success: (_) => false,
+      Fail: (tee) =>
+        match(
+          tee,
+          {
+            Other: (msg) => {
+              Test.log("ERROR Other : " + msg);
+              return false
+            },
+            Balance_too_low: (record) => {
+              Test.log("ERROR Balance_too_low");
+              return false
+            },
+            Rejected: (s) => {
+              Test.log(["expected error : ", message, " Actual : "]);
+              Test.log(s[0]);
+              return ((Test.eval(message)) == s[0])
+            }
+          }
+        )
+    }
+  )
+};
+
+//util
+
+const initAccount = (keypair: [string, key]): address => {
+  Test.log("For keypair :");
+  Test.log(keypair);
+  //add this account to test context
+
+  Test.
+  add_account(keypair[0], keypair[1]);
+  //create the account in Tezos
+
+  const hk: key_hash = Crypto.hash_key(keypair[1]);
+  let c: contract<unit> = Tezos.implicit_account(hk);
+  //set balance to avoid empty implicit accounts
+
+  let _: test_exec_result = Test.transfer_to_contract(c, unit, (1000 as tez));
+  Test.log("New account");
+  Test.log(Tezos.address(c));
+  Test.log(Test.get_balance(Tezos.address(c)));
+  Test.log("with voting power :");
+  let vp: michelson_program =
+    Test.run((phk: key_hash) => Tezos.voting_power(phk), hk);
+  Test.log(Test.decompile(vp) as nat);
+  return Tezos.address(c)
+};
+
+let _ = Test.reset_state(3 as nat, list([]) as list<tez>);
+
+const baker1 = Test.nth_bootstrap_account(0);
+
+const admin = Test.nth_bootstrap_account(1);
+
+const senderKey1: [string, key] = Test.new_account();
+
+const sender1 = initAccount(senderKey1);
+
+const _ = Test.set_source(admin);
+
+const _ = Test.set_baker(baker1);
+
+const initial_storage = { votingPeriodIndex: 0 as nat, admin: admin };
+
+const [taddr, _, _] =
+  Test.originate_module(contract_of (VPO), initial_storage, 0 as tez);
+
+const contr = Test.to_contract(taddr);
+
+const contrAddress = Tezos.address(contr);
+
+const _testOriginate = (): bool => {
+  assert((Test.get_storage(taddr) as VPO.storage).admin == admin);
+  assert(
+    (Test.get_storage(taddr) as VPO.storage).votingPeriodIndex == (0 as nat)
+  );
+  return true
+};
+
+const _testUpdate = (s: address, value: nat): bool => {
+  Test.set_source(s);
+  let _ =
+    Test.transfer_to_contract_exn(
+      contr,
+      UpdateCurrentVotingPeriod(value),
+      1 as mutez
+    );
+  let st = (Test.get_storage(taddr) as VPO.storage);
+  Test.log(st);
+  assert(st.votingPeriodIndex == value);
+  return true
+};
+
+const _testUpdateFail = (s: address, value: nat, message: string): bool => {
+  Test.set_source(s);
+  return assert_failure(
+    Test.transfer_to_contract(
+      contr,
+      UpdateCurrentVotingPeriod(value),
+      1 as mutez
+    ),
+    message
+  )
+};
+
+const testOriginate = _testOriginate();
+
+//FILL
+
+const testSender1UpdateNotAdmin =
+  _testUpdateFail(sender1, 25 as nat, "You are not the admin !!!");
+
+const testAdminUpdateGhost = _testUpdate(admin, 25 as nat);
+
+const testAdminUpdateGhostAgain = _testUpdate(admin, 26 as nat);

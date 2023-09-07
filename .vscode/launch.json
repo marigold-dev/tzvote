@@ -1,0 +1,41 @@
+{
+  // Use IntelliSense to learn about possible attributes.
+  // Hover to view descriptions of existing attributes.
+  // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "ligo",
+      "request": "launch",
+      "name": "Permission vote Pikachu",
+      "logDir": "",
+      "entrypoint": "main",
+      "parameterLang": "LIGO",
+      "parameter": "Vote(\"Pikachu\")",
+      "storageLang": "LIGO",
+      "storage": "{  name : \"Which is the cutiest pokemon?\" , from_ : (\"1969-01-01t00:00:00Z\" as timestamp), to : (\"2030-01-01t00:00:00Z\" as timestamp) ,  options : list([\"Mew\",\"Pikachu\"]) , owner : (\"tz1VApBuWHuaTfDHtKzU3NBtWFYsxJvvWhYk\" as address) , registeredVoters : list([\"tz29EDhZ4D3XueHxm5RGZsJLHRtj3qSA2MzH\" as address]) as list<address>,  votes : (Map.empty as map<address, string>),  results : (Map.empty as map<string, int>)}"
+    },
+    {
+      "type": "ligo",
+      "request": "launch",
+      "name": "Permission vote UNKNOWN will fail",
+      "logDir": "",
+      "entrypoint": "main",
+      "parameterLang": "LIGO",
+      "parameter": "Vote(\"UNKNOWN\")",
+      "storageLang": "LIGO",
+      "storage": "{  name : \"Which is the cutiest pokemon?\" , from_ : (\"1969-01-01t00:00:00Z\" as timestamp), to : (\"2030-01-01t00:00:00Z\" as timestamp) ,  options : list([\"Mew\",\"Pikachu\"]) , owner : (\"tz1VApBuWHuaTfDHtKzU3NBtWFYsxJvvWhYk\" as address) , registeredVoters : list([\"tz29EDhZ4D3XueHxm5RGZsJLHRtj3qSA2MzH\" as address]) as list<address>,  votes : (Map.empty as map<address, string>),  results : (Map.empty as map<string, int>)}"
+    },
+    {
+      "type": "ligo",
+      "request": "launch",
+      "name": "Permission UNKNOWN command will fail",
+      "logDir": "",
+      "entrypoint": "main",
+      "parameterLang": "LIGO",
+      "parameter": "UNKNOWN(\"UNKNOWN\")",
+      "storageLang": "LIGO",
+      "storage": "{  name : \"Which is the cutiest pokemon?\" , from_ : (\"1969-01-01t00:00:00Z\" as timestamp), to : (\"2030-01-01t00:00:00Z\" as timestamp) ,  options : list([\"Mew\",\"Pikachu\"]) , owner : (\"tz1VApBuWHuaTfDHtKzU3NBtWFYsxJvvWhYk\" as address) , registeredVoters : list([\"tz29EDhZ4D3XueHxm5RGZsJLHRtj3qSA2MzH\" as address]) as list<address>,  votes : (Map.empty as map<address, string>),  results : (Map.empty as map<string, int>)}"
+    }
+  ]
+}

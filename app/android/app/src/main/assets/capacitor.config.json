@@ -1,0 +1,8 @@
+{
+	"appId": "dev.marigold.tzvote",
+	"appName": "TzVote",
+	"webDir": "dist",
+	"server": {
+		"androidScheme": "https"
+	}
+}
