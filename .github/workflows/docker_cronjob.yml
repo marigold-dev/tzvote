@@ -5,8 +5,8 @@ on:
     branches:
       - "mainnet"
       - "ghostnet"
-    paths-ignore:
-      - "app/**"
+    paths:
+      - "cronjob/**"
   workflow_dispatch:
 
 jobs:
@@ -44,11 +44,8 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
           push: true
-<<<<<<< HEAD
-=======
           build-args: |
             --env-file ./cronjob/.env.mainnet
->>>>>>> 08ff00fbbcc6f964c524b3197c39a620866acff4
           tags: |
             ghcr.io/marigold-dev/tzvote-cronjob:${{ steps.vars.outputs.date }}-${{ steps.vars.outputs.sha_short }}-mainnet
 
@@ -62,10 +59,7 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
           push: true
-<<<<<<< HEAD
-=======
           build-args: |
             --env-file ./cronjob/.env.ghostnet
->>>>>>> 08ff00fbbcc6f964c524b3197c39a620866acff4
           tags: |
             ghcr.io/marigold-dev/tzvote-cronjob:${{ steps.vars.outputs.date }}-${{ steps.vars.outputs.sha_short }}-ghostnet
