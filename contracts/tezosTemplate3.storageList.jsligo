@@ -1,4 +1,4 @@
-#include "tezosTemplate3.jsligo"
+#import "tezosTemplate3.jsligo" "Contract"
 const default_storage =
     {
         name: "Which is the cutiest pokemon?",

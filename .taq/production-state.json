@@ -1,0 +1,47 @@
+{
+    "operations": {},
+    "tasks": {
+        "@taqueria/plugin-taquito.deploy.1694088924383": {
+            "task": "deploy",
+            "plugin": "@taqueria/plugin-taquito",
+            "time": 1694088924383,
+            "output": [
+                {
+                    "contract": "votingPeriodOracle.tz",
+                    "address": "KT1C8Varn3RWkSk6jJBVSRUHkmmXArGefifp",
+                    "alias": "votingPeriodOracle",
+                    "balanceInMutez": "0",
+                    "destination": "https://mainnet.api.tez.ie"
+                }
+            ]
+        },
+        "@taqueria/plugin-taquito.deploy.1694155128695": {
+            "task": "deploy",
+            "plugin": "@taqueria/plugin-taquito",
+            "time": 1694155128695,
+            "output": [
+                {
+                    "contract": "tezosTemplate3.tz",
+                    "address": "KT1FohLnkN7zNk4fQy99D4TJoM83Ln8JJz4c",
+                    "alias": "tezosTemplate3",
+                    "balanceInMutez": "0",
+                    "destination": "https://mainnet.api.tez.ie"
+                }
+            ]
+        },
+        "@taqueria/plugin-taquito.deploy.1694155965657": {
+            "task": "deploy",
+            "plugin": "@taqueria/plugin-taquito",
+            "time": 1694155965657,
+            "output": [
+                {
+                    "contract": "permissionedSimplePoll.tz",
+                    "address": "KT1CXVRgTKeEn2F2fqVX7tWcMrYRn8vaJwUa",
+                    "alias": "permissionedSimplePoll",
+                    "balanceInMutez": "0",
+                    "destination": "https://mainnet.api.tez.ie"
+                }
+            ]
+        }
+    }
+}

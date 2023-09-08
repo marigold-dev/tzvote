@@ -73,6 +73,8 @@ KT1G4DCjT2SviF7T6Ji9zB5m65DR67Mw91nZ
 taq deploy tezosTemplate3.tz -e "production" --storage tezosTemplate3.storage.mainnet.tz
 ```
 
+KT1FohLnkN7zNk4fQy99D4TJoM83Ln8JJz4c
+
 ## Compile permissioned Simple Poll contract
 
 ```bash
@@ -91,9 +93,13 @@ taq test unit_permissionedSimplePoll.jsligo
 taq deploy permissionedSimplePoll.tz -e "testing" --storage permissionedSimplePoll.storage.ghostnet.tz
 ```
 
+KT1ACfH87dohx1bAVc4PigcNBAFSTdxrRwj7
+
 ```bash
 taq deploy permissionedSimplePoll.tz -e "production" --storage permissionedSimplePoll.storage.mainnet.tz
 ```
+
+KT1CXVRgTKeEn2F2fqVX7tWcMrYRn8vaJwUa
 
 # App
 
