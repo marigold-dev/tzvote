@@ -44,7 +44,7 @@ jobs:
           platforms: linux/amd64
           # cache-from: type=gha
           no-cache: true
-          push: ${{ github.ref == 'refs/heads/main' || github.ref == 'refs/heads/mainnet' }}
+          push: true
           tags: |
             ghcr.io/marigold-dev/tzvote:${{ steps.vars.outputs.date }}-${{ steps.vars.outputs.sha_short }}-mainnet
 
@@ -58,7 +58,6 @@ jobs:
           platforms: linux/amd64
           # cache-from: type=gha
           no-cache: true
-          push: ${{ github.ref == 'refs/heads/ghostnet' }}
+          push: true
           tags: |
             ghcr.io/marigold-dev/tzvote:${{ steps.vars.outputs.date }}-${{ steps.vars.outputs.sha_short }}-ghostnet
-

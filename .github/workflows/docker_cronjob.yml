@@ -44,8 +44,8 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
           push: true
-          # build-args: |
-          #   --env-file ./cronjob/.env.mainnet
+          build-args: |
+            --env-file ./cronjob/.env.mainnet
           tags: |
             ghcr.io/marigold-dev/tzvote-cronjob:${{ steps.vars.outputs.date }}-${{ steps.vars.outputs.sha_short }}-mainnet
 
