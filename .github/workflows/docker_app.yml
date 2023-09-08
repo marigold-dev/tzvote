@@ -40,7 +40,6 @@ jobs:
         uses: docker/build-push-action@v3
         with:
           file: ./app/Dockerfile.mainnet
-          context: ./app/
           platforms: linux/amd64
           # cache-from: type=gha
           no-cache: true
@@ -54,7 +53,6 @@ jobs:
         uses: docker/build-push-action@v3
         with:
           file: ./app/Dockerfile.ghostnet
-          context: ./app/
           platforms: linux/amd64
           # cache-from: type=gha
           no-cache: true
