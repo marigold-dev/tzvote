@@ -9,8 +9,8 @@ COPY --from=docker:dind /usr/local/bin/docker /bin/docker
 ADD https://github.com/ecadlabs/taqueria/releases/download/v0.39.0/taq-linux /bin/taq
 RUN chmod +x /bin/taq && apt-get update && apt-get install -y jq
 COPY . .
-RUN rm .env
-COPY .env.ghostnet app/.env
+RUN rm app/.env
+COPY app/.env.ghostnet app/.env
 
 
 RUN npm ci && taq init
