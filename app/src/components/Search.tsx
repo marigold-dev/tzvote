@@ -637,27 +637,21 @@ export const Search: React.FC = () => {
                               <IonLabel>&nbsp; Results</IonLabel>
                             </IonButton>
 
-                            {contract.creator === userAddress &&
-                            contract.type ===
-                              VOTING_TEMPLATE.PERMISSIONEDSIMPLEPOLL ? (
-                              <IonButton
-                                color="dark"
-                                onClick={() =>
-                                  push(
-                                    PAGES.SETTINGS +
-                                      "/" +
-                                      contract.type.name +
-                                      "/" +
-                                      contract.address
-                                  )
-                                }
-                              >
-                                <IonIcon icon={settingsOutline}></IonIcon>
-                                <IonLabel>&nbsp; Settings</IonLabel>
-                              </IonButton>
-                            ) : (
-                              ""
-                            )}
+                            <IonButton
+                              color="dark"
+                              onClick={() =>
+                                push(
+                                  PAGES.SETTINGS +
+                                    "/" +
+                                    contract.type.name +
+                                    "/" +
+                                    contract.address
+                                )
+                              }
+                            >
+                              <IonIcon icon={settingsOutline}></IonIcon>
+                              <IonLabel>&nbsp; Details</IonLabel>
+                            </IonButton>
                           </IonRow>
                         </IonCardContent>
 

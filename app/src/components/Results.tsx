@@ -93,7 +93,7 @@ export const Results: React.FC<ResultsProps> = ({ match }) => {
   const [selectedContract, setSelectedContract] = useState<VotingContract>();
 
   //CONTEXT
-  const { Tezos, userAddress } = React.useContext(
+  const { Tezos, userAddress, bakerPower } = React.useContext(
     UserContext
   ) as UserContextType;
 
@@ -186,6 +186,7 @@ export const Results: React.FC<ResultsProps> = ({ match }) => {
         <IonCard>
           <IonCardHeader>
             <IonTitle>Question</IonTitle>
+            <IonCardSubtitle>From {selectedContract?.creator}</IonCardSubtitle>
           </IonCardHeader>
 
           <IonCardContent>

@@ -1,18 +1,24 @@
 import {
+  IonAvatar,
   IonButton,
   IonButtons,
   IonCard,
   IonCardContent,
   IonCardHeader,
   IonCardSubtitle,
+  IonCol,
   IonContent,
   IonHeader,
   IonIcon,
+  IonImg,
   IonInput,
   IonItem,
   IonLabel,
   IonList,
+  IonModal,
   IonPage,
+  IonRadio,
+  IonRadioGroup,
   IonRow,
   IonSpinner,
   IonTitle,
@@ -21,19 +27,28 @@ import {
 } from "@ionic/react";
 import * as api from "@tzkt/sdk-api";
 import {
+  TezosTemplate3WalletType,
+  Storage as TezosTemplateVotingContract,
+} from "../tezosTemplate3.types";
+
+import {
   addCircleOutline,
+  lockClosedOutline,
+  lockOpenOutline,
   radioButtonOffOutline,
   returnUpBackOutline,
   trashBinOutline,
 } from "ionicons/icons";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { RouteComponentProps, useHistory } from "react-router-dom";
 import { UserContext, UserContextType } from "../App";
 import {
+  STATUS,
   VOTING_TEMPLATE,
   VotingContract,
   convertFromTZKTTezosContractToPermissionnedSimplePollTemplateVotingContract,
   convertFromTZKTTezosContractToTezosTemplateVotingContract,
+  userCanVoteNow,
 } from "../contractutils/TezosUtils";
 import {
   Storage as PermissionedSimplePollVotingContract,
@@ -42,7 +57,7 @@ import {
 
 import { WalletContract } from "@taquito/taquito";
 import { TransactionInvalidBeaconError } from "../contractutils/TezosUtils";
-import { address } from "../type-aliases";
+import { address, key_hash } from "../type-aliases";
 
 type SettingsProps = RouteComponentProps<{
   type: string;
@@ -67,12 +82,22 @@ export const Settings: React.FC<SettingsProps> = ({ match }) => {
   const [contract, setContract] = useState<VotingContract>();
 
   //CONTEXT
-  const { Tezos, bakerDelegators, userAddress, reloadUser, BLOCK_TIME } =
-    React.useContext(UserContext) as UserContextType;
+  const {
+    Tezos,
+    bakerDelegators,
+    userAddress,
+    reloadUser,
+    BLOCK_TIME,
+    bakerPower,
+    bakerDeactivated,
+  } = React.useContext(UserContext) as UserContextType;
 
   const refreshData = async (): Promise<void> => {
     let contract: VotingContract;
     let contractFromTzkt: api.Contract = await api.contractsGetByAddress(id);
+    let contractStorageFromTzkt: Blob = await api.contractsGetStorage(id);
+
+    contractFromTzkt.storage = JSON.parse(await contractStorageFromTzkt.text());
     switch (type) {
       case VOTING_TEMPLATE.PERMISSIONEDSIMPLEPOLL.name: {
         contract =
@@ -265,6 +290,76 @@ export const Settings: React.FC<SettingsProps> = ({ match }) => {
     }
   };
 
+  //vote popup
+  const votePopup = useRef<HTMLIonModalElement>(null);
+  //vote button
+  const [voteValue, setVoteValue] = React.useState("");
+  const handleVoteSubmit = async (contract: VotingContract) => {
+    setLoading(true);
+
+    if (voteValue !== "") {
+      try {
+        if (contract.type == VOTING_TEMPLATE.PERMISSIONEDSIMPLEPOLL) {
+          const c = await Tezos.wallet.at<PermissionedSimplePollWalletType>(
+            contract.address
+          );
+
+          const op = await c.methods.vote(voteValue).send();
+
+          console.log("BLOCK_TIME", BLOCK_TIME);
+
+          //refresh info on list
+          setTimeout(() => {
+            refreshData();
+            setLoading(false);
+            presentAlert({
+              header: "Success",
+              message: "Your vote has been accepted",
+            });
+          }, BLOCK_TIME);
+        } else if (contract.type == VOTING_TEMPLATE.TEZOSTEMPLATE) {
+          const c = await Tezos.wallet.at<TezosTemplate3WalletType>(
+            contract.address
+          );
+
+          const pkh = await Tezos.wallet.pkh();
+          const op = await c.methods.default(voteValue, pkh as key_hash).send();
+          await op.confirmation();
+
+          //refresh info on list
+          setTimeout(() => {
+            refreshData();
+          }, BLOCK_TIME);
+
+          presentAlert({
+            header: "Success",
+            message: "Your vote has been accepted (wait a bit the refresh)",
+          });
+        } else {
+          console.error("Cannot find the type for contract ", contract);
+
+          throw new Error(
+            "Cannot find the type for contract " + contract.address
+          );
+        }
+      } catch (error: any) {
+        console.table(`Error: ${JSON.stringify(error, null, 2)}`);
+        let tibe: TransactionInvalidBeaconError =
+          new TransactionInvalidBeaconError(error);
+        presentAlert({
+          header: "Error",
+          message: tibe.data_message,
+        });
+      } finally {
+        setLoading(false);
+      }
+    } else {
+      console.log("Please select an option.");
+    }
+
+    setLoading(false);
+  };
+
   return (
     <IonPage className="container">
       {loading ? (
@@ -281,16 +376,199 @@ export const Settings: React.FC<SettingsProps> = ({ match }) => {
                   <IonLabel>Back</IonLabel>
                 </IonButton>
               </IonButtons>
-              <IonTitle>Settings</IonTitle>
+
+              <IonTitle>
+                <IonRow className="container">
+                  Poll &nbsp;
+                  <IonAvatar style={{ height: "20px", width: "20px" }}>
+                    <IonImg
+                      src={
+                        contract?.type ===
+                        VOTING_TEMPLATE.PERMISSIONEDSIMPLEPOLL
+                          ? "/permissioned.png"
+                          : "/baker.png"
+                      }
+                    />
+                  </IonAvatar>
+                  &nbsp; details
+                </IonRow>
+              </IonTitle>
             </IonToolbar>
           </IonHeader>
           <IonContent fullscreen className="ionContentBg">
+            <IonCard>
+              <IonCardHeader>
+                <IonTitle>Question</IonTitle>
+                <IonCardSubtitle>From {contract?.creator}</IonCardSubtitle>
+              </IonCardHeader>
+
+              <IonCardContent>
+                <IonLabel>{contract?.name}</IonLabel>
+              </IonCardContent>
+            </IonCard>
+
+            <IonCard>
+              <IonCardHeader>
+                <IonTitle>Options</IonTitle>
+
+                {bakerPower > 0 ? (
+                  <IonCardSubtitle>
+                    Baker voting power : {bakerPower / 1000000}
+                  </IonCardSubtitle>
+                ) : (
+                  ""
+                )}
+              </IonCardHeader>
+              <IonCardContent>
+                <IonRadioGroup>
+                  {contract?.options.map((option: string) => (
+                    <IonRadio
+                      style={{ margin: "1em" }}
+                      key={option}
+                      value={option}
+                      contentEditable={false}
+                    >
+                      {option}
+                    </IonRadio>
+                  ))}
+                </IonRadioGroup>
+              </IonCardContent>
+            </IonCard>
+
+            <IonCard>
+              <IonCardHeader>
+                <IonTitle>Dates</IonTitle>
+                <IonCardSubtitle>
+                  Status :{" "}
+                  <IonIcon
+                    color={
+                      contract?.status === STATUS.ONGOING ? "success" : "danger"
+                    }
+                    icon={
+                      contract?.status === STATUS.ONGOING
+                        ? lockOpenOutline
+                        : lockClosedOutline
+                    }
+                  ></IonIcon>
+                </IonCardSubtitle>
+                {contract?.type === VOTING_TEMPLATE.TEZOSTEMPLATE ? (
+                  <IonCardSubtitle>
+                    Period index :{" "}
+                    {(
+                      contract as TezosTemplateVotingContract
+                    ).votingPeriodIndex.toNumber() - 1}
+                  </IonCardSubtitle>
+                ) : (
+                  ""
+                )}
+              </IonCardHeader>
+              <IonCardContent>
+                <IonRow>
+                  {" "}
+                  <IonCol>From</IonCol>
+                  <IonCol>To</IonCol>
+                </IonRow>
+                <IonRow>
+                  <IonCol>{new Date(contract?.from!).toLocaleString()}</IonCol>
+
+                  <IonCol>{new Date(contract?.to!).toLocaleString()}</IonCol>
+                </IonRow>
+              </IonCardContent>
+            </IonCard>
+
+            {userCanVoteNow(
+              contract!,
+              userAddress as address,
+              bakerPower,
+              bakerDeactivated
+            ) ? (
+              <>
+                <IonButton
+                  id={"votePopupIdSettings" + contract?.address}
+                  color="dark"
+                >
+                  <IonIcon icon="/voting.svg"></IonIcon>
+                  <IonLabel>VOTE</IonLabel>
+                </IonButton>
+
+                <IonModal
+                  className="container"
+                  trigger={"votePopupIdSettings" + contract?.address}
+                  ref={votePopup}
+                >
+                  <IonHeader>
+                    <IonToolbar>
+                      <IonButtons slot="start">
+                        <IonButton
+                          onClick={async () => {
+                            await votePopup.current?.dismiss();
+                          }}
+                        >
+                          Cancel
+                        </IonButton>
+                      </IonButtons>
+                      <IonTitle>Vote</IonTitle>
+                      <IonButtons slot="end">
+                        <IonButton onClick={() => handleVoteSubmit(contract!)}>
+                          Confirm
+                        </IonButton>
+                      </IonButtons>
+                    </IonToolbar>
+                  </IonHeader>
+                  <IonContent className="ion-padding ionContentBg">
+                    <IonCard>
+                      <IonCardHeader>
+                        <IonTitle>Question</IonTitle>
+                      </IonCardHeader>
+
+                      <IonCardContent>
+                        <IonLabel>{contract?.name}</IonLabel>
+                      </IonCardContent>
+                    </IonCard>
+
+                    <IonCard>
+                      <IonCardHeader>
+                        <IonTitle>Options</IonTitle>
+
+                        {bakerPower > 0 ? (
+                          <IonCardSubtitle>
+                            Baker voting power : {bakerPower / 1000000}
+                          </IonCardSubtitle>
+                        ) : (
+                          ""
+                        )}
+                      </IonCardHeader>
+                      <IonCardContent>
+                        <IonRadioGroup
+                          value={voteValue}
+                          onIonChange={(e) => setVoteValue(e.target.value)}
+                        >
+                          {contract?.options.map((option: string) => (
+                            <IonRadio
+                              style={{ margin: "1em" }}
+                              key={option}
+                              value={option}
+                            >
+                              {option}
+                            </IonRadio>
+                          ))}
+                        </IonRadioGroup>
+                      </IonCardContent>
+                    </IonCard>
+                  </IonContent>
+                </IonModal>
+              </>
+            ) : (
+              ""
+            )}
+
             {contract &&
-            contract.type == VOTING_TEMPLATE.PERMISSIONEDSIMPLEPOLL ? (
+            contract.type == VOTING_TEMPLATE.PERMISSIONEDSIMPLEPOLL &&
+            userAddress === contract.creator ? (
               <>
                 <IonCard>
                   <IonCardHeader>
-                    <IonTitle>Voters</IonTitle>
+                    <IonTitle>Manage voters</IonTitle>
                     <IonCardSubtitle>
                       <IonRow>
                         <IonInput
