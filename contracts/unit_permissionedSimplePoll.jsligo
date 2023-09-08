@@ -1,132 +1,209 @@
-#include "../src/contracttemplates/permissionedSimplePoll.jsligo"
-
+#import "./permissionedSimplePoll.jsligo" "PSP"
 //util function
-let assert_failure = ([result,message] : [test_exec_result,string]) : bool => {
-  return match(result,{
-    Success: (_ : nat) => false,
-    Fail: ( tee : test_exec_error ) => 
-      match(tee,{
-        Other: (msg : string) => {Test.log("ERROR Other : "+msg) ; return false}, 
-        Balance_too_low : (record : [ address ,  tez , tez ]) => {Test.log("ERROR Balance_too_low") ; return false}, 
-        Rejected: (s:[michelson_program , address])=>{  Test.log (["expected error : ", message, " Actual : "]) ; Test.log(s[0]) ; return ((Test.eval(message)) == s[0]) } }) 
-    })
+
+const assert_failure = (result : test_exec_result, message: string): bool => {
+  return match(
+    result,
+    {
+      Success: (_: nat) => false,
+      Fail: (tee: test_exec_error) =>
+        match(
+          tee,
+          {
+            Other: (msg) => {
+              Test.log("ERROR Other : " + msg);
+              return false
+            },
+            Balance_too_low: (record) => {
+              Test.log("ERROR Balance_too_low");
+              return false
+            },
+            Rejected: (s) => {
+              Test.log(["expected error : ", message, " Actual : "]);
+              Test.log(s[0]);
+              return ((Test.eval(message)) == s[0])
+            }
+          }
+        )
+    }
+  )
+};
+
+// reset state
+
+const _ = Test.reset_state(5 as nat, list([]) as list<tez>);
+
+const faucet = Test.nth_bootstrap_account(0);
+
+const sender1: address = Test.nth_bootstrap_account(1);
+
+const sender2: address = Test.nth_bootstrap_account(2);
+
+const sender3: address = Test.nth_bootstrap_account(3);
+
+const johndoe: address = Test.nth_bootstrap_account(4);
+
+const _ = Test.set_baker(faucet);
+
+const _ = Test.set_source(sender1);
+
+const initial_storage : PSP.storage =
+  {
+    name: "Which is the cutiest pokemon?",
+    from_: ("1970-01-01t00:00:00Z" as timestamp),
+    to: ("1970-01-01t00:30:00Z" as timestamp),
+    options: list(["Mew", "Pikachu"]),
+    owner: sender1,
+    registeredVoters: list([sender1, sender2, sender3]) as list<address>,
+    votes: (Map.empty as map<address, string>),
+    results: (Map.empty as map<string, int>)
   };
-  
-  // reset state
-  let _ = Test.reset_state ( 5 as nat, list([]) as list <tez> );
-  let faucet = Test.nth_bootstrap_account(0);
-  let sender1 : address = Test.nth_bootstrap_account(1);
-  let sender2 : address = Test.nth_bootstrap_account(2);
-  let sender3 : address = Test.nth_bootstrap_account(3);                        
-  let johndoe : address = Test.nth_bootstrap_account(4);           
-  
-  let _ = Test.set_baker(faucet);
-  let _ = Test.set_source(sender1);
 
-  
-  let initial_storage = 
-  {  name : "Which is the cutiest pokemon?",
-  from_ : ("1970-01-01t00:00:00Z" as timestamp),  
-  to : ("1970-01-01t00:30:00Z" as timestamp), 
-  options : list(["Mew","Pikachu"]) ,  
-  owner : sender1,
-  registeredVoters : list([sender1,sender2,sender3]) as list<address>, 
-  votes : (Map.empty as map<address, string>), 
-  results : (Map.empty as map<string, int>)
-} ;
+const [taddr, _, _] =
+  Test.originate_module(contract_of (PSP), initial_storage, 0 as tez);
 
+const contr = Test.to_contract(taddr);
 
-let [taddr, _, _] = Test.originate(main, initial_storage, (0 as tez));
-let contr = Test.to_contract(taddr);
-let _ = Test.log("voteContract");
-let _ = Test.log(contr);
+const _ = Test.log("voteContract");
 
-let _testOriginate = () : bool => {
-  assert((Test.get_storage(taddr) as storage).name  == "Which is the cutiest pokemon?");
-  return true ;
+const _ = Test.log(contr);
+
+const _testOriginate = (): bool => {
+  assert(
+    (Test.get_storage(taddr) as PSP.storage).name == "Which is the cutiest pokemon?"
+  );
+  return true
 };
 
-let _testVote = ([s,o,voteCount] : [address,string,int]) : bool => {
+const _testVote = (s:address, o:string, voteCount:int): bool => {
   Test.set_source(s);
-  let status = Test.transfer_to_contract(contr, (Vote(o)), 1 as mutez);
+  const status = Test.transfer_to_contract(contr, (Vote(o)), 1 as mutez);
   Test.log(status);
-  let st = (Test.get_storage(taddr) as storage);
+  const st = (Test.get_storage(taddr) as PSP.storage);
   Test.log(st);
-  assert(Option.unopt(Map.find_opt(s,st.votes))  == o);
-  Test.log (["expected voteCount : ", voteCount]) ;
-  Test.log (["actual voteCount : ",Option.unopt(Map.find_opt(o,st.results))]) ;
-  assert(Option.unopt(Map.find_opt(o,st.results))  == voteCount);
-  return true;
+  assert(Option.unopt(Map.find_opt(s, st.votes)) == o);
+  Test.log(["expected voteCount : ", voteCount]);
+  Test.log(["actual voteCount : ", Option.unopt(Map.find_opt(o, st.results))]);
+  assert(Option.unopt(Map.find_opt(o, st.results)) == voteCount);
+  return true
 };
 
-let _testVoteFail = ( [s,o,message] : [address,string,string]) : bool => {
+const _testVoteFail = (s : address, o:string, message:string): bool => {
   Test.set_source(s);
-  return assert_failure(Test.transfer_to_contract(contr, (Vote(o)), 1 as mutez),message);
+  return assert_failure(
+    Test.transfer_to_contract(contr, (Vote(o)), 1 as mutez),
+    message
+  )
 };
 
-let _testVoteFailOutOfDate = ( [s,o,message] : [address,string,string]) : bool => {
-  let [taddr, _, _] = Test.originate(main, initial_storage, (0 as tez));
-  let oldContr = Test.to_contract(taddr);
+const _testVoteFailOutOfDate = (s : address, o:string, message:string): bool => {
+
+const [taddr, _, _] =
+  Test.originate_module(contract_of (PSP), initial_storage, 0 as tez);
+
+  const oldContr = Test.to_contract(taddr);
   Test.set_source(s);
-  return assert_failure(Test.transfer_to_contract(oldContr, (Vote(o)), 1 as mutez),message);
+  return assert_failure(
+    Test.transfer_to_contract(oldContr, (Vote(o)), 1 as mutez),
+    message
+  )
 };
 
-
-let _testAddVoter = ([s1,s2] : [address,address]) : bool => {
+const _testAddVoter = (s1:address, s2:address): bool => {
   Test.set_source(s1);
-  let status = Test.transfer_to_contract(contr, (AddVoter(s2)), 1 as mutez);
+  const status = Test.transfer_to_contract(contr, (AddVoter(s2)), 1 as mutez);
   Test.log(status);
-  let st = (Test.get_storage(taddr) as storage);
+  const st = (Test.get_storage(taddr) as PSP.storage);
   Test.log(st);
-  assert(Option.unopt(find_opt(( (a : address) => a == s2),st.registeredVoters))  == s2);
-  return true;
+  assert(
+    Option.unopt(List.find_opt(((a: address) => a == s2), st.registeredVoters)) == s2
+  );
+  return true
 };
 
-let _testAddVoterFail = ( [s1,s2,message] : [address,address,string]) : bool => {
+const _testAddVoterFail = (s1 : address, s2:address, message:string): bool => {
   Test.set_source(s1);
-  return assert_failure(Test.transfer_to_contract(contr, (AddVoter(s2)), 1 as mutez),message);
+  return assert_failure(
+    Test.transfer_to_contract(contr, (AddVoter(s2)), 1 as mutez),
+    message
+  )
 };
 
-
-let _testRemoveVoter = ([s1,s2] : [address,address]) : bool => {
+const _testRemoveVoter = (s1:address, s2:address): bool => {
   Test.set_source(s1);
-  let status = Test.transfer_to_contract(contr, (RemoveVoter(s2)), 1 as mutez);
+  const status = Test.transfer_to_contract(contr, (RemoveVoter(s2)), 1 as mutez);
   Test.log(status);
-  let st = (Test.get_storage(taddr) as storage);
+  const st = (Test.get_storage(taddr) as PSP.storage);
   Test.log(st);
-  assert(find_opt(( (a : address) => a == s2),st.registeredVoters)  == (None() as option<address>));
-  return true;
+  assert(
+    List.find_opt(((a: address) => a == s2), st.registeredVoters) ==
+      (None() as option<address>)
+  );
+  return true
 };
 
-let _testRemoveVoterFail = ( [s1,s2,message] : [address,address,string]) : bool => {
+const _testRemoveVoterFail = (s1:address, s2:address, message:string): bool => {
   Test.set_source(s1);
-  return assert_failure(Test.transfer_to_contract(contr, (RemoveVoter(s2)), 1 as mutez),message);
+  return assert_failure(
+    Test.transfer_to_contract(contr, (RemoveVoter(s2)), 1 as mutez),
+    message
+  )
 };
 
-let testOriginate = _testOriginate();
-
+const testOriginate = _testOriginate();
 
 //FIXME 
 //val bake_until_n_cycle_end : nat -> unit
 //It bakes until a number of cycles pass, so that an account registered as delegate can effectively act as a baker.
-
 //votes
-let testSender1VoteUnknownOption = _testVoteFail(sender1, "Batman","Option does not exist");
 
-let testSender1VotePikachu = _testVote(sender1,"Pikachu",1);
-let testSender1VotePikachuAgainAndFail = _testVoteFail(sender1,"Pikachu","A vote with option Pikachu  already exists for this user");
-let testSender2VotePikachu = _testVote(sender2,"Pikachu",2);
-let testSender2VoteMewAndFail = _testVoteFail(sender2,"Mew","A vote with option Pikachu  already exists for this user");
-let testSender3VoteMew = _testVote(sender3,"Mew",1);
-let testjohndoeNotRegistered = _testVoteFail(johndoe,"Mew","User is not registered");
+const testSender1VoteUnknownOption =
+  _testVoteFail(sender1, "Batman", "Option does not exist");
+
+const testSender1VotePikachu = _testVote(sender1, "Pikachu", 1);
+
+const testSender1VotePikachuAgainAndFail =
+  _testVoteFail(
+    sender1,
+    "Pikachu",
+    "A vote with option Pikachu  already exists for this user"
+  );
+
+const testSender2VotePikachu = _testVote(sender2, "Pikachu", 2);
+
+const testSender2VoteMewAndFail =
+  _testVoteFail(
+    sender2,
+    "Mew",
+    "A vote with option Pikachu  already exists for this user"
+  );
+
+const testSender3VoteMew = _testVote(sender3, "Mew", 1);
+
+const testjohndoeNotRegistered =
+  _testVoteFail(johndoe, "Mew", "User is not registered");
+
 //owner actions
-let testjohndoeAddjohndoe = _testAddVoterFail(johndoe,johndoe,"User has to be owner");
-let testSender1Addjohndoe = _testAddVoter(sender1,johndoe);
-let testSender1AddjohndoeAgainAndFail = _testAddVoterFail(sender1,johndoe,"User is already registered");
-let testjohndoeRemovejohndoe = _testRemoveVoterFail(johndoe,johndoe,"User has to be owner");
-let testSender1Removejohndoe = _testRemoveVoter(sender1,johndoe);
-let testSender1RemovejohndoeAgainAndFail = _testRemoveVoterFail(sender1,johndoe,"User not found");
+
+const testjohndoeAddjohndoe =
+  _testAddVoterFail(johndoe, johndoe, "User has to be owner");
+
+const testSender1Addjohndoe = _testAddVoter(sender1, johndoe);
+
+const testSender1AddjohndoeAgainAndFail =
+  _testAddVoterFail(sender1, johndoe, "User is already registered");
+
+const testjohndoeRemovejohndoe =
+  _testRemoveVoterFail(johndoe, johndoe, "User has to be owner");
+
+const testSender1Removejohndoe = _testRemoveVoter(sender1, johndoe);
+
+const testSender1RemovejohndoeAgainAndFail =
+  _testRemoveVoterFail(sender1, johndoe, "User not found");
 
 //test out of time period for voting
-let _ = Test.bake_until_n_cycle_end(100 as nat);
-let testVoteOutOfDate = _testVoteFailOutOfDate(sender1,"Pikachu","Not yet the time to vote");
+
+const _ = Test.bake_until_n_cycle_end(100 as nat);
+
+const testVoteOutOfDate =
+  _testVoteFailOutOfDate(sender1, "Pikachu", "Not yet the time to vote");

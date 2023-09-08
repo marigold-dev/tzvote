@@ -2,13 +2,13 @@
   "contracts": {
     "votingPeriodOracle": {
       "address": "KT1C8Varn3RWkSk6jJBVSRUHkmmXArGefifp"
+    },
+    "tezosTemplate3": {
+      "address": "KT1FohLnkN7zNk4fQy99D4TJoM83Ln8JJz4c"
+    },
+    "permissionedSimplePoll": {
+      "address": "KT1CXVRgTKeEn2F2fqVX7tWcMrYRn8vaJwUa"
     }
   },
-  "networkName": "mainnet",
-  "accounts": {
-    "taqOperatorAccount": {
-      "publicKeyHash": "tz1QYD1zbK2gTUu1YWX8m7hPcKNkuXoxPo73",
-      "privateKey": ""
-    }
-  }
+  "networkName": "mainnet"
 }
