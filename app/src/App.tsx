@@ -60,7 +60,9 @@ export type UserContextType = {
 export const UserContext = React.createContext<UserContextType | null>(null);
 
 const App: React.FC = () => {
-  const Tezos = new TezosToolkit("https://ghostnet.tezos.marigold.dev");
+  const Tezos = new TezosToolkit(
+    "https://" + import.meta.env.VITE_NETWORK + ".tezos.marigold.dev"
+  );
   const [BLOCK_TIME, setBLOCK_TIME] = useState<number>(15);
   const wallet = new BeaconWallet({
     name: "TzVote",
