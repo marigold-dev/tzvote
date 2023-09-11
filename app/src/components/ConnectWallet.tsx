@@ -62,11 +62,9 @@ const ConnectButton = (): JSX.Element => {
     try {
       await wallet.requestPermissions({
         network: {
-          type: import.meta.env.VITE_NETWORK
-            ? NetworkType[
-                import.meta.env.VITE_NETWORK.toUpperCase() as keyof typeof NetworkType
-              ]
-            : NetworkType.GHOSTNET,
+          type: NetworkType[
+            import.meta.env.VITE_NETWORK.toUpperCase() as keyof typeof NetworkType
+          ],
           rpcUrl: import.meta.env.VITE_TEZOS_NODE,
         },
       });

@@ -1,3 +1,5 @@
+import { Share } from "@capacitor/share";
+
 import {
   IonAvatar,
   IonButton,
@@ -25,12 +27,13 @@ import { BigNumber } from "bignumber.js";
 import {
   radioButtonOnOutline,
   returnUpBackOutline,
+  shareSocialOutline,
   trophyOutline,
 } from "ionicons/icons";
 import React, { useEffect, useState } from "react";
 import { RouteComponentProps, useHistory } from "react-router-dom";
 import { Cell, Pie, PieChart, ResponsiveContainer } from "recharts";
-import { UserContext, UserContextType } from "../App";
+import { PAGES, UserContext, UserContextType } from "../App";
 import {
   VOTING_TEMPLATE,
   VotingContract,
@@ -40,6 +43,7 @@ import {
 } from "../contractutils/TezosUtils";
 import { Storage as TezosTemplateVotingContract } from "../tezosTemplate3.types";
 
+import { Capacitor } from "@capacitor/core";
 import { int } from "../type-aliases";
 
 const RADIAN = Math.PI / 180;
@@ -90,7 +94,7 @@ export const Results: React.FC<ResultsProps> = ({ match }) => {
   const type: string = match.params.type;
 
   //SELECTED CONTRACT
-  const [selectedContract, setSelectedContract] = useState<VotingContract>();
+  const [contract, setContract] = useState<VotingContract>();
 
   //CONTEXT
   const { Tezos, userAddress, bakerPower } = React.useContext(
@@ -123,11 +127,6 @@ export const Results: React.FC<ResultsProps> = ({ match }) => {
     (async () => {
       let selectedContract: VotingContract;
       let contractFromTzkt: api.Contract = await api.contractsGetByAddress(id);
-      let contractStorageFromTzkt: Blob = await api.contractsGetStorage(id);
-
-      contractFromTzkt.storage = JSON.parse(
-        await contractStorageFromTzkt.text()
-      );
 
       switch (type) {
         case VOTING_TEMPLATE.PERMISSIONEDSIMPLEPOLL.name: {
@@ -155,7 +154,7 @@ export const Results: React.FC<ResultsProps> = ({ match }) => {
         }
       }
 
-      setSelectedContract(selectedContract);
+      setContract(selectedContract);
 
       const data = Array.from(selectedContract.results.keys()).map((key) => {
         return {
@@ -179,6 +178,39 @@ export const Results: React.FC<ResultsProps> = ({ match }) => {
               <IonLabel>Back</IonLabel>
             </IonButton>
           </IonButtons>
+          <IonButtons slot="end">
+            <IonButton
+              onClick={async () => {
+                const url =
+                  window.location.host +
+                  PAGES.SETTINGS +
+                  "/" +
+                  contract?.type.name +
+                  "/" +
+                  contract?.address;
+                if (Capacitor.isNativePlatform()) {
+                  await Share.share({
+                    title: "Share this poll",
+                    url: url,
+                    dialogTitle: "Share with your buddies",
+                  });
+                } else {
+                  navigator.clipboard.writeText(url);
+                  presentAlert({
+                    header: "Copied to clipboard !",
+                    message: url,
+                  });
+                }
+              }}
+            >
+              <IonIcon
+                slot="end"
+                style={{ cursor: "pointer" }}
+                icon={shareSocialOutline}
+              ></IonIcon>
+              <IonLabel>Share</IonLabel>
+            </IonButton>
+          </IonButtons>
           <IonTitle>Results</IonTitle>
         </IonToolbar>
       </IonHeader>
@@ -186,22 +218,22 @@ export const Results: React.FC<ResultsProps> = ({ match }) => {
         <IonCard>
           <IonCardHeader>
             <IonTitle>Question</IonTitle>
-            <IonCardSubtitle>From {selectedContract?.creator}</IonCardSubtitle>
+            <IonCardSubtitle>From {contract?.creator}</IonCardSubtitle>
           </IonCardHeader>
 
           <IonCardContent>
-            <IonLabel>{selectedContract?.name}</IonLabel>
+            <IonLabel>{contract?.name}</IonLabel>
           </IonCardContent>
         </IonCard>
 
         <IonCard>
           <IonCardHeader>
             <IonTitle>Dates</IonTitle>
-            {selectedContract?.type === VOTING_TEMPLATE.TEZOSTEMPLATE ? (
+            {contract?.type === VOTING_TEMPLATE.TEZOSTEMPLATE ? (
               <IonCardSubtitle>
                 Period index :{" "}
                 {(
-                  selectedContract as TezosTemplateVotingContract
+                  contract as TezosTemplateVotingContract
                 ).votingPeriodIndex.toNumber() - 1}
               </IonCardSubtitle>
             ) : (
@@ -215,13 +247,9 @@ export const Results: React.FC<ResultsProps> = ({ match }) => {
               <IonCol>To</IonCol>
             </IonRow>
             <IonRow>
-              <IonCol>
-                {new Date(selectedContract?.from!).toLocaleString()}
-              </IonCol>
+              <IonCol>{new Date(contract?.from!).toLocaleString()}</IonCol>
 
-              <IonCol>
-                {new Date(selectedContract?.to!).toLocaleString()}
-              </IonCol>
+              <IonCol>{new Date(contract?.to!).toLocaleString()}</IonCol>
             </IonRow>
           </IonCardContent>
         </IonCard>
@@ -260,46 +288,43 @@ export const Results: React.FC<ResultsProps> = ({ match }) => {
             <IonCol>Result</IonCol>
           </IonRow>
 
-          {selectedContract
-            ? Object.entries<string>(selectedContract?.options).map(
-                ([key, value]) => (
-                  <IonRow key={key}>
-                    <IonCol style={{ textAlign: "left" }}>
-                      <IonIcon
-                        icon={radioButtonOnOutline}
-                        style={{ fill: colorArray.get(value) }}
-                      ></IonIcon>
-                      {value}
-                    </IonCol>
-                    <IonCol>
-                      {getWinner(selectedContract).indexOf(value) >= 0 ? (
-                        <IonIcon icon={trophyOutline} />
-                      ) : (
-                        ""
-                      )}
-                      {selectedContract.results.get(value)
-                        ? selectedContract.results.get(value).toNumber() /
-                          (selectedContract.type ===
-                          VOTING_TEMPLATE.TEZOSTEMPLATE
-                            ? 1000000
-                            : 1)
-                        : 0}
-                    </IonCol>
-                  </IonRow>
-                )
-              )
+          {contract
+            ? Object.entries<string>(contract?.options).map(([key, value]) => (
+                <IonRow key={key}>
+                  <IonCol style={{ textAlign: "left" }}>
+                    <IonIcon
+                      icon={radioButtonOnOutline}
+                      style={{ fill: colorArray.get(value) }}
+                    ></IonIcon>
+                    {value}
+                  </IonCol>
+                  <IonCol>
+                    {getWinner(contract).indexOf(value) >= 0 ? (
+                      <IonIcon icon={trophyOutline} />
+                    ) : (
+                      ""
+                    )}
+                    {contract.results.get(value)
+                      ? contract.results.get(value).toNumber() /
+                        (contract.type === VOTING_TEMPLATE.TEZOSTEMPLATE
+                          ? 1000000
+                          : 1)
+                      : 0}
+                  </IonCol>
+                </IonRow>
+              ))
             : ""}
         </IonGrid>
 
         <IonGrid>
           <IonChip>
             <IonAvatar style={{ fontSize: "initial", marginTop: 0 }}>
-              {selectedContract?.votes.size}
+              {contract?.votes.size}
             </IonAvatar>
             <IonLabel>Voters</IonLabel>
           </IonChip>
 
-          {selectedContract && type === VOTING_TEMPLATE.TEZOSTEMPLATE.name ? (
+          {contract && type === VOTING_TEMPLATE.TEZOSTEMPLATE.name ? (
             <IonChip>
               <IonAvatar
                 style={{
@@ -309,7 +334,7 @@ export const Results: React.FC<ResultsProps> = ({ match }) => {
                   width: "auto",
                 }}
               >
-                {Array.from(selectedContract.results.values())
+                {Array.from(contract.results.values())
                   .reduce(
                     (value: int, acc: int) => value.plus(acc) as int,
                     new BigNumber(0) as int

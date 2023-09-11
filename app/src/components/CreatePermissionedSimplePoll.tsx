@@ -87,6 +87,7 @@ const CreatePermissionedSimplePoll: React.FC = () => {
 
   const [inputOption, setInputOption] = useState<string>("");
   const [inputVoter, setInputVoter] = useState<string>("");
+  const [inputBaker, setInputBaker] = useState<string>("");
 
   const createVoteContract = async () => {
     //block if no option
@@ -343,7 +344,7 @@ const CreatePermissionedSimplePoll: React.FC = () => {
                 <IonCardSubtitle>
                   <IonRow>
                     <IonInput
-                      style={{ width: "80%" }}
+                      style={{ width: "calc(100% - 110px)" }}
                       value={inputVoter}
                       label="New voter to add"
                       labelPlacement="floating"
@@ -351,7 +352,7 @@ const CreatePermissionedSimplePoll: React.FC = () => {
                       required
                       id="name"
                       placeholder="Enter new voter here ..."
-                      maxlength={100}
+                      maxlength={36}
                       counter
                       onIonInput={(e) => {
                         setInputVoter(e.target.value as string);
@@ -359,7 +360,7 @@ const CreatePermissionedSimplePoll: React.FC = () => {
                     ></IonInput>
 
                     <IonButton
-                      style={{ marginLeft: "1em" }}
+                      style={{ maxWidth: "100px" }}
                       onClick={() => {
                         setContract({
                           ...contract,
@@ -372,18 +373,63 @@ const CreatePermissionedSimplePoll: React.FC = () => {
                       }}
                     >
                       <IonIcon icon={addCircleOutline} />
+                      <IonLabel>Voter</IonLabel>
                     </IonButton>
+                  </IonRow>
+
+                  <IonRow>
+                    <IonInput
+                      style={{ width: "calc(100% - 185px)" }}
+                      value={inputBaker}
+                      label="Baker address"
+                      labelPlacement="floating"
+                      color="primary"
+                      required
+                      id="name"
+                      placeholder="Enter baker here ..."
+                      maxlength={36}
+                      counter
+                      onIonInput={(e) => {
+                        setInputBaker(e.target.value as string);
+                      }}
+                    ></IonInput>
+                    <IonButton
+                      style={{ width: "175px" }}
+                      className="button-solid"
+                      onClick={async () => {
+                        setContract({
+                          ...contract,
+                          registeredVoters: [
+                            ...new Set([
+                              ...contract.registeredVoters,
+                              ...(await Tezos.rpc.getDelegates(inputBaker))
+                                .delegated_contracts,
+                            ]),
+                          ],
+                        } as PermissionedSimplePollVotingContract);
+                      }}
+                    >
+                      <IonIcon icon={addCircleOutline} /> &nbsp; delegators of
+                    </IonButton>
+                  </IonRow>
+
+                  <IonRow>
                     {bakerDelegators.length > 0 ? (
                       <IonButton
                         style={{ marginRight: "1em", marginBottom: "0.2em" }}
                         onClick={() => {
                           setContract({
                             ...contract,
-                            registeredVoters: [...bakerDelegators],
+                            registeredVoters: [
+                              ...new Set([
+                                ...contract.registeredVoters,
+                                ...bakerDelegators,
+                              ]),
+                            ],
                           } as PermissionedSimplePollVotingContract);
                         }}
                       >
-                        <IonIcon icon={addCircleOutline} /> &nbsp; delegators
+                        <IonIcon icon={addCircleOutline} /> &nbsp; my delegators
                       </IonButton>
                     ) : (
                       ""

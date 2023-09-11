@@ -1,4 +1,5 @@
 import { NetworkType } from "@airgap/beacon-sdk";
+import { Share } from "@capacitor/share";
 import {
   IonAvatar,
   IonButton,
@@ -59,6 +60,7 @@ import { PermissionedSimplePollWalletType } from "../permissionedSimplePoll.type
 
 import { TezosTemplate3WalletType } from "../tezosTemplate3.types";
 
+import { Capacitor } from "@capacitor/core";
 import * as api from "@tzkt/sdk-api";
 import {
   addCircleOutline,
@@ -68,6 +70,7 @@ import {
   lockOpenOutline,
   personCircleOutline,
   settingsOutline,
+  shareSocialOutline,
 } from "ionicons/icons";
 import { useHistory } from "react-router";
 import { PAGES, UserContext, UserContextType } from "../App";
@@ -100,6 +103,7 @@ export const Search: React.FC = () => {
     openOnly: boolean;
     mineOnly: boolean;
     template: string[];
+    newerThan2Weeks: boolean;
   };
 
   const [filter, setFilter] = React.useState<Filter>({
@@ -108,6 +112,7 @@ export const Search: React.FC = () => {
     openOnly: false,
     mineOnly: false,
     template: [],
+    newerThan2Weeks: true,
   });
 
   //LIST
@@ -223,6 +228,20 @@ export const Search: React.FC = () => {
         "After filteredContract",
         newFilter.template
       );*/
+    }
+
+    //newerThan2Weeks
+    if (newFilter.newerThan2Weeks) {
+      filteredContract = filteredContract.filter((c: VotingContract) => {
+        const diff = new Date().getTime() - new Date(c.to).getTime();
+
+        //diff less than  2 weeks
+        if (diff <= 0 || Math.abs(diff) < 1000 * 60 * 60 * 24 * 7 * 2) {
+          return true;
+        } else {
+          return false;
+        }
+      });
     }
 
     setContracts(filteredContract);
@@ -498,6 +517,21 @@ export const Search: React.FC = () => {
                 >
                   Mine
                 </IonToggle>
+                &nbsp;&nbsp;&nbsp;
+                <IonToggle
+                  enableOnOffLabels
+                  checked={filter.newerThan2Weeks}
+                  onClick={(e) => {
+                    const newFilter = {
+                      ...filter,
+                      newerThan2Weeks: e.currentTarget.checked,
+                    };
+                    setFilter(newFilter);
+                    filterContracts(newFilter);
+                  }}
+                >
+                  Newer than 2 weeks
+                </IonToggle>
                 <IonSelect
                   placeholder="Filter by template"
                   onIonChange={(ev) => {
@@ -547,6 +581,7 @@ export const Search: React.FC = () => {
                           <IonCardTitle>
                             <IonRow>
                               <IonText>{contract.name}</IonText>
+                              &nbsp;
                               <IonAvatar
                                 style={{ height: "20px", width: "20px" }}
                               >
@@ -560,7 +595,7 @@ export const Search: React.FC = () => {
                                   }
                                 />
                               </IonAvatar>
-
+                              &nbsp;
                               <IonIcon
                                 color={
                                   contract.status === STATUS.ONGOING
@@ -573,7 +608,7 @@ export const Search: React.FC = () => {
                                     : lockClosedOutline
                                 }
                               ></IonIcon>
-
+                              &nbsp;
                               <a
                                 href={`https://${
                                   NetworkType[
@@ -585,6 +620,33 @@ export const Search: React.FC = () => {
                               >
                                 <IonIcon icon={eyeOutline} />
                               </a>
+                              &nbsp;
+                              <IonIcon
+                                style={{ cursor: "pointer" }}
+                                icon={shareSocialOutline}
+                                onClick={async () => {
+                                  const url =
+                                    window.location.host +
+                                    PAGES.SETTINGS +
+                                    "/" +
+                                    contract.type.name +
+                                    "/" +
+                                    contract.address;
+                                  if (Capacitor.isNativePlatform()) {
+                                    await Share.share({
+                                      title: "Share this poll",
+                                      url: url,
+                                      dialogTitle: "Share with your buddies",
+                                    });
+                                  } else {
+                                    navigator.clipboard.writeText(url);
+                                    presentAlert({
+                                      header: "Copied to clipboard !",
+                                      message: url,
+                                    });
+                                  }
+                                }}
+                              ></IonIcon>
                             </IonRow>
                           </IonCardTitle>
                           <IonCardSubtitle style={{ textAlign: "left" }}>
@@ -599,13 +661,11 @@ export const Search: React.FC = () => {
                                 <a
                                   href={
                                     `https://` +
-                                    (import.meta.env.VITE_NETWORK
-                                      ? NetworkType[
-                                          import.meta.env[
-                                            "VITE_NETWORK"
-                                          ].toUpperCase() as keyof typeof NetworkType
-                                        ]
-                                      : NetworkType.GHOSTNET) +
+                                    NetworkType[
+                                      import.meta.env[
+                                        "VITE_NETWORK"
+                                      ].toUpperCase() as keyof typeof NetworkType
+                                    ] +
                                     `.tzkt.io/${contract.creator}/info`
                                   }
                                   target="_blank"

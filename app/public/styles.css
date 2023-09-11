@@ -283,3 +283,21 @@ ion-card {
   width: 100% !important;
   max-width: 100% !important;
 }
+
+.sc-ion-buttons-md-s .button-solid {
+  --background: var(--ion-color-primary, #3880ff);
+  --color: var(--ion-color-primary-contrast, #fff);
+  --background-activated: transparent;
+  --background-focused: currentColor;
+}
+
+.sc-ion-buttons-md-s ion-button {
+  margin-inline-end: 0;
+}
+
+.sc-ion-buttons-md-h {
+  align-items: unset;
+  margin-top: 4px;
+  margin-bottom: 4px;
+  border-radius: 4px;
+}
