@@ -166,7 +166,7 @@ export const Results: React.FC<ResultsProps> = ({ match }) => {
 
       initColorArray(data);
     })();
-  }, []);
+  }, [id]);
 
   return (
     <IonPage className="container">
@@ -288,7 +288,7 @@ export const Results: React.FC<ResultsProps> = ({ match }) => {
         <IonGrid style={{ border: "1px white solid" }}>
           <IonRow style={{ borderBottom: "1px white solid" }}>
             <IonCol>Options</IonCol>
-            <IonCol>Result</IonCol>
+            <IonCol>Result (nb votes)</IonCol>
           </IonRow>
 
           {contract

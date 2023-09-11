@@ -36,6 +36,7 @@ import * as api from "@tzkt/sdk-api";
 import {
   addCircleOutline,
   radioButtonOffOutline,
+  radioButtonOnOutline,
   returnUpBackOutline,
   shareSocialOutline,
   trashBinOutline,
@@ -126,6 +127,8 @@ export const Settings: React.FC<SettingsProps> = ({ match }) => {
     }
 
     setContract(contract);
+
+    console.log("contract", contract);
   };
 
   useEffect(() => {
@@ -139,7 +142,7 @@ export const Settings: React.FC<SettingsProps> = ({ match }) => {
 
       await refreshData();
     })();
-  }, []);
+  }, [id]);
 
   //add,remove member button
   const [inputVoter, setInputVoter] = React.useState<string>("");
@@ -463,13 +466,12 @@ export const Settings: React.FC<SettingsProps> = ({ match }) => {
               <IonCardContent>
                 <IonRadioGroup>
                   {contract?.options.map((option: string) => (
-                    <IonRadio
-                      style={{ margin: "1em" }}
-                      key={option}
-                      value={option}
-                    >
-                      {option}
-                    </IonRadio>
+                    <IonRow key={option}>
+                      <IonCol style={{ textAlign: "center" }}>
+                        <IonIcon icon={radioButtonOnOutline}> </IonIcon>
+                        <IonLabel>{option}</IonLabel>
+                      </IonCol>
+                    </IonRow>
                   ))}
                 </IonRadioGroup>
               </IonCardContent>
