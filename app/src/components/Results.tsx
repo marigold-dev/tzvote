@@ -191,7 +191,10 @@ export const Results: React.FC<ResultsProps> = ({ match }) => {
                 if (Capacitor.isNativePlatform()) {
                   await Share.share({
                     title: "Share this poll",
-                    url: url,
+                    url: url.replace(
+                      "localhost",
+                      "https://tzvote.marigold.dev"
+                    ), //override for native app
                     dialogTitle: "Share with your buddies",
                   });
                 } else {
