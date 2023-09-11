@@ -7,9 +7,10 @@ WORKDIR /tzvote
 # Install functionnal Taq
 COPY --from=docker:dind /usr/local/bin/docker /bin/docker
 ADD https://github.com/ecadlabs/taqueria/releases/download/v0.39.0/taq-linux /bin/taq
-RUN chmod +x /bin/taq && apt-get update && apt-get install -y jq
+RUN chmod +x /bin/taq && apt-get update && apt-get install -y jq && rm -rf /var/lib/apt/lists/*
 COPY . .
 RUN rm -f app/.env
+RUN rm -f app/.env.ghostnet
 COPY app/.env.mainnet app/.env
 
 
@@ -20,5 +21,7 @@ RUN cd app && npm ci
 RUN npm install -g serve
 
 WORKDIR /tzvote/app
+RUN ls -last
+RUN cat /tzvote/app/.env
 
 ENTRYPOINT ["npm", "run" , "start:prod"]
