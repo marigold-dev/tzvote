@@ -84,7 +84,7 @@ export const Results: React.FC<ResultsProps> = ({ match }) => {
     "https://api." + import.meta.env.VITE_NETWORK + ".tzkt.io";
 
   const [presentAlert] = useIonAlert();
-  const { goBack } = useHistory();
+  const { push } = useHistory(); //mandatory in case of a shared page, there is no history
 
   //TEZOS OPERATIONS
   const [loading, setLoading] = React.useState(false);
@@ -173,7 +173,7 @@ export const Results: React.FC<ResultsProps> = ({ match }) => {
       <IonHeader>
         <IonToolbar>
           <IonButtons slot="start">
-            <IonButton onClick={goBack}>
+            <IonButton onClick={() => push(PAGES.SEARCH)}>
               <IonIcon icon={returnUpBackOutline}></IonIcon>
               <IonLabel>Back</IonLabel>
             </IonButton>
@@ -191,7 +191,10 @@ export const Results: React.FC<ResultsProps> = ({ match }) => {
                 if (Capacitor.isNativePlatform()) {
                   await Share.share({
                     title: "Share this poll",
-                    url: url,
+                    url: url.replace(
+                      "localhost",
+                      "https://tzvote.marigold.dev"
+                    ), //override for native app
                     dialogTitle: "Share with your buddies",
                   });
                 } else {
