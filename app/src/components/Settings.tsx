@@ -139,13 +139,16 @@ export const Settings: React.FC<SettingsProps> = ({ match }) => {
 
   //add,remove member button
   const [inputVoter, setInputVoter] = React.useState<string>("");
+  const [inputBaker, setInputBaker] = React.useState<string>("");
 
-  const handleAddDelegatorVoters = async () => {
+  const handleAddDelegatorVoters = async (newDelegators: string[]) => {
     try {
+      setLoading(true);
+
       const batch = Tezos.wallet.batch();
       let batchNotEmpty: boolean = false;
       await Promise.all(
-        bakerDelegators.map(async (delegator) => {
+        newDelegators.map(async (delegator) => {
           //only new voters
           if (
             (
@@ -174,9 +177,10 @@ export const Settings: React.FC<SettingsProps> = ({ match }) => {
         }, BLOCK_TIME);
       } else {
         presentAlert({
-          header: "Wanning",
+          header: "Warning",
           message: "All delegators already added",
         });
+        setLoading(false);
       }
     } catch (error: any) {
       console.table(`Error: ${JSON.stringify(error, null, 2)}`);
@@ -588,7 +592,7 @@ export const Settings: React.FC<SettingsProps> = ({ match }) => {
                     <IonCardSubtitle>
                       <IonRow>
                         <IonInput
-                          style={{ width: "80%" }}
+                          style={{ width: "calc(100% - 110px)" }}
                           value={inputVoter}
                           label="New voter to add"
                           labelPlacement="floating"
@@ -596,7 +600,7 @@ export const Settings: React.FC<SettingsProps> = ({ match }) => {
                           required
                           id="name"
                           placeholder="Enter new voter here ..."
-                          maxlength={100}
+                          maxlength={36}
                           counter
                           onIonInput={(e) => {
                             setInputVoter(e.target.value as string);
@@ -604,20 +608,51 @@ export const Settings: React.FC<SettingsProps> = ({ match }) => {
                         ></IonInput>
 
                         <IonButton
-                          style={{ marginLeft: "1em" }}
+                          style={{ maxWidth: "100px" }}
                           onClick={() => handleAddVoter()}
                         >
                           <IonIcon icon={addCircleOutline} />
+                          <IonLabel>Voter</IonLabel>
                         </IonButton>
+                      </IonRow>
+                      <IonRow>
+                        <IonInput
+                          style={{ width: "calc(100% - 185px)" }}
+                          value={inputBaker}
+                          label="Baker address"
+                          labelPlacement="floating"
+                          color="primary"
+                          required
+                          id="name"
+                          placeholder="Enter baker here ..."
+                          maxlength={36}
+                          counter
+                          onIonInput={(e) => {
+                            setInputBaker(e.target.value as string);
+                          }}
+                        ></IonInput>
+                        <IonButton
+                          style={{ width: "175px" }}
+                          className="button-solid"
+                          onClick={async () => {
+                            handleAddDelegatorVoters(
+                              (await Tezos.rpc.getDelegates(inputBaker))
+                                .delegated_contracts
+                            );
+                          }}
+                        >
+                          <IonIcon icon={addCircleOutline} /> &nbsp; delegators
+                          of
+                        </IonButton>
+                      </IonRow>
+                      <IonRow>
                         {bakerDelegators.length > 0 ? (
                           <IonButton
-                            style={{
-                              marginRight: "1em",
-                              marginBottom: "0.2em",
+                            onClick={() => {
+                              handleAddDelegatorVoters(bakerDelegators);
                             }}
-                            onClick={handleAddDelegatorVoters}
                           >
-                            <IonIcon icon={addCircleOutline} /> &nbsp;
+                            <IonIcon icon={addCircleOutline} /> &nbsp; my
                             delegators
                           </IonButton>
                         ) : (
