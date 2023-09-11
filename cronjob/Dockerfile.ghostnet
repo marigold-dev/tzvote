@@ -4,4 +4,4 @@ COPY . .
 RUN rm -f .env
 COPY .env.ghostnet .env
 RUN yarn install
-CMD ["yarn", "start"]
+CMD ["yarn", "dev"]
