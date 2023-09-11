@@ -93,47 +93,53 @@ const App: React.FC = () => {
     ])
   );
 
-  const reloadUser = async (): Promise<void> => {
+  const reloadUser = async (): Promise<string | undefined> => {
     const activeAccount = await wallet.client.getActiveAccount();
-    let userAddress = activeAccount!.address;
-    setUserAddress(userAddress);
 
-    console.log("userAddress", userAddress);
+    if (activeAccount) {
+      let userAddress = activeAccount!.address;
+      setUserAddress(userAddress);
 
-    //update baker power
-    try {
-      const delegatesResponse: DelegatesResponse = await Tezos.rpc.getDelegates(
-        userAddress
-      );
+      console.log("userAddress", userAddress);
 
-      if (
-        delegatesResponse !== undefined &&
-        delegatesResponse.delegated_contracts !== undefined &&
-        delegatesResponse.staking_balance !== undefined
-      ) {
-        setBakerDelegators(delegatesResponse.delegated_contracts);
-        setBakerPower(
-          delegatesResponse.voting_power
-            ? delegatesResponse.voting_power.toNumber()
-            : 0
-        );
-        setBakerDeactivated(delegatesResponse.deactivated);
-        console.log(
-          "We have a baker with power ",
-          delegatesResponse.staking_balance.toNumber(),
-          " and delegators ",
-          delegatesResponse.delegated_contracts,
-          " and status deactivated  ",
-          delegatesResponse.deactivated,
-          " and voting_power  ",
-          delegatesResponse.voting_power
-        );
-      } else {
-        setBakerPower(0);
-        console.log("We have a baker with no power");
+      //update baker power
+      try {
+        const delegatesResponse: DelegatesResponse =
+          await Tezos.rpc.getDelegates(userAddress);
+
+        if (
+          delegatesResponse !== undefined &&
+          delegatesResponse.delegated_contracts !== undefined &&
+          delegatesResponse.staking_balance !== undefined
+        ) {
+          setBakerDelegators(delegatesResponse.delegated_contracts);
+          setBakerPower(
+            delegatesResponse.voting_power
+              ? delegatesResponse.voting_power.toNumber()
+              : 0
+          );
+          setBakerDeactivated(delegatesResponse.deactivated);
+          console.log(
+            "We have a baker with power ",
+            delegatesResponse.staking_balance.toNumber(),
+            " and delegators ",
+            delegatesResponse.delegated_contracts,
+            " and status deactivated  ",
+            delegatesResponse.deactivated,
+            " and voting_power  ",
+            delegatesResponse.voting_power
+          );
+        } else {
+          setBakerPower(0);
+          console.log("We have a baker with no power");
+        }
+      } catch (error) {
+        console.log("We have a simple user");
       }
-    } catch (error) {
-      console.log("We have a simple user");
+
+      return userAddress;
+    } else {
+      return undefined;
     }
   };
 

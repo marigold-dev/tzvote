@@ -75,6 +75,7 @@ import {
 import { useHistory } from "react-router";
 import { PAGES, UserContext, UserContextType } from "../App";
 import { address, key_hash } from "../type-aliases";
+import ConnectButton from "./ConnectWallet";
 import DisconnectButton from "./DisconnectWallet";
 
 momentDurationFormatSetup(moment);
@@ -745,29 +746,33 @@ export const Search: React.FC = () => {
               </IonGrid>
             )}
 
-            <IonFab slot="fixed" vertical="bottom" horizontal="end">
-              <IonFabButton>
-                <IonIcon icon={addCircleOutline}></IonIcon>
-              </IonFabButton>
-              <IonFabList side="top">
-                <IonFabButton onClick={() => push(PAGES.CreateTezosTemplate)}>
-                  <IonAvatar style={{ height: "20px", width: "20px" }}>
-                    <IonImg src="/baker.png" />
-                  </IonAvatar>
+            {userAddress ? (
+              <IonFab slot="fixed" vertical="bottom" horizontal="end">
+                <IonFabButton>
+                  <IonIcon icon={addCircleOutline}></IonIcon>
                 </IonFabButton>
-                <IonFabButton
-                  onClick={() => push(PAGES.CreatePermissionedSimplePoll)}
-                >
-                  <IonAvatar style={{ height: "20px", width: "20px" }}>
-                    <IonImg src="/permissioned.png" />
-                  </IonAvatar>
-                </IonFabButton>
-              </IonFabList>
-            </IonFab>
+                <IonFabList side="top">
+                  <IonFabButton onClick={() => push(PAGES.CreateTezosTemplate)}>
+                    <IonAvatar style={{ height: "20px", width: "20px" }}>
+                      <IonImg src="/baker.png" />
+                    </IonAvatar>
+                  </IonFabButton>
+                  <IonFabButton
+                    onClick={() => push(PAGES.CreatePermissionedSimplePoll)}
+                  >
+                    <IonAvatar style={{ height: "20px", width: "20px" }}>
+                      <IonImg src="/permissioned.png" />
+                    </IonAvatar>
+                  </IonFabButton>
+                </IonFabList>
+              </IonFab>
+            ) : (
+              ""
+            )}
           </IonContent>
           <IonFooter>
             <IonToolbar>
-              <DisconnectButton />
+              {userAddress ? <DisconnectButton /> : <ConnectButton />}
             </IonToolbar>
           </IonFooter>
         </>
