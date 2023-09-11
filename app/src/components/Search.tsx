@@ -103,6 +103,7 @@ export const Search: React.FC = () => {
     openOnly: boolean;
     mineOnly: boolean;
     template: string[];
+    newerThan2Weeks: boolean;
   };
 
   const [filter, setFilter] = React.useState<Filter>({
@@ -111,6 +112,7 @@ export const Search: React.FC = () => {
     openOnly: false,
     mineOnly: false,
     template: [],
+    newerThan2Weeks: true,
   });
 
   //LIST
@@ -226,6 +228,20 @@ export const Search: React.FC = () => {
         "After filteredContract",
         newFilter.template
       );*/
+    }
+
+    //newerThan2Weeks
+    if (newFilter.newerThan2Weeks) {
+      filteredContract = filteredContract.filter((c: VotingContract) => {
+        const diff = new Date().getTime() - new Date(c.to).getTime();
+
+        //diff less than  2 weeks
+        if (diff <= 0 || Math.abs(diff) < 1000 * 60 * 60 * 24 * 7 * 2) {
+          return true;
+        } else {
+          return false;
+        }
+      });
     }
 
     setContracts(filteredContract);
@@ -500,6 +516,21 @@ export const Search: React.FC = () => {
                   }}
                 >
                   Mine
+                </IonToggle>
+                &nbsp;&nbsp;&nbsp;
+                <IonToggle
+                  enableOnOffLabels
+                  checked={filter.newerThan2Weeks}
+                  onClick={(e) => {
+                    const newFilter = {
+                      ...filter,
+                      newerThan2Weeks: e.currentTarget.checked,
+                    };
+                    setFilter(newFilter);
+                    filterContracts(newFilter);
+                  }}
+                >
+                  Newer than 2 weeks
                 </IonToggle>
                 <IonSelect
                   placeholder="Filter by template"
