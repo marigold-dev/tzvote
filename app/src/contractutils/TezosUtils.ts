@@ -246,8 +246,11 @@ export async function convertFromTZKTTezosContractToTezosTemplateVotingContract(
   tzktContract: Contract
 ): Promise<VotingContract> {
   if (!tzktContract.storage) {
-    console.error("TZKT Storage not loaded", tzktContract);
-    throw new Error("TZKT Storage not loaded");
+    let contractStorageFromTzkt: Blob = await api.contractsGetStorage(
+      tzktContract.address!
+    );
+
+    tzktContract.storage = JSON.parse(await contractStorageFromTzkt.text());
   }
 
   const tezosTemplate3WalletType: TezosTemplate3WalletType =

@@ -1,4 +1,5 @@
 import { NetworkType } from "@airgap/beacon-sdk";
+import { Share } from "@capacitor/share";
 import {
   IonAvatar,
   IonButton,
@@ -59,6 +60,7 @@ import { PermissionedSimplePollWalletType } from "../permissionedSimplePoll.type
 
 import { TezosTemplate3WalletType } from "../tezosTemplate3.types";
 
+import { Capacitor } from "@capacitor/core";
 import * as api from "@tzkt/sdk-api";
 import {
   addCircleOutline,
@@ -68,6 +70,7 @@ import {
   lockOpenOutline,
   personCircleOutline,
   settingsOutline,
+  shareSocialOutline,
 } from "ionicons/icons";
 import { useHistory } from "react-router";
 import { PAGES, UserContext, UserContextType } from "../App";
@@ -547,6 +550,7 @@ export const Search: React.FC = () => {
                           <IonCardTitle>
                             <IonRow>
                               <IonText>{contract.name}</IonText>
+                              &nbsp;
                               <IonAvatar
                                 style={{ height: "20px", width: "20px" }}
                               >
@@ -560,7 +564,7 @@ export const Search: React.FC = () => {
                                   }
                                 />
                               </IonAvatar>
-
+                              &nbsp;
                               <IonIcon
                                 color={
                                   contract.status === STATUS.ONGOING
@@ -573,7 +577,7 @@ export const Search: React.FC = () => {
                                     : lockClosedOutline
                                 }
                               ></IonIcon>
-
+                              &nbsp;
                               <a
                                 href={`https://${
                                   NetworkType[
@@ -585,6 +589,33 @@ export const Search: React.FC = () => {
                               >
                                 <IonIcon icon={eyeOutline} />
                               </a>
+                              &nbsp;
+                              <IonIcon
+                                style={{ cursor: "pointer" }}
+                                icon={shareSocialOutline}
+                                onClick={async () => {
+                                  const url =
+                                    window.location.host +
+                                    PAGES.SETTINGS +
+                                    "/" +
+                                    contract.type.name +
+                                    "/" +
+                                    contract.address;
+                                  if (Capacitor.isNativePlatform()) {
+                                    await Share.share({
+                                      title: "Share this poll",
+                                      url: url,
+                                      dialogTitle: "Share with your buddies",
+                                    });
+                                  } else {
+                                    navigator.clipboard.writeText(url);
+                                    presentAlert({
+                                      header: "Copied to clipboard !",
+                                      message: url,
+                                    });
+                                  }
+                                }}
+                              ></IonIcon>
                             </IonRow>
                           </IonCardTitle>
                           <IonCardSubtitle style={{ textAlign: "left" }}>
@@ -637,27 +668,21 @@ export const Search: React.FC = () => {
                               <IonLabel>&nbsp; Results</IonLabel>
                             </IonButton>
 
-                            {contract.creator === userAddress &&
-                            contract.type ===
-                              VOTING_TEMPLATE.PERMISSIONEDSIMPLEPOLL ? (
-                              <IonButton
-                                color="dark"
-                                onClick={() =>
-                                  push(
-                                    PAGES.SETTINGS +
-                                      "/" +
-                                      contract.type.name +
-                                      "/" +
-                                      contract.address
-                                  )
-                                }
-                              >
-                                <IonIcon icon={settingsOutline}></IonIcon>
-                                <IonLabel>&nbsp; Settings</IonLabel>
-                              </IonButton>
-                            ) : (
-                              ""
-                            )}
+                            <IonButton
+                              color="dark"
+                              onClick={() =>
+                                push(
+                                  PAGES.SETTINGS +
+                                    "/" +
+                                    contract.type.name +
+                                    "/" +
+                                    contract.address
+                                )
+                              }
+                            >
+                              <IonIcon icon={settingsOutline}></IonIcon>
+                              <IonLabel>&nbsp; Details</IonLabel>
+                            </IonButton>
                           </IonRow>
                         </IonCardContent>
 
