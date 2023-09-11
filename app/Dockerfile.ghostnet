@@ -18,8 +18,7 @@ RUN rm -f app/.env.mainnet
 RUN npm ci && taq init
 RUN cd app && npm ci 
 
-RUN cat package.json
-RUN npm run build:dev
+RUN cd app && npm run build:dev
 
 # Install serve globally
 RUN npm install -g serve
