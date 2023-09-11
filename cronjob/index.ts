@@ -15,7 +15,7 @@ const TEZOS_RPC_URL = process.env.TEZOS_RPC_URL!;
 const TEZOS_RPC_ADDRESS = process.env.TEZOS_RPC_ADDRESS!;
 const TEZOS_SECRET_KEY = process.env.TEZOS_SECRET_KEY!;
 const TEZOS_NETWORK = process.env.TEZOS_NETWORK || "mainnet";
-const TIME = parseInt(process.env.TIME) || 15000;
+const TIME = parseInt(process.env.TIME) * 1000 || 15000;
 const AMMOUNT = parseInt(process.env.AMMOUNT) || 0;
 const CONFIRMATION = parseInt(process.env.CONFIRMATION) || 1;
 
