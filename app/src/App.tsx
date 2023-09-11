@@ -52,7 +52,7 @@ export type UserContextType = {
   bakerDeactivated: boolean;
   setBakerDeactivated: Dispatch<SetStateAction<boolean>>;
 
-  reloadUser: () => Promise<void>;
+  reloadUser: () => Promise<string | undefined>;
 
   BLOCK_TIME: number;
 };
