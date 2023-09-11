@@ -46,12 +46,10 @@ const Home: React.FC = () => {
   /**
    * LANDING PAGE
    *  */
-  let network = import.meta.env.VITE_NETWORK
-    ? NetworkType[
-        import.meta.env.VITE_NETWORK.toUpperCase() as keyof typeof NetworkType
-      ]
-    : NetworkType.GHOSTNET;
-
+  let network =
+    NetworkType[
+      import.meta.env.VITE_NETWORK.toUpperCase() as keyof typeof NetworkType
+    ];
   return (
     <IonPage className="container">
       <IonHeader>

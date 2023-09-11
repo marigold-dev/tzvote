@@ -661,13 +661,11 @@ export const Search: React.FC = () => {
                                 <a
                                   href={
                                     `https://` +
-                                    (import.meta.env.VITE_NETWORK
-                                      ? NetworkType[
-                                          import.meta.env[
-                                            "VITE_NETWORK"
-                                          ].toUpperCase() as keyof typeof NetworkType
-                                        ]
-                                      : NetworkType.GHOSTNET) +
+                                    NetworkType[
+                                      import.meta.env[
+                                        "VITE_NETWORK"
+                                      ].toUpperCase() as keyof typeof NetworkType
+                                    ] +
                                     `.tzkt.io/${contract.creator}/info`
                                   }
                                   target="_blank"

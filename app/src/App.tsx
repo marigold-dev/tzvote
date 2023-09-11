@@ -64,11 +64,10 @@ const App: React.FC = () => {
   const [BLOCK_TIME, setBLOCK_TIME] = useState<number>(15);
   const wallet = new BeaconWallet({
     name: "TzVote",
-    preferredNetwork: import.meta.env.VITE_NETWORK
-      ? NetworkType[
-          import.meta.env.VITE_NETWORK.toUpperCase() as keyof typeof NetworkType
-        ]
-      : NetworkType.GHOSTNET,
+    preferredNetwork:
+      NetworkType[
+        import.meta.env.VITE_NETWORK.toUpperCase() as keyof typeof NetworkType
+      ],
   });
   Tezos.setWalletProvider(wallet);
   const [userAddress, setUserAddress] = useState<string | undefined>();
