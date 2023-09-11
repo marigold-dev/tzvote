@@ -69,7 +69,7 @@ export const Settings: React.FC<SettingsProps> = ({ match }) => {
     "https://api." + import.meta.env.VITE_NETWORK + ".tzkt.io";
 
   const [presentAlert] = useIonAlert();
-  const { goBack } = useHistory();
+  const { push } = useHistory();
 
   //TEZOS OPERATIONS
   const [loading, setLoading] = React.useState(false);
@@ -372,7 +372,7 @@ export const Settings: React.FC<SettingsProps> = ({ match }) => {
           <IonHeader>
             <IonToolbar>
               <IonButtons slot="start">
-                <IonButton onClick={goBack}>
+                <IonButton onClick={() => push(PAGES.SEARCH)}>
                   <IonIcon icon={returnUpBackOutline}></IonIcon>
                   <IonLabel>Back</IonLabel>
                 </IonButton>
