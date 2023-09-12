@@ -36,7 +36,10 @@ import {
 import React, { useEffect, useState } from "react";
 import { useHistory } from "react-router";
 import { PAGES, UserContext, UserContextType } from "../App";
-import { TransactionInvalidBeaconError } from "../contractutils/TezosUtils";
+import {
+  TransactionInvalidBeaconError,
+  validateAddress,
+} from "../contractutils/TezosUtils";
 import { Storage as PermissionedSimplePollVotingContract } from "../permissionedSimplePoll.types";
 import { address, asMap, int, timestamp } from "../type-aliases";
 
@@ -50,7 +53,7 @@ const CreatePermissionedSimplePoll: React.FC = () => {
   const { Tezos, userAddress, bakerDelegators, reloadUser, BLOCK_TIME } =
     React.useContext(UserContext) as UserContextType;
 
-  const { push, goBack } = useHistory();
+  const { push, goBack, go } = useHistory();
 
   //TEZOS OPERATIONS
   const [loading, setLoading] = React.useState(false);
@@ -86,8 +89,14 @@ const CreatePermissionedSimplePoll: React.FC = () => {
   }, [userAddress]);
 
   const [inputOption, setInputOption] = useState<string>("");
+
   const [inputVoter, setInputVoter] = useState<string>("");
+  const [inputVoterValid, setInputVoterValid] = useState<boolean>(false);
+  const [inputVoterTouched, setInputVoterTouched] = useState<boolean>(false);
+
   const [inputBaker, setInputBaker] = useState<string>("");
+  const [inputBakerValid, setInputBakerValid] = useState<boolean>(false);
+  const [inputBakerTouched, setInputBakerTouched] = useState<boolean>(false);
 
   const createVoteContract = async () => {
     //block if no option
@@ -123,6 +132,7 @@ const CreatePermissionedSimplePoll: React.FC = () => {
 
       setTimeout(async () => {
         setLoading(false);
+
         presentAlert({
           header: "Success",
           message: `Origination completed for ${
@@ -130,8 +140,10 @@ const CreatePermissionedSimplePoll: React.FC = () => {
           }.`,
         });
         push(PAGES.SEARCH);
+        go(0);
       }, BLOCK_TIME);
     } catch (error) {
+      setLoading(false);
       console.table(`Error: ${JSON.stringify(error, null, 2)}`);
       let tibe: TransactionInvalidBeaconError =
         new TransactionInvalidBeaconError(error);
@@ -139,8 +151,6 @@ const CreatePermissionedSimplePoll: React.FC = () => {
         header: "Error",
         message: tibe.data_message,
       });
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -354,7 +364,25 @@ const CreatePermissionedSimplePoll: React.FC = () => {
                       placeholder="Enter new voter here ..."
                       maxlength={36}
                       counter
+                      className={`${inputVoterValid && "ion-valid"} ${
+                        inputVoterValid === false && "ion-invalid"
+                      } ${inputVoterTouched && "ion-touched"} `}
+                      helperText="Enter a valid address (tz1,tz2,KT1,etc...)"
+                      errorText="Invalid address"
+                      onIonBlur={() => {
+                        setInputVoterTouched(true);
+                      }}
                       onIonInput={(e) => {
+                        if (validateAddress(e.target.value as string))
+                          setInputVoterValid(true);
+                        else setInputVoterValid(false);
+
+                        console.log(
+                          e.target.value +
+                            " is " +
+                            validateAddress(e.target.value as string)
+                        );
+
                         setInputVoter(e.target.value as string);
                       }}
                     ></IonInput>
@@ -389,7 +417,19 @@ const CreatePermissionedSimplePoll: React.FC = () => {
                       placeholder="Enter baker here ..."
                       maxlength={36}
                       counter
+                      className={`${inputBakerValid && "ion-valid"} ${
+                        inputBakerValid === false && "ion-invalid"
+                      } ${inputBakerTouched && "ion-touched"} `}
+                      helperText="Enter a valid address (tz1,tz2,KT1,etc...)"
+                      errorText="Invalid address"
+                      onIonBlur={() => {
+                        setInputBakerTouched(true);
+                      }}
                       onIonInput={(e) => {
+                        if (validateAddress(e.target.value as string))
+                          setInputBakerValid(true);
+                        else setInputBakerValid(false);
+
                         setInputBaker(e.target.value as string);
                       }}
                     ></IonInput>

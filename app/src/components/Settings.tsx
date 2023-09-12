@@ -12,6 +12,7 @@ import {
   IonCardContent,
   IonCardHeader,
   IonCardSubtitle,
+  IonChip,
   IonCol,
   IonContent,
   IonHeader,
@@ -34,6 +35,8 @@ import {
 import * as api from "@tzkt/sdk-api";
 import {
   addCircleOutline,
+  lockClosedOutline,
+  lockOpenOutline,
   radioButtonOffOutline,
   radioButtonOnOutline,
   returnUpBackOutline,
@@ -44,11 +47,13 @@ import React, { useEffect, useRef, useState } from "react";
 import { RouteComponentProps, useHistory } from "react-router-dom";
 import { PAGES, UserContext, UserContextType } from "../App";
 import {
+  STATUS,
   VOTING_TEMPLATE,
   VotingContract,
   convertFromTZKTTezosContractToPermissionnedSimplePollTemplateVotingContract,
   convertFromTZKTTezosContractToTezosTemplateVotingContract,
   userCanVoteNow,
+  validateAddress,
 } from "../contractutils/TezosUtils";
 import {
   Storage as PermissionedSimplePollVotingContract,
@@ -70,7 +75,7 @@ export const Settings: React.FC<SettingsProps> = ({ match }) => {
     "https://api." + import.meta.env.VITE_NETWORK + ".tzkt.io";
 
   const [presentAlert] = useIonAlert();
-  const { push } = useHistory();
+  const { push, go } = useHistory();
 
   //TEZOS OPERATIONS
   const [loading, setLoading] = React.useState(false);
@@ -142,7 +147,12 @@ export const Settings: React.FC<SettingsProps> = ({ match }) => {
 
   //add,remove member button
   const [inputVoter, setInputVoter] = React.useState<string>("");
+  const [inputVoterValid, setInputVoterValid] = useState<boolean>(false);
+  const [inputVoterTouched, setInputVoterTouched] = useState<boolean>(false);
+
   const [inputBaker, setInputBaker] = React.useState<string>("");
+  const [inputBakerValid, setInputBakerValid] = useState<boolean>(false);
+  const [inputBakerTouched, setInputBakerTouched] = useState<boolean>(false);
 
   const handleAddDelegatorVoters = async (newDelegators: string[]) => {
     try {
@@ -309,8 +319,7 @@ export const Settings: React.FC<SettingsProps> = ({ match }) => {
           );
 
           const op = await c.methods.vote(voteValue).send();
-
-          console.log("BLOCK_TIME", BLOCK_TIME);
+          await op.confirmation();
 
           //refresh info on list
           setTimeout(() => {
@@ -333,13 +342,15 @@ export const Settings: React.FC<SettingsProps> = ({ match }) => {
           //refresh info on list
           setTimeout(() => {
             refreshData();
+            setLoading(false);
+            presentAlert({
+              header: "Success",
+              message: "Your vote has been accepted",
+            });
           }, BLOCK_TIME);
-
-          presentAlert({
-            header: "Success",
-            message: "Your vote has been accepted (wait a bit the refresh)",
-          });
         } else {
+          setLoading(false);
+
           console.error("Cannot find the type for contract ", contract);
 
           throw new Error(
@@ -347,6 +358,8 @@ export const Settings: React.FC<SettingsProps> = ({ match }) => {
           );
         }
       } catch (error: any) {
+        setLoading(false);
+
         console.table(`Error: ${JSON.stringify(error, null, 2)}`);
         let tibe: TransactionInvalidBeaconError =
           new TransactionInvalidBeaconError(error);
@@ -354,14 +367,12 @@ export const Settings: React.FC<SettingsProps> = ({ match }) => {
           header: "Error",
           message: tibe.data_message,
         });
-      } finally {
-        setLoading(false);
       }
     } else {
+      setLoading(false);
+
       console.log("Please select an option.");
     }
-
-    setLoading(false);
   };
 
   return (
@@ -375,7 +386,11 @@ export const Settings: React.FC<SettingsProps> = ({ match }) => {
           <IonHeader>
             <IonToolbar>
               <IonButtons slot="start">
-                <IonButton onClick={() => push(PAGES.SEARCH)}>
+                <IonButton
+                  onClick={() => {
+                    push(PAGES.SEARCH);
+                  }}
+                >
                   <IonIcon icon={returnUpBackOutline}></IonIcon>
                   <IonLabel>Back</IonLabel>
                 </IonButton>
@@ -486,6 +501,28 @@ export const Settings: React.FC<SettingsProps> = ({ match }) => {
                 ) : (
                   ""
                 )}
+
+                <IonCardSubtitle>
+                  <IonChip
+                    color={
+                      contract?.status === STATUS.ONGOING ? "success" : "danger"
+                    }
+                  >
+                    <IonIcon
+                      color={
+                        contract?.status === STATUS.ONGOING
+                          ? "success"
+                          : "danger"
+                      }
+                      icon={
+                        contract?.status === STATUS.ONGOING
+                          ? lockOpenOutline
+                          : lockClosedOutline
+                      }
+                    ></IonIcon>
+                    <IonLabel>{contract?.status}</IonLabel>
+                  </IonChip>
+                </IonCardSubtitle>
               </IonCardHeader>
               <IonCardContent>
                 <IonRow>
@@ -607,7 +644,19 @@ export const Settings: React.FC<SettingsProps> = ({ match }) => {
                           placeholder="Enter new voter here ..."
                           maxlength={36}
                           counter
+                          className={`${inputVoterValid && "ion-valid"} ${
+                            inputVoterValid === false && "ion-invalid"
+                          } ${inputVoterTouched && "ion-touched"} `}
+                          helperText="Enter a valid address (tz1,tz2,KT1,etc...)"
+                          errorText="Invalid address"
+                          onIonBlur={() => {
+                            setInputVoterTouched(true);
+                          }}
                           onIonInput={(e) => {
+                            if (validateAddress(e.target.value as string))
+                              setInputVoterValid(true);
+                            else setInputVoterValid(false);
+
                             setInputVoter(e.target.value as string);
                           }}
                         ></IonInput>
@@ -632,7 +681,19 @@ export const Settings: React.FC<SettingsProps> = ({ match }) => {
                           placeholder="Enter baker here ..."
                           maxlength={36}
                           counter
+                          className={`${inputBakerValid && "ion-valid"} ${
+                            inputBakerValid === false && "ion-invalid"
+                          } ${inputBakerTouched && "ion-touched"} `}
+                          helperText="Enter a valid address (tz1,tz2,KT1,etc...)"
+                          errorText="Invalid address"
+                          onIonBlur={() => {
+                            setInputBakerTouched(true);
+                          }}
                           onIonInput={(e) => {
+                            if (validateAddress(e.target.value as string))
+                              setInputBakerValid(true);
+                            else setInputBakerValid(false);
+
                             setInputBaker(e.target.value as string);
                           }}
                         ></IonInput>

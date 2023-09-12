@@ -143,7 +143,13 @@ const Home: React.FC = () => {
             </IonCol>{" "}
             <IonCol>
               <a href="https://marigold.dev" target="_blank">
-                <IonImg style={{ height: 30 }} src="/marigold.png" />
+                <IonRow>
+                  <IonImg
+                    style={{ height: 30 }}
+                    src="https://uploads-ssl.webflow.com/616ab4741d375d1642c19027/61793ee65c891c190fcaa1d0_Vector(1).png"
+                  ></IonImg>
+                  <IonImg style={{ height: 30 }} src="/marigold.png" />
+                </IonRow>
               </a>
             </IonCol>
           </IonRow>

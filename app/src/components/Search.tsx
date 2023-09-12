@@ -123,7 +123,7 @@ export const Search: React.FC = () => {
   //TEZOS OPERATIONS
   const [loading, setLoading] = React.useState(false);
 
-  const refreshData = (event?: CustomEvent<RefresherEventDetail>) => {
+  const refreshData = async (event?: CustomEvent<RefresherEventDetail>) => {
     (async () => {
       let allTEZOSTEMPLATEContractFromTzkt: Array<Contract> =
         await api.contractsGetSame(
@@ -257,12 +257,19 @@ export const Search: React.FC = () => {
       })();
     }
 
-    refreshData();
+    (async () => {
+      await refreshData();
+      console.log("Search - refreshData");
+    })();
   }, []); //init load
 
   React.useEffect(() => {
     filterContracts(filter);
-  }, [allContracts]); //if data refreshed, need to refresh the filtered list too
+    console.log(
+      "Search - filterContracts",
+      "if data refreshed, need to refresh the filtered list too"
+    );
+  }, [allContracts]);
 
   const durationToString = (value: number): string => {
     return moment
@@ -291,12 +298,11 @@ export const Search: React.FC = () => {
           );
 
           const op = await c.methods.vote(voteValue).send();
-
-          console.log("BLOCK_TIME", BLOCK_TIME);
+          await op.confirmation();
 
           //refresh info on list
-          setTimeout(() => {
-            refreshData();
+          setTimeout(async () => {
+            await refreshData();
             setLoading(false);
             filterContracts(filter);
             presentAlert({
@@ -314,16 +320,17 @@ export const Search: React.FC = () => {
           await op.confirmation();
 
           //refresh info on list
-          setTimeout(() => {
-            refreshData();
+          setTimeout(async () => {
+            await refreshData();
+            setLoading(false);
             filterContracts(filter);
+            presentAlert({
+              header: "Success",
+              message: "Your vote has been accepted",
+            });
           }, BLOCK_TIME);
-
-          presentAlert({
-            header: "Success",
-            message: "Your vote has been accepted (wait a bit the refresh)",
-          });
         } else {
+          setLoading(false);
           console.error("Cannot find the type for contract ", contract);
 
           throw new Error(
@@ -331,6 +338,7 @@ export const Search: React.FC = () => {
           );
         }
       } catch (error: any) {
+        setLoading(false);
         console.table(`Error: ${JSON.stringify(error, null, 2)}`);
         let tibe: TransactionInvalidBeaconError =
           new TransactionInvalidBeaconError(error);
@@ -338,14 +346,11 @@ export const Search: React.FC = () => {
           header: "Error",
           message: tibe.data_message,
         });
-      } finally {
-        setLoading(false);
       }
     } else {
       console.log("Please select an option.");
+      setLoading(false);
     }
-
-    setLoading(false);
   };
 
   const buttonChoices = (contract: VotingContract) => {
