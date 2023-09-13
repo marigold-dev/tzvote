@@ -5,6 +5,11 @@ import { walletOutline } from "ionicons/icons";
 import React from "react";
 import { useHistory } from "react-router";
 import { PAGES, UserContext, UserContextType } from "../App";
+import { address } from "../type-aliases";
+import TzCommunityReactContext, {
+  TzCommunityReactContextType,
+} from "../tzcommunity/TzCommunityReactContext";
+import { getUserProfile } from "../tzcommunity/TzCommunityUtils";
 
 const ConnectButton = (): JSX.Element => {
   const {
@@ -15,6 +20,14 @@ const ConnectButton = (): JSX.Element => {
     setBakerPower,
     setBakerDeactivated,
   } = React.useContext(UserContext) as UserContextType;
+
+  const {
+    setUserProfile,
+    connectToWeb2Backend,
+    localStorage,
+    setUserProfiles,
+    userProfiles,
+  } = React.useContext(TzCommunityReactContext) as TzCommunityReactContextType;
 
   const { replace } = useHistory();
 
@@ -71,6 +84,32 @@ const ConnectButton = (): JSX.Element => {
       // gets user's address
       const userAddress = await wallet.getPKH();
       await setup(userAddress);
+
+      //connect to TzCommunity
+      await connectToWeb2Backend(
+        wallet,
+        userAddress,
+        (
+          await wallet.client.getActiveAccount()
+        )?.publicKey!,
+        localStorage
+      );
+
+      //try to load your user profile
+      try {
+        const newUserProfile = await getUserProfile(userAddress, localStorage);
+        setUserProfile(newUserProfile!);
+
+        setUserProfiles(
+          userProfiles.set(userAddress as address, newUserProfile!)
+        );
+      } catch (error) {
+        console.warn(
+          "User " +
+            userAddress +
+            " has no social account profile link on TzCommunity"
+        );
+      }
 
       replace(PAGES.SEARCH);
     } catch (error) {

@@ -45,6 +45,10 @@ import { address, asMap, int, timestamp } from "../type-aliases";
 
 import jsonContractTemplate from "../contracttemplates/permissionedSimplePoll.json";
 import { VOTING_TEMPLATE } from "../contractutils/TezosUtils";
+import { TzCommunityIonicUserProfileChip } from "../tzcommunity/TzCommunityIonicUserProfileChip";
+import TzCommunityReactContext, {
+  TzCommunityReactContextType,
+} from "../tzcommunity/TzCommunityReactContext";
 
 // Get the time zone set on the user's device
 const userTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
@@ -52,6 +56,11 @@ const userTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 const CreatePermissionedSimplePoll: React.FC = () => {
   const { Tezos, userAddress, bakerDelegators, reloadUser, BLOCK_TIME } =
     React.useContext(UserContext) as UserContextType;
+
+  //TZCOM CONTEXT
+  const { userProfiles } = React.useContext(
+    TzCommunityReactContext
+  ) as TzCommunityReactContextType;
 
   const { push, goBack, go } = useHistory();
 
@@ -291,7 +300,7 @@ const CreatePermissionedSimplePoll: React.FC = () => {
                 <IonCardSubtitle>
                   <IonRow>
                     <IonInput
-                      style={{ width: "80%" }}
+                      style={{ width: "calc(100% - 55px)" }}
                       value={inputOption}
                       label="New option to add"
                       labelPlacement="floating"
@@ -307,7 +316,6 @@ const CreatePermissionedSimplePoll: React.FC = () => {
                     ></IonInput>
 
                     <IonButton
-                      style={{ marginLeft: "1em" }}
                       onClick={() => {
                         setContract({
                           ...contract,
@@ -354,14 +362,14 @@ const CreatePermissionedSimplePoll: React.FC = () => {
                 <IonCardSubtitle>
                   <IonRow>
                     <IonInput
-                      style={{ width: "calc(100% - 110px)" }}
+                      style={{ width: "calc(100% - 55px)" }}
                       value={inputVoter}
-                      label="New voter to add"
+                      label="Add individual voter"
                       labelPlacement="floating"
                       color="primary"
                       required
                       id="name"
-                      placeholder="Enter new voter here ..."
+                      placeholder="Enter voter address here ..."
                       maxlength={36}
                       counter
                       className={`${inputVoterValid && "ion-valid"} ${
@@ -388,7 +396,6 @@ const CreatePermissionedSimplePoll: React.FC = () => {
                     ></IonInput>
 
                     <IonButton
-                      style={{ maxWidth: "100px" }}
                       onClick={() => {
                         setContract({
                           ...contract,
@@ -401,20 +408,19 @@ const CreatePermissionedSimplePoll: React.FC = () => {
                       }}
                     >
                       <IonIcon icon={addCircleOutline} />
-                      <IonLabel>Voter</IonLabel>
                     </IonButton>
                   </IonRow>
 
                   <IonRow>
                     <IonInput
-                      style={{ width: "calc(100% - 185px)" }}
+                      style={{ width: "calc(100% - 55px)" }}
                       value={inputBaker}
-                      label="Baker address"
+                      label="Add baker delegatees"
                       labelPlacement="floating"
                       color="primary"
                       required
                       id="name"
-                      placeholder="Enter baker here ..."
+                      placeholder="Enter baker address here ..."
                       maxlength={36}
                       counter
                       className={`${inputBakerValid && "ion-valid"} ${
@@ -434,7 +440,6 @@ const CreatePermissionedSimplePoll: React.FC = () => {
                       }}
                     ></IonInput>
                     <IonButton
-                      style={{ width: "175px" }}
                       className="button-solid"
                       onClick={async () => {
                         setContract({
@@ -449,7 +454,7 @@ const CreatePermissionedSimplePoll: React.FC = () => {
                         } as PermissionedSimplePollVotingContract);
                       }}
                     >
-                      <IonIcon icon={addCircleOutline} /> &nbsp; delegators of
+                      <IonIcon icon={addCircleOutline} />
                     </IonButton>
                   </IonRow>
 
@@ -479,30 +484,31 @@ const CreatePermissionedSimplePoll: React.FC = () => {
               </IonCardHeader>
 
               <IonCardContent>
-                <IonList inputMode="text">
-                  {contract.registeredVoters.map(
-                    (voter: string, index: number) => (
-                      <IonItem key={voter}>
-                        <IonLabel>
-                          <IonIcon icon={radioButtonOffOutline} /> &nbsp;{" "}
-                          {voter}
-                        </IonLabel>
+                {contract.registeredVoters.map(
+                  (voter: string, index: number) => (
+                    <IonRow key={voter}>
+                      <TzCommunityIonicUserProfileChip
+                        userProfiles={userProfiles}
+                        address={voter as address}
+                        key={voter}
+                        style={{ width: "calc(100% - 24px - 16px)" }}
+                      ></TzCommunityIonicUserProfileChip>
 
-                        <IonIcon
-                          color="danger"
-                          icon={trashBinOutline}
-                          onClick={() => {
-                            contract.registeredVoters.splice(index, 1);
-                            setContract({
-                              ...contract,
-                              registeredVoters: contract.registeredVoters,
-                            } as PermissionedSimplePollVotingContract);
-                          }}
-                        />
-                      </IonItem>
-                    )
-                  )}
-                </IonList>
+                      <IonIcon
+                        style={{ height: "24px", width: "24px" }}
+                        color="danger"
+                        icon={trashBinOutline}
+                        onClick={() => {
+                          contract.registeredVoters.splice(index, 1);
+                          setContract({
+                            ...contract,
+                            registeredVoters: contract.registeredVoters,
+                          } as PermissionedSimplePollVotingContract);
+                        }}
+                      />
+                    </IonRow>
+                  )
+                )}
               </IonCardContent>
             </IonCard>
           </IonContent>

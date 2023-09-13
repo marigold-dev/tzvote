@@ -47,7 +47,11 @@ import {
 import { Storage as TezosTemplateVotingContract } from "../tezosTemplate3.types";
 
 import { Capacitor } from "@capacitor/core";
-import { int } from "../type-aliases";
+import { address, int } from "../type-aliases";
+import { TzCommunityIonicUserProfileChip } from "../tzcommunity/TzCommunityIonicUserProfileChip";
+import TzCommunityReactContext, {
+  TzCommunityReactContextType,
+} from "../tzcommunity/TzCommunityReactContext";
 
 const RADIAN = Math.PI / 180;
 const renderCustomizedLabel = ({
@@ -103,6 +107,11 @@ export const Results: React.FC<ResultsProps> = ({ match }) => {
   const { Tezos, userAddress } = React.useContext(
     UserContext
   ) as UserContextType;
+
+  //TZCOM CONTEXT
+  const { userProfiles } = React.useContext(
+    TzCommunityReactContext
+  ) as TzCommunityReactContextType;
 
   const [data, setData] = useState<
     {
@@ -228,7 +237,14 @@ export const Results: React.FC<ResultsProps> = ({ match }) => {
         <IonCard>
           <IonCardHeader>
             <IonTitle>Question</IonTitle>
-            <IonCardSubtitle>From {contract?.creator}</IonCardSubtitle>
+            <IonCardSubtitle>
+              From{" "}
+              <TzCommunityIonicUserProfileChip
+                userProfiles={userProfiles}
+                address={contract?.creator as address}
+                key={contract?.creator}
+              ></TzCommunityIonicUserProfileChip>
+            </IonCardSubtitle>
           </IonCardHeader>
 
           <IonCardContent>
