@@ -9,7 +9,6 @@ import {
   IonCardHeader,
   IonCardSubtitle,
   IonCardTitle,
-  IonChip,
   IonCol,
   IonContent,
   IonFab,
@@ -61,6 +60,11 @@ import { PermissionedSimplePollWalletType } from "../permissionedSimplePoll.type
 import { TezosTemplate3WalletType } from "../tezosTemplate3.types";
 
 import { Capacitor } from "@capacitor/core";
+import {
+  TzCommunityReactContext,
+  TzCommunityReactContextType,
+} from "@marigold-dev/tezos-community-reactcontext";
+import { TzCommunityIonicUserProfileChip } from "@marigold-dev/tezos-community-reactcontext-ionic";
 import * as api from "@tzkt/sdk-api";
 import {
   addCircleOutline,
@@ -68,7 +72,6 @@ import {
   eyeOutline,
   lockClosedOutline,
   lockOpenOutline,
-  personCircleOutline,
   settingsOutline,
   shareSocialOutline,
 } from "ionicons/icons";
@@ -93,6 +96,10 @@ export const Search: React.FC = () => {
     reloadUser,
     BLOCK_TIME,
   } = React.useContext(UserContext) as UserContextType;
+
+  const { userProfiles } = React.useContext(
+    TzCommunityReactContext
+  ) as TzCommunityReactContextType;
 
   const [presentAlert] = useIonAlert();
   const { push } = useHistory();
@@ -253,6 +260,7 @@ export const Search: React.FC = () => {
     //in case of forced page refresh
     if (!userAddress) {
       (async () => {
+        console.warn("We lost the user, refreshing the page");
         await reloadUser();
       })();
     }
@@ -592,7 +600,6 @@ export const Search: React.FC = () => {
                                 style={{ height: "20px", width: "20px" }}
                               >
                                 <IonImg
-                                  alt="Silhouette of a person's head"
                                   src={
                                     contract.type.name ==
                                     VOTING_TEMPLATE.PERMISSIONEDSIMPLEPOLL.name
@@ -659,30 +666,11 @@ export const Search: React.FC = () => {
                             </IonRow>
                           </IonCardTitle>
                           <IonCardSubtitle style={{ textAlign: "left" }}>
-                            {" "}
-                            <IonChip
-                              style={{
-                                fontSize: "x-small",
-                              }}
-                            >
-                              <IonIcon icon={personCircleOutline}></IonIcon>
-                              <IonLabel>
-                                <a
-                                  href={
-                                    `https://` +
-                                    NetworkType[
-                                      import.meta.env[
-                                        "VITE_NETWORK"
-                                      ].toUpperCase() as keyof typeof NetworkType
-                                    ] +
-                                    `.tzkt.io/${contract.creator}/info`
-                                  }
-                                  target="_blank"
-                                >
-                                  {contract.creator}
-                                </a>
-                              </IonLabel>
-                            </IonChip>
+                            <TzCommunityIonicUserProfileChip
+                              userProfiles={userProfiles}
+                              address={contract.creator as address}
+                              key={contract.creator}
+                            ></TzCommunityIonicUserProfileChip>
                           </IonCardSubtitle>
                         </IonCardHeader>
 

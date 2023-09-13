@@ -19,9 +19,7 @@ import {
   IonIcon,
   IonImg,
   IonInput,
-  IonItem,
   IonLabel,
-  IonList,
   IonModal,
   IonPage,
   IonRadio,
@@ -37,7 +35,6 @@ import {
   addCircleOutline,
   lockClosedOutline,
   lockOpenOutline,
-  radioButtonOffOutline,
   radioButtonOnOutline,
   returnUpBackOutline,
   shareSocialOutline,
@@ -61,6 +58,11 @@ import {
 } from "../permissionedSimplePoll.types";
 
 import { Capacitor } from "@capacitor/core";
+import {
+  TzCommunityReactContext,
+  TzCommunityReactContextType,
+} from "@marigold-dev/tezos-community-reactcontext";
+import { TzCommunityIonicUserProfileChip } from "@marigold-dev/tezos-community-reactcontext-ionic";
 import { WalletContract } from "@taquito/taquito";
 import { TransactionInvalidBeaconError } from "../contractutils/TezosUtils";
 import { address, key_hash } from "../type-aliases";
@@ -97,6 +99,11 @@ export const Settings: React.FC<SettingsProps> = ({ match }) => {
     bakerPower,
     bakerDeactivated,
   } = React.useContext(UserContext) as UserContextType;
+
+  //TZCOM CONTEXT
+  const { userProfiles } = React.useContext(
+    TzCommunityReactContext
+  ) as TzCommunityReactContextType;
 
   const refreshData = async (): Promise<void> => {
     let contract: VotingContract;
@@ -454,7 +461,14 @@ export const Settings: React.FC<SettingsProps> = ({ match }) => {
             <IonCard>
               <IonCardHeader>
                 <IonTitle>Question</IonTitle>
-                <IonCardSubtitle>From {contract?.creator}</IonCardSubtitle>
+                <IonCardSubtitle>
+                  From{" "}
+                  <TzCommunityIonicUserProfileChip
+                    userProfiles={userProfiles}
+                    address={contract?.creator as address}
+                    key={contract?.creator}
+                  ></TzCommunityIonicUserProfileChip>
+                </IonCardSubtitle>
               </IonCardHeader>
 
               <IonCardContent>
@@ -606,11 +620,7 @@ export const Settings: React.FC<SettingsProps> = ({ match }) => {
                           onIonChange={(e) => setVoteValue(e.target.value)}
                         >
                           {contract?.options.map((option: string) => (
-                            <IonRadio
-                              style={{ margin: "1em" }}
-                              key={option}
-                              value={option}
-                            >
+                            <IonRadio key={option} value={option}>
                               {option}
                             </IonRadio>
                           ))}
@@ -634,14 +644,14 @@ export const Settings: React.FC<SettingsProps> = ({ match }) => {
                     <IonCardSubtitle>
                       <IonRow>
                         <IonInput
-                          style={{ width: "calc(100% - 110px)" }}
+                          style={{ width: "calc(100% - 55px)" }}
                           value={inputVoter}
-                          label="New voter to add"
+                          label="Add individual voter"
                           labelPlacement="floating"
                           color="primary"
                           required
                           id="name"
-                          placeholder="Enter new voter here ..."
+                          placeholder="Enter voter address here ..."
                           maxlength={36}
                           counter
                           className={`${inputVoterValid && "ion-valid"} ${
@@ -666,19 +676,18 @@ export const Settings: React.FC<SettingsProps> = ({ match }) => {
                           onClick={() => handleAddVoter()}
                         >
                           <IonIcon icon={addCircleOutline} />
-                          <IonLabel>Voter</IonLabel>
                         </IonButton>
                       </IonRow>
                       <IonRow>
                         <IonInput
-                          style={{ width: "calc(100% - 185px)" }}
+                          style={{ width: "calc(100% - 55px)" }}
                           value={inputBaker}
-                          label="Baker address"
+                          label="Add baker delegatees"
                           labelPlacement="floating"
                           color="primary"
                           required
                           id="name"
-                          placeholder="Enter baker here ..."
+                          placeholder="Enter baker address here ..."
                           maxlength={36}
                           counter
                           className={`${inputBakerValid && "ion-valid"} ${
@@ -698,7 +707,6 @@ export const Settings: React.FC<SettingsProps> = ({ match }) => {
                           }}
                         ></IonInput>
                         <IonButton
-                          style={{ width: "175px" }}
                           className="button-solid"
                           onClick={async () => {
                             handleAddDelegatorVoters(
@@ -707,8 +715,7 @@ export const Settings: React.FC<SettingsProps> = ({ match }) => {
                             );
                           }}
                         >
-                          <IonIcon icon={addCircleOutline} /> &nbsp; delegators
-                          of
+                          <IonIcon icon={addCircleOutline} />
                         </IonButton>
                       </IonRow>
                       <IonRow>
@@ -729,24 +736,24 @@ export const Settings: React.FC<SettingsProps> = ({ match }) => {
                   </IonCardHeader>
 
                   <IonCardContent>
-                    <IonList inputMode="text">
-                      {(
-                        contract as PermissionedSimplePollVotingContract
-                      ).registeredVoters.map((voter: string, index: number) => (
-                        <IonItem key={voter}>
-                          <IonLabel>
-                            <IonIcon icon={radioButtonOffOutline} /> &nbsp;{" "}
-                            {voter}
-                          </IonLabel>
-
-                          <IonIcon
-                            color="danger"
-                            icon={trashBinOutline}
-                            onClick={() => handleRemoveVoter(voter as address)}
-                          />
-                        </IonItem>
-                      ))}
-                    </IonList>
+                    {(
+                      contract as PermissionedSimplePollVotingContract
+                    ).registeredVoters.map((voter: string, index: number) => (
+                      <IonRow key={voter}>
+                        <TzCommunityIonicUserProfileChip
+                          userProfiles={userProfiles}
+                          address={voter as address}
+                          key={voter}
+                          style={{ width: "calc(100% - 24px - 16px)" }}
+                        ></TzCommunityIonicUserProfileChip>
+                        <IonIcon
+                          style={{ height: "24px", width: "24px" }}
+                          color="danger"
+                          icon={trashBinOutline}
+                          onClick={() => handleRemoveVoter(voter as address)}
+                        />
+                      </IonRow>
+                    ))}
                   </IonCardContent>
                 </IonCard>
               </>
