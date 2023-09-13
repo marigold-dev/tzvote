@@ -35,18 +35,18 @@ import { VOTING_TEMPLATE } from "./contractutils/TezosUtils";
 import "./theme/variables.css";
 import { address } from "./type-aliases";
 
-import { CachingService } from "./tzcommunity/caching.service";
-import TzCommunityReactContext from "./tzcommunity/TzCommunityReactContext";
 import {
-  connectToWeb2Backend,
-  getUserProfile,
-  loadUserProfiles,
+  CachingService,
   LocalStorageKeys,
-  refreshToken,
   TzCommunityError,
   TzCommunityErrorType,
   UserProfile,
-} from "./tzcommunity/TzCommunityUtils";
+  connectToWeb2Backend,
+  getUserProfile,
+  loadUserProfiles,
+  refreshToken,
+} from "@marigold-dev/tezos-community";
+import { TzCommunityReactContext } from "@marigold-dev/tezos-community-reactcontext";
 
 setupIonicReact();
 

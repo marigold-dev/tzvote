@@ -60,6 +60,11 @@ import { PermissionedSimplePollWalletType } from "../permissionedSimplePoll.type
 import { TezosTemplate3WalletType } from "../tezosTemplate3.types";
 
 import { Capacitor } from "@capacitor/core";
+import {
+  TzCommunityReactContext,
+  TzCommunityReactContextType,
+} from "@marigold-dev/tezos-community-reactcontext";
+import { TzCommunityIonicUserProfileChip } from "@marigold-dev/tezos-community-reactcontext-ionic";
 import * as api from "@tzkt/sdk-api";
 import {
   addCircleOutline,
@@ -73,10 +78,6 @@ import {
 import { useHistory } from "react-router";
 import { PAGES, UserContext, UserContextType } from "../App";
 import { address, key_hash } from "../type-aliases";
-import { TzCommunityIonicUserProfileChip } from "../tzcommunity/TzCommunityIonicUserProfileChip";
-import TzCommunityReactContext, {
-  TzCommunityReactContextType,
-} from "../tzcommunity/TzCommunityReactContext";
 import ConnectButton from "./ConnectWallet";
 import DisconnectButton from "./DisconnectWallet";
 

@@ -58,13 +58,14 @@ import {
 } from "../permissionedSimplePoll.types";
 
 import { Capacitor } from "@capacitor/core";
+import {
+  TzCommunityReactContext,
+  TzCommunityReactContextType,
+} from "@marigold-dev/tezos-community-reactcontext";
+import { TzCommunityIonicUserProfileChip } from "@marigold-dev/tezos-community-reactcontext-ionic";
 import { WalletContract } from "@taquito/taquito";
 import { TransactionInvalidBeaconError } from "../contractutils/TezosUtils";
 import { address, key_hash } from "../type-aliases";
-import { TzCommunityIonicUserProfileChip } from "../tzcommunity/TzCommunityIonicUserProfileChip";
-import TzCommunityReactContext, {
-  TzCommunityReactContextType,
-} from "../tzcommunity/TzCommunityReactContext";
 
 type SettingsProps = RouteComponentProps<{
   type: string;

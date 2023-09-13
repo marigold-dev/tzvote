@@ -43,12 +43,13 @@ import {
 import { Storage as PermissionedSimplePollVotingContract } from "../permissionedSimplePoll.types";
 import { address, asMap, int, timestamp } from "../type-aliases";
 
+import {
+  TzCommunityReactContext,
+  TzCommunityReactContextType,
+} from "@marigold-dev/tezos-community-reactcontext";
+import { TzCommunityIonicUserProfileChip } from "@marigold-dev/tezos-community-reactcontext-ionic";
 import jsonContractTemplate from "../contracttemplates/permissionedSimplePoll.json";
 import { VOTING_TEMPLATE } from "../contractutils/TezosUtils";
-import { TzCommunityIonicUserProfileChip } from "../tzcommunity/TzCommunityIonicUserProfileChip";
-import TzCommunityReactContext, {
-  TzCommunityReactContextType,
-} from "../tzcommunity/TzCommunityReactContext";
 
 // Get the time zone set on the user's device
 const userTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;

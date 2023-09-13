@@ -47,11 +47,12 @@ import {
 import { Storage as TezosTemplateVotingContract } from "../tezosTemplate3.types";
 
 import { Capacitor } from "@capacitor/core";
-import { address, int } from "../type-aliases";
-import { TzCommunityIonicUserProfileChip } from "../tzcommunity/TzCommunityIonicUserProfileChip";
-import TzCommunityReactContext, {
+import {
+  TzCommunityReactContext,
   TzCommunityReactContextType,
-} from "../tzcommunity/TzCommunityReactContext";
+} from "@marigold-dev/tezos-community-reactcontext";
+import { TzCommunityIonicUserProfileChip } from "@marigold-dev/tezos-community-reactcontext-ionic";
+import { address, int } from "../type-aliases";
 
 const RADIAN = Math.PI / 180;
 const renderCustomizedLabel = ({

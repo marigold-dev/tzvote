@@ -1,16 +1,17 @@
 import { NetworkType } from "@airgap/beacon-sdk";
 import { IonButton, IonIcon, IonLabel } from "@ionic/react";
+import {
+  TzCommunityReactContext,
+  TzCommunityReactContextType,
+} from "@marigold-dev/tezos-community-reactcontext";
 import { DelegatesResponse } from "@taquito/rpc";
 import { walletOutline } from "ionicons/icons";
 import React from "react";
 import { useHistory } from "react-router";
 import { PAGES, UserContext, UserContextType } from "../App";
 import { address } from "../type-aliases";
-import TzCommunityReactContext, {
-  TzCommunityReactContextType,
-} from "../tzcommunity/TzCommunityReactContext";
-import { getUserProfile } from "../tzcommunity/TzCommunityUtils";
 
+import { getUserProfile } from "@marigold-dev/tezos-community";
 const ConnectButton = (): JSX.Element => {
   const {
     Tezos,

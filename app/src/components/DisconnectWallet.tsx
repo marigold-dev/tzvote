@@ -1,15 +1,16 @@
 import { IonButton, IonIcon, IonLabel } from "@ionic/react";
+import {
+  TzCommunityReactContext,
+  TzCommunityReactContextType,
+} from "@marigold-dev/tezos-community-reactcontext";
+import { TzCommunityIonicUserProfileChip } from "@marigold-dev/tezos-community-reactcontext-ionic";
 import { logOutOutline } from "ionicons/icons";
 import React from "react";
 import { useHistory } from "react-router";
 import { PAGES, UserContext, UserContextType } from "../App";
 import { address } from "../type-aliases";
-import { TzCommunityIonicUserProfileChip } from "../tzcommunity/TzCommunityIonicUserProfileChip";
-import TzCommunityReactContext, {
-  TzCommunityReactContextType,
-} from "../tzcommunity/TzCommunityReactContext";
-import { LocalStorageKeys } from "../tzcommunity/TzCommunityUtils";
 
+import { LocalStorageKeys } from "@marigold-dev/tezos-community";
 const DisconnectButton = (): JSX.Element => {
   const {
     userAddress,
@@ -53,6 +54,11 @@ const DisconnectButton = (): JSX.Element => {
       <IonLabel>
         &nbsp; Logout{" "}
         <TzCommunityIonicUserProfileChip
+          style={{
+            width: "calc(100% - 1.1em - 60px)",
+            whiteSpace: "normal",
+            fontSize: "xx-small",
+          }}
           color="light"
           userProfiles={userProfiles}
           address={userAddress as address}
