@@ -21,6 +21,7 @@ import "@ionic/react/css/text-transformation.css";
 
 /* Theme variables */
 import { NetworkType } from "@airgap/beacon-types";
+import { Storage as LocalStorage } from "@ionic/storage";
 import { BeaconWallet } from "@taquito/beacon-wallet";
 import { DelegatesResponse } from "@taquito/rpc";
 import { TezosToolkit } from "@taquito/taquito";
@@ -32,6 +33,20 @@ import { Search } from "./components/Search";
 import { Settings } from "./components/Settings";
 import { VOTING_TEMPLATE } from "./contractutils/TezosUtils";
 import "./theme/variables.css";
+import { address } from "./type-aliases";
+
+import {
+  CachingService,
+  LocalStorageKeys,
+  TzCommunityError,
+  TzCommunityErrorType,
+  UserProfile,
+  connectToWeb2Backend,
+  getUserProfile,
+  loadUserProfiles,
+  refreshToken,
+} from "@marigold-dev/tezos-community";
+import { TzCommunityReactContext } from "@marigold-dev/tezos-community-reactcontext";
 
 setupIonicReact();
 
@@ -93,6 +108,28 @@ const App: React.FC = () => {
     ])
   );
 
+  const disconnectWallet = async (): Promise<void> => {
+    setUserAddress(undefined);
+    setBakerPower(0);
+    setBakerDelegators(new Array<string>());
+
+    //TzCommunity
+    if (localStorage.initialized) {
+      console.log("localStorage is initialized, removing access tokens");
+      await localStorage.remove(LocalStorageKeys.access_token); //remove SIWT tokens
+      await localStorage.remove(LocalStorageKeys.id_token); //remove SIWT tokens
+      await localStorage.remove(LocalStorageKeys.refresh_token); //remove SIWT tokens
+    } else {
+      console.warn("localStorage not initialized, cannot remove access tokens");
+    }
+    //End TzCommunity
+    console.log("disconnecting wallet");
+
+    await wallet.clearActiveAccount();
+
+    window.location.href = PAGES.HOME;
+  };
+
   const reloadUser = async (): Promise<string | undefined> => {
     const activeAccount = await wallet.client.getActiveAccount();
 
@@ -137,6 +174,47 @@ const App: React.FC = () => {
         console.log("We have a simple user");
       }
 
+      //try to load your user profile
+      try {
+        const newUserProfile = await getUserProfile(userAddress, localStorage);
+        setUserProfile(newUserProfile!);
+
+        setUserProfiles(
+          userProfiles.set(userAddress as address, newUserProfile!)
+        );
+      } catch (error) {
+        if (error instanceof TzCommunityError) {
+          switch (error.type) {
+            case TzCommunityErrorType.ACCESS_TOKEN_NULL: {
+              console.warn("Cannot refresh token, disconnect");
+              disconnectWallet();
+              break;
+            }
+            case TzCommunityErrorType.ACCESS_TOKEN_EXPIRED: {
+              console.warn(
+                "Access token expired, try to fetch from refresh token.."
+              );
+              await refreshToken(userAddress!, localStorage);
+              const userProfile = await getUserProfile(
+                userAddress!,
+                localStorage
+              );
+              if (userProfile) setUserProfile(userProfile);
+              setUserProfiles(
+                await loadUserProfiles(Tezos, userAddress!, localStorage)
+              );
+              break;
+            }
+          }
+        } else {
+          console.warn(
+            "User " +
+              userAddress +
+              " has no social account profile link on TzCommunity"
+          );
+        }
+      }
+
       return userAddress;
     } else {
       return undefined;
@@ -148,51 +226,127 @@ const App: React.FC = () => {
       const constantsResponse = await Tezos.rpc.getConstants();
       setBLOCK_TIME(constantsResponse.minimal_block_delay!.toNumber() * 1000);
     })();
+
+    //TzCommunity
+    (async () => {
+      await localStorage.initStorage();
+    })();
+    //End TzCommunity
   }, []);
+
+  //tzCommunity
+  const [userProfiles, setUserProfiles] = useState<Map<address, UserProfile>>(
+    new Map()
+  );
+
+  const [userProfile, setUserProfile] = useState<UserProfile | undefined>();
+  const [localStorage, setLocalStorage] = useState<CachingService>(
+    new CachingService(new LocalStorage())
+  );
+
+  useEffect(() => {
+    //only try to load if userProfile, it means you are logged with TzCommunity
+    (async () => {
+      if (userProfile || userProfile === null) {
+        try {
+          setUserProfiles(
+            await loadUserProfiles(Tezos, userAddress!, localStorage)
+          );
+        } catch (error) {
+          console.log(error);
+
+          if (error instanceof TzCommunityError) {
+            switch (error.type) {
+              case TzCommunityErrorType.ACCESS_TOKEN_NULL: {
+                console.warn("Cannot refresh token, disconnect");
+                disconnectWallet();
+                break;
+              }
+              case TzCommunityErrorType.ACCESS_TOKEN_EXPIRED: {
+                console.warn(
+                  "Access token expired, try to fetch from refresh token.."
+                );
+                await refreshToken(userAddress!, localStorage);
+                const userProfile = await getUserProfile(
+                  userAddress!,
+                  localStorage
+                );
+                if (userProfile) setUserProfile(userProfile);
+                setUserProfiles(
+                  await loadUserProfiles(Tezos, userAddress!, localStorage)
+                );
+                break;
+              }
+            }
+          } else {
+            //nada
+          }
+        }
+      } else {
+        //nada
+      }
+    })();
+  }, [userProfile]);
+
+  //end tzCommunity
 
   return (
     <IonApp>
       {" "}
-      <UserContext.Provider
+      <TzCommunityReactContext.Provider
         value={{
-          Tezos,
-          userAddress,
-          setUserAddress,
-          wallet,
-          votingTemplateAddresses,
-          setVotingTemplateAddresses,
-          bakerPower,
-          setBakerPower,
-          bakerDelegators,
-          setBakerDelegators,
-          reloadUser,
-          bakerDeactivated,
-          setBakerDeactivated,
-          BLOCK_TIME,
+          userProfiles,
+          setUserProfiles,
+          userProfile,
+          setUserProfile,
+          localStorage,
+          connectToWeb2Backend: connectToWeb2Backend,
         }}
       >
-        <IonReactRouter>
-          <IonRouterOutlet>
-            <Route exact path={PAGES.HOME}>
-              <Home />
-            </Route>
-            <Route exact path={PAGES.SEARCH}>
-              <Search />
-            </Route>
-            <Route path={`${PAGES.RESULTS}/:type/:id`} component={Results} />
-            <Route path={`${PAGES.SETTINGS}/:type/:id`} component={Settings} />
-            <Route exact path={PAGES.CreatePermissionedSimplePoll}>
-              <CreatePermissionedSimplePoll />
-            </Route>
-            <Route exact path={PAGES.CreateTezosTemplate}>
-              <CreateTezosTemplate />
-            </Route>
-            <Route exact path="/">
-              <Redirect to="/home" />
-            </Route>
-          </IonRouterOutlet>
-        </IonReactRouter>
-      </UserContext.Provider>
+        <UserContext.Provider
+          value={{
+            Tezos,
+            userAddress,
+            setUserAddress,
+            wallet,
+            votingTemplateAddresses,
+            setVotingTemplateAddresses,
+            bakerPower,
+            setBakerPower,
+            bakerDelegators,
+            setBakerDelegators,
+            reloadUser,
+            bakerDeactivated,
+            setBakerDeactivated,
+            BLOCK_TIME,
+          }}
+        >
+          <IonReactRouter>
+            <IonRouterOutlet>
+              <Route exact path={PAGES.HOME}>
+                <Home />
+              </Route>
+              <Route exact path={PAGES.SEARCH}>
+                <Search />
+              </Route>
+              <Route path={`${PAGES.RESULTS}/:type/:id`} component={Results} />
+              <Route
+                path={`${PAGES.SETTINGS}/:type/:id`}
+                component={Settings}
+              />
+              <Route exact path={PAGES.CreatePermissionedSimplePoll}>
+                <CreatePermissionedSimplePoll />
+              </Route>
+              <Route exact path={PAGES.CreateTezosTemplate}>
+                <CreateTezosTemplate />
+              </Route>
+              <Route exact path="/">
+                <Redirect to="/home" />
+              </Route>
+            </IonRouterOutlet>
+          </IonReactRouter>
+        </UserContext.Provider>
+      </TzCommunityReactContext.Provider>
     </IonApp>
   );
 };

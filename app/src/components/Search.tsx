@@ -9,7 +9,6 @@ import {
   IonCardHeader,
   IonCardSubtitle,
   IonCardTitle,
-  IonChip,
   IonCol,
   IonContent,
   IonFab,
@@ -61,6 +60,11 @@ import { PermissionedSimplePollWalletType } from "../permissionedSimplePoll.type
 import { TezosTemplate3WalletType } from "../tezosTemplate3.types";
 
 import { Capacitor } from "@capacitor/core";
+import {
+  TzCommunityReactContext,
+  TzCommunityReactContextType,
+} from "@marigold-dev/tezos-community-reactcontext";
+import { TzCommunityIonicUserProfileChip } from "@marigold-dev/tezos-community-reactcontext-ionic";
 import * as api from "@tzkt/sdk-api";
 import {
   addCircleOutline,
@@ -68,7 +72,6 @@ import {
   eyeOutline,
   lockClosedOutline,
   lockOpenOutline,
-  personCircleOutline,
   settingsOutline,
   shareSocialOutline,
 } from "ionicons/icons";
@@ -93,6 +96,10 @@ export const Search: React.FC = () => {
     reloadUser,
     BLOCK_TIME,
   } = React.useContext(UserContext) as UserContextType;
+
+  const { userProfiles } = React.useContext(
+    TzCommunityReactContext
+  ) as TzCommunityReactContextType;
 
   const [presentAlert] = useIonAlert();
   const { push } = useHistory();
@@ -123,7 +130,7 @@ export const Search: React.FC = () => {
   //TEZOS OPERATIONS
   const [loading, setLoading] = React.useState(false);
 
-  const refreshData = (event?: CustomEvent<RefresherEventDetail>) => {
+  const refreshData = async (event?: CustomEvent<RefresherEventDetail>) => {
     (async () => {
       let allTEZOSTEMPLATEContractFromTzkt: Array<Contract> =
         await api.contractsGetSame(
@@ -253,16 +260,24 @@ export const Search: React.FC = () => {
     //in case of forced page refresh
     if (!userAddress) {
       (async () => {
+        console.warn("We lost the user, refreshing the page");
         await reloadUser();
       })();
     }
 
-    refreshData();
+    (async () => {
+      await refreshData();
+      console.log("Search - refreshData");
+    })();
   }, []); //init load
 
   React.useEffect(() => {
     filterContracts(filter);
-  }, [allContracts]); //if data refreshed, need to refresh the filtered list too
+    console.log(
+      "Search - filterContracts",
+      "if data refreshed, need to refresh the filtered list too"
+    );
+  }, [allContracts]);
 
   const durationToString = (value: number): string => {
     return moment
@@ -291,12 +306,11 @@ export const Search: React.FC = () => {
           );
 
           const op = await c.methods.vote(voteValue).send();
-
-          console.log("BLOCK_TIME", BLOCK_TIME);
+          await op.confirmation();
 
           //refresh info on list
-          setTimeout(() => {
-            refreshData();
+          setTimeout(async () => {
+            await refreshData();
             setLoading(false);
             filterContracts(filter);
             presentAlert({
@@ -314,16 +328,17 @@ export const Search: React.FC = () => {
           await op.confirmation();
 
           //refresh info on list
-          setTimeout(() => {
-            refreshData();
+          setTimeout(async () => {
+            await refreshData();
+            setLoading(false);
             filterContracts(filter);
+            presentAlert({
+              header: "Success",
+              message: "Your vote has been accepted",
+            });
           }, BLOCK_TIME);
-
-          presentAlert({
-            header: "Success",
-            message: "Your vote has been accepted (wait a bit the refresh)",
-          });
         } else {
+          setLoading(false);
           console.error("Cannot find the type for contract ", contract);
 
           throw new Error(
@@ -331,6 +346,7 @@ export const Search: React.FC = () => {
           );
         }
       } catch (error: any) {
+        setLoading(false);
         console.table(`Error: ${JSON.stringify(error, null, 2)}`);
         let tibe: TransactionInvalidBeaconError =
           new TransactionInvalidBeaconError(error);
@@ -338,14 +354,11 @@ export const Search: React.FC = () => {
           header: "Error",
           message: tibe.data_message,
         });
-      } finally {
-        setLoading(false);
       }
     } else {
       console.log("Please select an option.");
+      setLoading(false);
     }
-
-    setLoading(false);
   };
 
   const buttonChoices = (contract: VotingContract) => {
@@ -587,7 +600,6 @@ export const Search: React.FC = () => {
                                 style={{ height: "20px", width: "20px" }}
                               >
                                 <IonImg
-                                  alt="Silhouette of a person's head"
                                   src={
                                     contract.type.name ==
                                     VOTING_TEMPLATE.PERMISSIONEDSIMPLEPOLL.name
@@ -654,30 +666,11 @@ export const Search: React.FC = () => {
                             </IonRow>
                           </IonCardTitle>
                           <IonCardSubtitle style={{ textAlign: "left" }}>
-                            {" "}
-                            <IonChip
-                              style={{
-                                fontSize: "x-small",
-                              }}
-                            >
-                              <IonIcon icon={personCircleOutline}></IonIcon>
-                              <IonLabel>
-                                <a
-                                  href={
-                                    `https://` +
-                                    NetworkType[
-                                      import.meta.env[
-                                        "VITE_NETWORK"
-                                      ].toUpperCase() as keyof typeof NetworkType
-                                    ] +
-                                    `.tzkt.io/${contract.creator}/info`
-                                  }
-                                  target="_blank"
-                                >
-                                  {contract.creator}
-                                </a>
-                              </IonLabel>
-                            </IonChip>
+                            <TzCommunityIonicUserProfileChip
+                              userProfiles={userProfiles}
+                              address={contract.creator as address}
+                              key={contract.creator}
+                            ></TzCommunityIonicUserProfileChip>
                           </IonCardSubtitle>
                         </IonCardHeader>
 

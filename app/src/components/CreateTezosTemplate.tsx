@@ -57,7 +57,7 @@ const CreateTezosTemplate: React.FC = () => {
   // MESSAGES
 
   const [presentAlert] = useIonAlert();
-  const { push, goBack } = useHistory();
+  const { push, goBack, go } = useHistory();
   // CURRRENT CONTRACT
 
   const [contract, setContract] = useState<TezosTemplateVotingContract>({
@@ -118,6 +118,7 @@ const CreateTezosTemplate: React.FC = () => {
       })
       .then((contract) => {
         push(PAGES.SEARCH);
+        go(0);
         presentAlert({
           header: "Success",
           message: `Origination completed for ${contract.address}.`,

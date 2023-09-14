@@ -327,3 +327,11 @@ export async function convertFromTZKTTezosContractToPermissionnedSimplePollTempl
 
   return permissionedSimplePollVotingContract;
 }
+
+export function validateAddress(anyString: string | undefined | null): boolean {
+  return anyString
+    ? (anyString.toLowerCase().startsWith("tz") ||
+        anyString.toLowerCase().startsWith("kt")) &&
+        anyString.match("[a-zA-Z0-9]{36}") != null
+    : false;
+}

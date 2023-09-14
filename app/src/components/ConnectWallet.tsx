@@ -1,11 +1,17 @@
 import { NetworkType } from "@airgap/beacon-sdk";
 import { IonButton, IonIcon, IonLabel } from "@ionic/react";
+import {
+  TzCommunityReactContext,
+  TzCommunityReactContextType,
+} from "@marigold-dev/tezos-community-reactcontext";
 import { DelegatesResponse } from "@taquito/rpc";
 import { walletOutline } from "ionicons/icons";
 import React from "react";
 import { useHistory } from "react-router";
 import { PAGES, UserContext, UserContextType } from "../App";
+import { address } from "../type-aliases";
 
+import { getUserProfile } from "@marigold-dev/tezos-community";
 const ConnectButton = (): JSX.Element => {
   const {
     Tezos,
@@ -15,6 +21,14 @@ const ConnectButton = (): JSX.Element => {
     setBakerPower,
     setBakerDeactivated,
   } = React.useContext(UserContext) as UserContextType;
+
+  const {
+    setUserProfile,
+    connectToWeb2Backend,
+    localStorage,
+    setUserProfiles,
+    userProfiles,
+  } = React.useContext(TzCommunityReactContext) as TzCommunityReactContextType;
 
   const { replace } = useHistory();
 
@@ -71,6 +85,32 @@ const ConnectButton = (): JSX.Element => {
       // gets user's address
       const userAddress = await wallet.getPKH();
       await setup(userAddress);
+
+      //connect to TzCommunity
+      await connectToWeb2Backend(
+        wallet,
+        userAddress,
+        (
+          await wallet.client.getActiveAccount()
+        )?.publicKey!,
+        localStorage
+      );
+
+      //try to load your user profile
+      try {
+        const newUserProfile = await getUserProfile(userAddress, localStorage);
+        setUserProfile(newUserProfile!);
+
+        setUserProfiles(
+          userProfiles.set(userAddress as address, newUserProfile!)
+        );
+      } catch (error) {
+        console.warn(
+          "User " +
+            userAddress +
+            " has no social account profile link on TzCommunity"
+        );
+      }
 
       replace(PAGES.SEARCH);
     } catch (error) {

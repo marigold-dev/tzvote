@@ -36,10 +36,18 @@ import {
 import React, { useEffect, useState } from "react";
 import { useHistory } from "react-router";
 import { PAGES, UserContext, UserContextType } from "../App";
-import { TransactionInvalidBeaconError } from "../contractutils/TezosUtils";
+import {
+  TransactionInvalidBeaconError,
+  validateAddress,
+} from "../contractutils/TezosUtils";
 import { Storage as PermissionedSimplePollVotingContract } from "../permissionedSimplePoll.types";
 import { address, asMap, int, timestamp } from "../type-aliases";
 
+import {
+  TzCommunityReactContext,
+  TzCommunityReactContextType,
+} from "@marigold-dev/tezos-community-reactcontext";
+import { TzCommunityIonicUserProfileChip } from "@marigold-dev/tezos-community-reactcontext-ionic";
 import jsonContractTemplate from "../contracttemplates/permissionedSimplePoll.json";
 import { VOTING_TEMPLATE } from "../contractutils/TezosUtils";
 
@@ -50,7 +58,12 @@ const CreatePermissionedSimplePoll: React.FC = () => {
   const { Tezos, userAddress, bakerDelegators, reloadUser, BLOCK_TIME } =
     React.useContext(UserContext) as UserContextType;
 
-  const { push, goBack } = useHistory();
+  //TZCOM CONTEXT
+  const { userProfiles } = React.useContext(
+    TzCommunityReactContext
+  ) as TzCommunityReactContextType;
+
+  const { push, goBack, go } = useHistory();
 
   //TEZOS OPERATIONS
   const [loading, setLoading] = React.useState(false);
@@ -86,8 +99,14 @@ const CreatePermissionedSimplePoll: React.FC = () => {
   }, [userAddress]);
 
   const [inputOption, setInputOption] = useState<string>("");
+
   const [inputVoter, setInputVoter] = useState<string>("");
+  const [inputVoterValid, setInputVoterValid] = useState<boolean>(false);
+  const [inputVoterTouched, setInputVoterTouched] = useState<boolean>(false);
+
   const [inputBaker, setInputBaker] = useState<string>("");
+  const [inputBakerValid, setInputBakerValid] = useState<boolean>(false);
+  const [inputBakerTouched, setInputBakerTouched] = useState<boolean>(false);
 
   const createVoteContract = async () => {
     //block if no option
@@ -123,6 +142,7 @@ const CreatePermissionedSimplePoll: React.FC = () => {
 
       setTimeout(async () => {
         setLoading(false);
+
         presentAlert({
           header: "Success",
           message: `Origination completed for ${
@@ -130,8 +150,10 @@ const CreatePermissionedSimplePoll: React.FC = () => {
           }.`,
         });
         push(PAGES.SEARCH);
+        go(0);
       }, BLOCK_TIME);
     } catch (error) {
+      setLoading(false);
       console.table(`Error: ${JSON.stringify(error, null, 2)}`);
       let tibe: TransactionInvalidBeaconError =
         new TransactionInvalidBeaconError(error);
@@ -139,8 +161,6 @@ const CreatePermissionedSimplePoll: React.FC = () => {
         header: "Error",
         message: tibe.data_message,
       });
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -281,7 +301,7 @@ const CreatePermissionedSimplePoll: React.FC = () => {
                 <IonCardSubtitle>
                   <IonRow>
                     <IonInput
-                      style={{ width: "80%" }}
+                      style={{ width: "calc(100% - 55px)" }}
                       value={inputOption}
                       label="New option to add"
                       labelPlacement="floating"
@@ -297,7 +317,6 @@ const CreatePermissionedSimplePoll: React.FC = () => {
                     ></IonInput>
 
                     <IonButton
-                      style={{ marginLeft: "1em" }}
                       onClick={() => {
                         setContract({
                           ...contract,
@@ -344,23 +363,40 @@ const CreatePermissionedSimplePoll: React.FC = () => {
                 <IonCardSubtitle>
                   <IonRow>
                     <IonInput
-                      style={{ width: "calc(100% - 110px)" }}
+                      style={{ width: "calc(100% - 55px)" }}
                       value={inputVoter}
-                      label="New voter to add"
+                      label="Add individual voter"
                       labelPlacement="floating"
                       color="primary"
                       required
                       id="name"
-                      placeholder="Enter new voter here ..."
+                      placeholder="Enter voter address here ..."
                       maxlength={36}
                       counter
+                      className={`${inputVoterValid && "ion-valid"} ${
+                        inputVoterValid === false && "ion-invalid"
+                      } ${inputVoterTouched && "ion-touched"} `}
+                      helperText="Enter a valid address (tz1,tz2,KT1,etc...)"
+                      errorText="Invalid address"
+                      onIonBlur={() => {
+                        setInputVoterTouched(true);
+                      }}
                       onIonInput={(e) => {
+                        if (validateAddress(e.target.value as string))
+                          setInputVoterValid(true);
+                        else setInputVoterValid(false);
+
+                        console.log(
+                          e.target.value +
+                            " is " +
+                            validateAddress(e.target.value as string)
+                        );
+
                         setInputVoter(e.target.value as string);
                       }}
                     ></IonInput>
 
                     <IonButton
-                      style={{ maxWidth: "100px" }}
                       onClick={() => {
                         setContract({
                           ...contract,
@@ -373,28 +409,38 @@ const CreatePermissionedSimplePoll: React.FC = () => {
                       }}
                     >
                       <IonIcon icon={addCircleOutline} />
-                      <IonLabel>Voter</IonLabel>
                     </IonButton>
                   </IonRow>
 
                   <IonRow>
                     <IonInput
-                      style={{ width: "calc(100% - 185px)" }}
+                      style={{ width: "calc(100% - 55px)" }}
                       value={inputBaker}
-                      label="Baker address"
+                      label="Add baker delegatees"
                       labelPlacement="floating"
                       color="primary"
                       required
                       id="name"
-                      placeholder="Enter baker here ..."
+                      placeholder="Enter baker address here ..."
                       maxlength={36}
                       counter
+                      className={`${inputBakerValid && "ion-valid"} ${
+                        inputBakerValid === false && "ion-invalid"
+                      } ${inputBakerTouched && "ion-touched"} `}
+                      helperText="Enter a valid address (tz1,tz2,KT1,etc...)"
+                      errorText="Invalid address"
+                      onIonBlur={() => {
+                        setInputBakerTouched(true);
+                      }}
                       onIonInput={(e) => {
+                        if (validateAddress(e.target.value as string))
+                          setInputBakerValid(true);
+                        else setInputBakerValid(false);
+
                         setInputBaker(e.target.value as string);
                       }}
                     ></IonInput>
                     <IonButton
-                      style={{ width: "175px" }}
                       className="button-solid"
                       onClick={async () => {
                         setContract({
@@ -409,7 +455,7 @@ const CreatePermissionedSimplePoll: React.FC = () => {
                         } as PermissionedSimplePollVotingContract);
                       }}
                     >
-                      <IonIcon icon={addCircleOutline} /> &nbsp; delegators of
+                      <IonIcon icon={addCircleOutline} />
                     </IonButton>
                   </IonRow>
 
@@ -439,30 +485,31 @@ const CreatePermissionedSimplePoll: React.FC = () => {
               </IonCardHeader>
 
               <IonCardContent>
-                <IonList inputMode="text">
-                  {contract.registeredVoters.map(
-                    (voter: string, index: number) => (
-                      <IonItem key={voter}>
-                        <IonLabel>
-                          <IonIcon icon={radioButtonOffOutline} /> &nbsp;{" "}
-                          {voter}
-                        </IonLabel>
+                {contract.registeredVoters.map(
+                  (voter: string, index: number) => (
+                    <IonRow key={voter}>
+                      <TzCommunityIonicUserProfileChip
+                        userProfiles={userProfiles}
+                        address={voter as address}
+                        key={voter}
+                        style={{ width: "calc(100% - 24px - 16px)" }}
+                      ></TzCommunityIonicUserProfileChip>
 
-                        <IonIcon
-                          color="danger"
-                          icon={trashBinOutline}
-                          onClick={() => {
-                            contract.registeredVoters.splice(index, 1);
-                            setContract({
-                              ...contract,
-                              registeredVoters: contract.registeredVoters,
-                            } as PermissionedSimplePollVotingContract);
-                          }}
-                        />
-                      </IonItem>
-                    )
-                  )}
-                </IonList>
+                      <IonIcon
+                        style={{ height: "24px", width: "24px" }}
+                        color="danger"
+                        icon={trashBinOutline}
+                        onClick={() => {
+                          contract.registeredVoters.splice(index, 1);
+                          setContract({
+                            ...contract,
+                            registeredVoters: contract.registeredVoters,
+                          } as PermissionedSimplePollVotingContract);
+                        }}
+                      />
+                    </IonRow>
+                  )
+                )}
               </IonCardContent>
             </IonCard>
           </IonContent>

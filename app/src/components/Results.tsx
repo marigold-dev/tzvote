@@ -25,6 +25,8 @@ import {
 import * as api from "@tzkt/sdk-api";
 import { BigNumber } from "bignumber.js";
 import {
+  lockClosedOutline,
+  lockOpenOutline,
   radioButtonOnOutline,
   returnUpBackOutline,
   shareSocialOutline,
@@ -35,6 +37,7 @@ import { RouteComponentProps, useHistory } from "react-router-dom";
 import { Cell, Pie, PieChart, ResponsiveContainer } from "recharts";
 import { PAGES, UserContext, UserContextType } from "../App";
 import {
+  STATUS,
   VOTING_TEMPLATE,
   VotingContract,
   convertFromTZKTTezosContractToPermissionnedSimplePollTemplateVotingContract,
@@ -44,7 +47,12 @@ import {
 import { Storage as TezosTemplateVotingContract } from "../tezosTemplate3.types";
 
 import { Capacitor } from "@capacitor/core";
-import { int } from "../type-aliases";
+import {
+  TzCommunityReactContext,
+  TzCommunityReactContextType,
+} from "@marigold-dev/tezos-community-reactcontext";
+import { TzCommunityIonicUserProfileChip } from "@marigold-dev/tezos-community-reactcontext-ionic";
+import { address, int } from "../type-aliases";
 
 const RADIAN = Math.PI / 180;
 const renderCustomizedLabel = ({
@@ -84,7 +92,7 @@ export const Results: React.FC<ResultsProps> = ({ match }) => {
     "https://api." + import.meta.env.VITE_NETWORK + ".tzkt.io";
 
   const [presentAlert] = useIonAlert();
-  const { push } = useHistory(); //mandatory in case of a shared page, there is no history
+  const { push, go } = useHistory(); //mandatory in case of a shared page, there is no history
 
   //TEZOS OPERATIONS
   const [loading, setLoading] = React.useState(false);
@@ -100,6 +108,11 @@ export const Results: React.FC<ResultsProps> = ({ match }) => {
   const { Tezos, userAddress, bakerPower } = React.useContext(
     UserContext
   ) as UserContextType;
+
+  //TZCOM CONTEXT
+  const { userProfiles } = React.useContext(
+    TzCommunityReactContext
+  ) as TzCommunityReactContextType;
 
   const [data, setData] = useState<
     {
@@ -173,7 +186,11 @@ export const Results: React.FC<ResultsProps> = ({ match }) => {
       <IonHeader>
         <IonToolbar>
           <IonButtons slot="start">
-            <IonButton onClick={() => push(PAGES.SEARCH)}>
+            <IonButton
+              onClick={() => {
+                push(PAGES.SEARCH);
+              }}
+            >
               <IonIcon icon={returnUpBackOutline}></IonIcon>
               <IonLabel>Back</IonLabel>
             </IonButton>
@@ -221,7 +238,14 @@ export const Results: React.FC<ResultsProps> = ({ match }) => {
         <IonCard>
           <IonCardHeader>
             <IonTitle>Question</IonTitle>
-            <IonCardSubtitle>From {contract?.creator}</IonCardSubtitle>
+            <IonCardSubtitle>
+              From{" "}
+              <TzCommunityIonicUserProfileChip
+                userProfiles={userProfiles}
+                address={contract?.creator as address}
+                key={contract?.creator}
+              ></TzCommunityIonicUserProfileChip>
+            </IonCardSubtitle>
           </IonCardHeader>
 
           <IonCardContent>
@@ -242,6 +266,26 @@ export const Results: React.FC<ResultsProps> = ({ match }) => {
             ) : (
               ""
             )}
+
+            <IonCardSubtitle>
+              <IonChip
+                color={
+                  contract?.status === STATUS.ONGOING ? "success" : "danger"
+                }
+              >
+                <IonIcon
+                  color={
+                    contract?.status === STATUS.ONGOING ? "success" : "danger"
+                  }
+                  icon={
+                    contract?.status === STATUS.ONGOING
+                      ? lockOpenOutline
+                      : lockClosedOutline
+                  }
+                ></IonIcon>
+                <IonLabel>{contract?.status}</IonLabel>
+              </IonChip>
+            </IonCardSubtitle>
           </IonCardHeader>
           <IonCardContent>
             <IonRow>
