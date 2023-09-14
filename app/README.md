@@ -127,6 +127,17 @@ npm i
 npm run local
 ```
 
+## Build for Android (linked to mainnet config by default on package.json)
+
+```bash
+ionic capacitor add android
+ionic capacitor copy android
+npm install -g cordova-res
+cordova-res android --skip-config --copy
+ionic capacitor sync android
+ionic capacitor update android
+```
+
 # TIPS
 
 Add one of my account **alice** as a baker

@@ -13,7 +13,7 @@
     "lint": "eslint src --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
     "ionic:serve": "vite dev --host",
-    "sync": "npm run build && ionic cap sync --no-build"
+    "sync": "npm run build:prod && ionic cap sync --no-build"
   },
   "dependencies": {
     "@airgap/beacon-sdk": "^4.0.8",
