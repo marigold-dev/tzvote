@@ -1,10 +1,5 @@
 import { Share } from "@capacitor/share";
 import {
-  TezosTemplate3WalletType,
-  Storage as TezosTemplateVotingContract,
-} from "../tezosTemplate3.types";
-
-import {
   IonAvatar,
   IonButton,
   IonButtons,
@@ -40,6 +35,7 @@ import {
   shareSocialOutline,
   trashBinOutline,
 } from "ionicons/icons";
+import Papa from "papaparse";
 import React, { useEffect, useRef, useState } from "react";
 import { RouteComponentProps, useHistory } from "react-router-dom";
 import { PAGES, UserContext, UserContextType } from "../App";
@@ -56,6 +52,10 @@ import {
   Storage as PermissionedSimplePollVotingContract,
   PermissionedSimplePollWalletType,
 } from "../permissionedSimplePoll.types";
+import {
+  TezosTemplate3WalletType,
+  Storage as TezosTemplateVotingContract,
+} from "../tezosTemplate3.types";
 
 import { Capacitor } from "@capacitor/core";
 import {
@@ -198,7 +198,7 @@ export const Settings: React.FC<SettingsProps> = ({ match }) => {
       } else {
         presentAlert({
           header: "Warning",
-          message: "All delegators already added",
+          message: "All voters already added",
         });
         setLoading(false);
       }
@@ -731,6 +731,57 @@ export const Settings: React.FC<SettingsProps> = ({ match }) => {
                         ) : (
                           ""
                         )}
+
+                        <IonButton>
+                          <IonIcon icon="/csv.svg" />
+                          <label htmlFor="csvInput"> &nbsp; Import CSV</label>
+                          <input
+                            id="csvInput"
+                            type="file"
+                            hidden
+                            name="data"
+                            accept=".csv"
+                            onChange={(
+                              e: React.ChangeEvent<HTMLInputElement>
+                            ) => {
+                              const data = e.target.files
+                                ? e.target.files[0]
+                                : null;
+
+                              if (!data) {
+                                presentAlert(
+                                  "Enter a valid CSV file, only first column with Tezos addresses, no header"
+                                );
+                              } else {
+                                let newBakerDelegators: string[] = [];
+                                Papa.parse(data, {
+                                  header: false,
+
+                                  step: (row) => {
+                                    const address = (
+                                      row.data as Array<string>
+                                    )[0];
+                                    if (!validateAddress(address)) {
+                                      presentAlert(
+                                        "Enter a valid Tezos address (" +
+                                          address +
+                                          ") on the first column of the CSV file, no header please"
+                                      );
+                                    }
+                                    newBakerDelegators.push(address);
+                                  },
+                                  complete: () => {
+                                    handleAddDelegatorVoters(
+                                      newBakerDelegators
+                                    );
+                                  },
+                                });
+                              }
+
+                              e.preventDefault();
+                            }}
+                          />
+                        </IonButton>
                       </IonRow>
                     </IonCardSubtitle>
                   </IonCardHeader>

@@ -194,16 +194,22 @@ const App: React.FC = () => {
               console.warn(
                 "Access token expired, try to fetch from refresh token.."
               );
-              await refreshToken(userAddress!, localStorage);
-              const userProfile = await getUserProfile(
-                userAddress!,
-                localStorage
-              );
-              if (userProfile) setUserProfile(userProfile);
-              setUserProfiles(
-                await loadUserProfiles(Tezos, userAddress!, localStorage)
-              );
-              break;
+              try {
+                await refreshToken(userAddress!, localStorage);
+                const userProfile = await getUserProfile(
+                  userAddress!,
+                  localStorage
+                );
+                if (userProfile) setUserProfile(userProfile);
+                setUserProfiles(
+                  await loadUserProfiles(Tezos, userAddress!, localStorage)
+                );
+                break;
+              } catch (error) {
+                console.warn("Cannot refresh token, disconnect", error);
+                disconnectWallet();
+                break;
+              }
             }
           }
         } else {

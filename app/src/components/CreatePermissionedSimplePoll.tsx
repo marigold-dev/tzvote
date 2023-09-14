@@ -1,3 +1,5 @@
+import Papa from "papaparse";
+
 import {
   IonAvatar,
   IonButton,
@@ -480,6 +482,59 @@ const CreatePermissionedSimplePoll: React.FC = () => {
                     ) : (
                       ""
                     )}
+
+                    <IonButton>
+                      <IonIcon icon="/csv.svg" />
+                      <label htmlFor="csvInput"> &nbsp; Import CSV</label>
+                      <input
+                        id="csvInput"
+                        type="file"
+                        hidden
+                        name="data"
+                        accept=".csv"
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                          const data = e.target.files
+                            ? e.target.files[0]
+                            : null;
+
+                          if (!data) {
+                            presentAlert(
+                              "Enter a valid CSV file, only first column with Tezos addresses, no header"
+                            );
+                          } else {
+                            let newBakerDelegators: string[] = [];
+                            Papa.parse(data, {
+                              header: false,
+
+                              step: (row) => {
+                                const address = (row.data as Array<string>)[0];
+                                if (!validateAddress(address)) {
+                                  presentAlert(
+                                    "Enter a valid Tezos address (" +
+                                      address +
+                                      ") on the first column of the CSV file, no header please"
+                                  );
+                                }
+                                newBakerDelegators.push(address);
+                              },
+                              complete: () => {
+                                setContract({
+                                  ...contract,
+                                  registeredVoters: [
+                                    ...new Set([
+                                      ...contract.registeredVoters,
+                                      ...newBakerDelegators,
+                                    ]),
+                                  ],
+                                } as PermissionedSimplePollVotingContract);
+                              },
+                            });
+                          }
+
+                          e.preventDefault();
+                        }}
+                      />
+                    </IonButton>
                   </IonRow>
                 </IonCardSubtitle>
               </IonCardHeader>
