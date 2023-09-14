@@ -744,41 +744,57 @@ export const Settings: React.FC<SettingsProps> = ({ match }) => {
                             onChange={(
                               e: React.ChangeEvent<HTMLInputElement>
                             ) => {
-                              const data = e.target.files
-                                ? e.target.files[0]
-                                : null;
+                              try {
+                                const data = e.target.files
+                                  ? e.target.files[0]
+                                  : null;
 
-                              if (!data) {
-                                presentAlert(
-                                  "Enter a valid CSV file, only first column with Tezos addresses, no header"
-                                );
-                              } else {
-                                let newBakerDelegators: string[] = [];
-                                Papa.parse(data, {
-                                  header: false,
+                                console.log("data", data);
 
-                                  step: (row) => {
-                                    const address = (
-                                      row.data as Array<string>
-                                    )[0];
-                                    if (!validateAddress(address)) {
-                                      presentAlert(
-                                        "Enter a valid Tezos address (" +
-                                          address +
-                                          ") on the first column of the CSV file, no header please"
+                                if (!data) {
+                                  console.error(
+                                    "Enter a valid CSV file, only first column with Tezos addresses, no header"
+                                  );
+                                  presentAlert(
+                                    "Enter a valid CSV file, only first column with Tezos addresses, no header"
+                                  );
+                                } else {
+                                  let newBakerDelegators: string[] = [];
+                                  Papa.parse(data, {
+                                    header: false,
+                                    step: (row) => {
+                                      const address = (
+                                        row.data as Array<string>
+                                      )[0];
+                                      if (!validateAddress(address)) {
+                                        presentAlert(
+                                          "Enter a valid Tezos address (" +
+                                            address +
+                                            ") on the first column of the CSV file, no header please"
+                                        );
+                                      }
+                                      newBakerDelegators.push(address);
+                                      console.log(
+                                        "Adding Tezos address",
+                                        address
                                       );
-                                    }
-                                    newBakerDelegators.push(address);
-                                  },
-                                  complete: () => {
-                                    handleAddDelegatorVoters(
-                                      newBakerDelegators
-                                    );
-                                  },
-                                });
-                              }
+                                    },
+                                    complete: () => {
+                                      handleAddDelegatorVoters(
+                                        newBakerDelegators
+                                      );
+                                      console.log(
+                                        "Adding Tezos addresses",
+                                        newBakerDelegators
+                                      );
+                                    },
+                                  });
+                                }
 
-                              e.preventDefault();
+                                e.preventDefault();
+                              } catch (error) {
+                                console.error("upload error", error);
+                              }
                             }}
                           />
                         </IonButton>
