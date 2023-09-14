@@ -499,7 +499,7 @@ const CreatePermissionedSimplePoll: React.FC = () => {
 
                           if (!data) {
                             presentAlert(
-                              "Enter a valid CSV file, only first column with Tezos addresses, no header"
+                              "Select a valid CSV file, only first column with Tezos addresses, no header. File has to be on your internal filesystem storage"
                             );
                           } else {
                             let newBakerDelegators: string[] = [];

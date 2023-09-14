@@ -749,14 +749,9 @@ export const Settings: React.FC<SettingsProps> = ({ match }) => {
                                   ? e.target.files[0]
                                   : null;
 
-                                console.log("data", data);
-
                                 if (!data) {
-                                  console.error(
-                                    "Enter a valid CSV file, only first column with Tezos addresses, no header"
-                                  );
                                   presentAlert(
-                                    "Enter a valid CSV file, only first column with Tezos addresses, no header"
+                                    "Select a valid CSV file, only first column with Tezos addresses, no header. File has to be on your internal filesystem storage"
                                   );
                                 } else {
                                   let newBakerDelegators: string[] = [];
@@ -774,17 +769,9 @@ export const Settings: React.FC<SettingsProps> = ({ match }) => {
                                         );
                                       }
                                       newBakerDelegators.push(address);
-                                      console.log(
-                                        "Adding Tezos address",
-                                        address
-                                      );
                                     },
                                     complete: () => {
                                       handleAddDelegatorVoters(
-                                        newBakerDelegators
-                                      );
-                                      console.log(
-                                        "Adding Tezos addresses",
                                         newBakerDelegators
                                       );
                                     },
