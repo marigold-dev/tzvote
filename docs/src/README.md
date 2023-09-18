@@ -1,33 +1,53 @@
 # Introduction
 
+Vote is the base of the democracy
+
+> Elections belong to the people. It's their decision. If they decide to turn their back on the fire and burn their behinds, then they will just have to sit on their blisters.
+>
+> **Abraham Lincoln**
+
+![img](https://tzvote.marigold.dev/vote.jpg)
+
 ## The problem
 
-- Lot of decentralized groups : the community is scattered and very diverse from core developers to artist and gamers
-- No single entrypoint : There are plenty of tools, social networks and user registries
-- No effective information broadcast to all members : lot of scams, spams, bots or trollers
-- No global company/member directory : each application reimplements its own user registry bringing either duplication or separated worlds
+Giving power on an intermediary to process the votes is a threat in case of malicious actor. Even with electronic voting system, there are not clear proof of frauds but still remain some questions [(article here)](https://www.bbc.com/news/election-us-2020-54959962).
 
-## Tezos pseudonym social graph
+**Can we leverage the decentralized feature of blockchain to solve the intermediary problem ? It what TzVote claims to provide**
 
-![](https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fbrewminate.com%2Fwp-content%2Fuploads%2F2018%2F03%2F030218-62-Sociology-Groups.jpg&f=1&nofb=1&ipt=cc57ae859b81d6de42b7468249a2ff771a143343104785beb3d0a3f362cb226c&ipo=images)
+## Solution
 
-We are not going to tackle the problem of the unique identity like [BrightID](https://www.brightid.org/), instead we concentrate our effort on the **pseudonymity** already provided by **Tezos addresses** combined with **grouping** feature and restricted **social media linking**
+TzVote helps you deploy your own poll on a smart contract and gives you a simple website to interact with it
 
-- **Identity** :
-  1. strictly pseudonymous Tezos addresses
-  2. (optional) restricted display name, alias and picture from different social networks available for people from same organization
-- **Organizations** : a way to regroup people inside a cluster
-- **Internal alerting system** : a non gas-free way to send important message to other clusters and get alerted on real time
+## Flavours
 
-## Final goal
+There are different ways to create a poll, so we decided to create template for each particular use cases.
+First, here are the criteria to consider :
 
-This application :
+- question count : how many question on the poll ?
+- option count : how many options on the answer ?
+- votes choices count : only once or multiple answers
+- voting power : how is calculated the end result
+- dates : dates to consider
+- censorship resistant : what is the level of decentralization of your poll ?
+- privacy : does the poll include hidden ballot and preserve anonymity ?
 
-- should not be seen as a final product but as a **base layer for other application to integrate with**. Example : providing a list of player for a mobile game where it is hard to type and remember a tz1 address
-- does not require high presence. It has to be seen **as a configuration tool** like a contact list, a LDAP or other user registries running in background
+Here are the available templates :
+
+| name              | #questions | #options | #choices | voting power               | dates               | censorship resistant       | privacy |
+| ----------------- | ---------- | -------- | -------- | -------------------------- | ------------------- | -------------------------- | ------- |
+| permissioned vote | 1          | n        | 1        | 1 allowed address = 1 vote | from, to            | poll creator choose voters | no      |
+| baker vote        | 1          | n        | 1        | Tezos baker total stake    | Tezos voting period | yes                        | no      |
+
+## Next developments
+
+- bring complete anonymity, ballots might be hidden (to avoid physical threats)
+- bring more templates : [Borda](https://en.wikipedia.org/wiki/Borda_count), Samarkand
+- [Proof of Humanity](https://proofofhumanity.id/)
 
 ## Links
 
-- [TEZOS COMMUNITY DAPP (Web based)](https://tezos-community.com/)
-- TEZOS COMMUNITY DAPP (Android) Soon
+- [TzVote DAPP (Web based - mainnet)](https://tzvote.marigold.dev/)
+- [TzVote DAPP (Android - mainnet)](https://play.google.com/store/apps/details?id=dev.marigold.tzvote)
 - TEZOS COMMUNITY DAPP (iOS) Soon
+
+- [TzVote DAPP (Web based - ghostnet)](https://ghostnet.tzvote.marigold.dev)
