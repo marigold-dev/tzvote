@@ -62,3 +62,12 @@ Vote button only appears (depending of the choosen template policies) if you are
 # Cronjob
 
 Push current Tezos voting period index to the Oracle storage
+
+# Docs
+
+import git submodule and run doc locally
+
+```
+git submodule update --init --recursive
+mdbook serve --open --port 3003
+```
