@@ -2,63 +2,156 @@
 
 [logo]: https://i.imgflip.com/r56sp.jpg?a456398 "Vote"
 
-TzVote is a dapp for voting purpose composed by :
+[Full details here](https://hackmd.io/EBB3pObiT5y5eJs4tPQjXQ?view)
 
-- a React application with Taquito SDK
-- a voting session smart contract template in jsligo
-- a cronjob pushing data to the oracle smart contract
+# Oracle
 
-# Play with the application
+The Oracle is here to store missing information of current **voting period index**
 
-The app is available on all networks :
+## compile
 
-- [MAINNET](https://tzvote.marigold.dev/)
-- [GHOSTNET](https://ghostnet.tzvote.marigold.dev/)
+```bash
+TAQ_LIGO_IMAGE=ligolang/ligo:0.72.0 taq compile votingPeriodOracle.jsligo
+```
 
-![](doc/home.png)
+## Test
 
-## Connect to your wallet
+### Dry run
 
-Click on the header button
+```bash
+taq simulate votingPeriodOracle.tz --param pokeGame.parameter.default_parameter.tz  --sender alice --protocol nairobi
+```
 
-![](doc/connect.png)
+### Unit tests
 
-Select your wallet
+```bash
+taq test unit_votingPeriodOracle.jsligo
+```
 
-![](doc/beacon.png)
+## Deploy
 
-Select your account
+```bash
+taq deploy votingPeriodOracle.tz -e "testing" --storage votingPeriodOracle.storage.ghostnet.tz
+```
 
-![](doc/account.png)
+```bash
+taq deploy votingPeriodOracle.tz -e "production" --storage votingPeriodOracle.storage.mainnet.tz
+```
 
-## Search
+ghostnet : KT1ACfH87dohx1bAVc4PigcNBAFSTdxrRwj7
+mainnet : KT1C8Varn3RWkSk6jJBVSRUHkmmXArGefifp
 
-You can search existing polls and click on the status of a particular one to see the results
+### initialize some data
 
-![](doc/search.png)
+```bash
+taq call votingPeriodOracle --param pokeGame.parameter.default_parameter.tz  -e testing
+```
 
-## Create
+# Smart contract
 
-On the header, you can choose which template you want to use and click on the button to display the form
+## Compile Tezos baker contract
 
-![](doc/create1.png)
+```bash
+TAQ_LIGO_IMAGE=ligolang/ligo:0.72.0 taq compile tezosTemplate3.jsligo
+```
 
-Fill the form and click on the CREATE button
+### Unit tests
 
-![](doc/create2.png)
+```bash
+taq test unit_tezosTemplate3.jsligo
+```
 
-If you have connected your wallet, you will be able to deploy a voting session Smart Contract on Tezos
+### Deploy
 
-## Vote
+```bash
+taq deploy tezosTemplate3.tz -e "testing" --storage tezosTemplate3.storage.ghostnet.tz
+```
 
-Vote button only appears (depending of the choosen template policies) if you are :
+KT1G4DCjT2SviF7T6Ji9zB5m65DR67Mw91nZ
 
-- logged in
-- authorized to vote
-- have not yet voted
+```bash
+taq deploy tezosTemplate3.tz -e "production" --storage tezosTemplate3.storage.mainnet.tz
+```
 
-![](doc/vote.png)
+KT1FohLnkN7zNk4fQy99D4TJoM83Ln8JJz4c
 
-# Cronjob
+## Compile permissioned Simple Poll contract
 
-Push current Tezos voting period index to the Oracle storage
+```bash
+TAQ_LIGO_IMAGE=ligolang/ligo:0.72.0 taq compile permissionedSimplePoll.jsligo
+```
+
+### Unit tests
+
+```bash
+taq test unit_permissionedSimplePoll.jsligo
+```
+
+### Deploy
+
+```bash
+taq deploy permissionedSimplePoll.tz -e "testing" --storage permissionedSimplePoll.storage.ghostnet.tz
+```
+
+KT1ACfH87dohx1bAVc4PigcNBAFSTdxrRwj7
+
+```bash
+taq deploy permissionedSimplePoll.tz -e "production" --storage permissionedSimplePoll.storage.mainnet.tz
+```
+
+KT1CXVRgTKeEn2F2fqVX7tWcMrYRn8vaJwUa
+
+# App
+
+## Compile both for the frontend
+
+```bash
+TAQ_LIGO_IMAGE=ligolang/ligo:0.72.0 taq compile tezosTemplate3.jsligo --json && mv artifacts/tezosTemplate3.json ./app/src/contracttemplates/
+
+TAQ_LIGO_IMAGE=ligolang/ligo:0.72.0 taq compile permissionedSimplePoll.jsligo --json && mv artifacts/permissionedSimplePoll.json ./app/src/contracttemplates/
+```
+
+Generate types
+
+```bash
+taq install @taqueria/plugin-contract-types
+taq generate types ./app/src
+```
+
+## Build
+
+Install dependencies:
+
+```bash
+npm i
+npm run local
+```
+
+## Build for Android (linked to mainnet config by default on package.json)
+
+```bash
+ionic capacitor add android
+ionic capacitor copy android
+npm install -g cordova-res
+cordova-res android --skip-config --copy
+ionic capacitor sync android
+ionic capacitor update android
+```
+
+# TIPS
+
+Add one of my account **alice** as a baker
+
+```
+tezos-client register key alice as delegate
+```
+
+# Docs
+
+import git submodule and run doc locally
+
+```
+git submodule add https://github.com/marigold-dev/marigold-docs-theme.git docs/theme
+git submodule update --init --recursive
+mdbook serve --open --port 3003
+```
