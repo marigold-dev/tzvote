@@ -1,0 +1,400 @@
+<!DOCTYPE HTML>
+<html lang="en" class="sidebar-visible no-js light">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>TzVote Documentation</title>
+        <meta name="robots" content="noindex" />
+
+
+        <!-- Custom HTML head -->
+        
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff" />
+
+        <link rel="shortcut icon" href="favicon.png">
+        <link rel="stylesheet" href="css/variables.css">
+        <link rel="stylesheet" href="css/general.css">
+        <link rel="stylesheet" href="css/chrome.css">
+        <link rel="stylesheet" href="css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="highlight.css">
+        <link rel="stylesheet" href="tomorrow-night.css">
+        <link rel="stylesheet" href="ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+        <link rel="stylesheet" href="theme/marigold.css">
+
+        <!-- MathJax -->
+        <script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    </head>
+    <body>
+    <div id="body-container">
+        <!-- Provide site root to javascript -->
+        <script>
+            var path_to_root = "";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "light";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('no-js')
+            html.classList.remove('light')
+            html.classList.add(theme);
+            html.classList.add('js');
+        </script>
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            var html = document.querySelector('html');
+            var sidebar = null;
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+            }
+            html.classList.remove('sidebar-visible');
+            html.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item expanded affix "><a href="index.html">TzVote</a></li><li class="chapter-item expanded "><a href="USER.html"><strong aria-hidden="true">1.</strong> User Guide</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="LOGIN.html"><strong aria-hidden="true">1.1.</strong> Login</a></li><li class="chapter-item expanded "><a href="CREATE.html"><strong aria-hidden="true">1.2.</strong> Create a poll</a></li><li class="chapter-item expanded "><a href="MANAGE.html"><strong aria-hidden="true">1.3.</strong> Manage a poll (Details & Results) </a></li><li class="chapter-item expanded "><a href="VOTE.html"><strong aria-hidden="true">1.4.</strong> Vote on a poll</a></li><li class="chapter-item expanded "><a href="SEARCH.html"><strong aria-hidden="true">1.5.</strong> Search</a></li><li class="chapter-item expanded "><a href="SHARE.html"><strong aria-hidden="true">1.6.</strong> Share a poll</a></li><li class="spacer"></li></ol></li><li class="chapter-item expanded "><a href="contributors.html">Contributors</a></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
+        </nav>
+
+        <!-- Track and set sidebar scroll position -->
+        <script>
+            var sidebarScrollbox = document.querySelector('#sidebar .sidebar-scrollbox');
+            sidebarScrollbox.addEventListener('click', function(e) {
+                if (e.target.tagName === 'A') {
+                    sessionStorage.setItem('sidebar-scroll', sidebarScrollbox.scrollTop);
+                }
+            }, { passive: true });
+            var sidebarScrollTop = sessionStorage.getItem('sidebar-scroll');
+            sessionStorage.removeItem('sidebar-scroll');
+            if (sidebarScrollTop) {
+                // preserve sidebar scroll position when navigating via links within sidebar
+                sidebarScrollbox.scrollTop = sidebarScrollTop;
+            } else {
+                // scroll sidebar to current active section when navigating via "next/previous chapter" buttons
+                var activeSection = document.querySelector('#sidebar .active');
+                if (activeSection) {
+                    activeSection.scrollIntoView({ block: 'center' });
+                }
+            }
+        </script>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <button id="sidebar-toggle" class="icon-button" type="button" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </button>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">TzVote Documentation</h1>
+
+                    <div class="right-buttons">
+                        <a href="print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+                        <a href="https://github.com/marigold-dev/tzvote.git" title="Git repository" aria-label="Git repository">
+                            <i id="git-repository-button" class="fa fa-github"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1 id="introduction"><a class="header" href="#introduction">Introduction</a></h1>
+<p>Vote is the base of the democracy</p>
+<blockquote>
+<p>Elections belong to the people. It's their decision. If they decide to turn their back on the fire and burn their behinds, then they will just have to sit on their blisters.</p>
+<p><strong>Abraham Lincoln</strong></p>
+</blockquote>
+<p><img src="https://tzvote.marigold.dev/vote.jpg" alt="img" /></p>
+<h2 id="the-problem"><a class="header" href="#the-problem">The problem</a></h2>
+<p>Giving power on an intermediary to process the votes is a threat in case of malicious actor. Even with electronic voting system, there are not clear proof of frauds but still remain some questions <a href="https://www.bbc.com/news/election-us-2020-54959962">(article here)</a>.</p>
+<p><strong>Can we leverage the decentralized feature of blockchain to solve the intermediary problem ? It what TzVote claims to provide</strong></p>
+<h2 id="solution"><a class="header" href="#solution">Solution</a></h2>
+<p>TzVote helps you deploy your own poll on a smart contract and gives you a simple website to interact with it</p>
+<h2 id="flavours"><a class="header" href="#flavours">Flavours</a></h2>
+<p>There are different ways to create a poll, so we decided to create template for each particular use cases.
+First, here are the criteria to consider :</p>
+<ul>
+<li>question count : how many question on the poll ?</li>
+<li>option count : how many options on the answer ?</li>
+<li>votes choices count : only once or multiple answers</li>
+<li>voting power : how is calculated the end result</li>
+<li>dates : dates to consider</li>
+<li>censorship resistant : what is the level of decentralization of your poll ?</li>
+<li>privacy : does the poll include hidden ballot and preserve anonymity ?</li>
+</ul>
+<p>Here are the available templates :</p>
+<div class="table-wrapper"><table><thead><tr><th>name</th><th>#questions</th><th>#options</th><th>#choices</th><th>voting power</th><th>dates</th><th>censorship resistant</th><th>privacy</th></tr></thead><tbody>
+<tr><td>permissioned vote</td><td>1</td><td>n</td><td>1</td><td>1 allowed address = 1 vote</td><td>from, to</td><td>poll creator choose voters</td><td>no</td></tr>
+<tr><td>baker vote</td><td>1</td><td>n</td><td>1</td><td>Tezos baker total stake</td><td>Tezos voting period</td><td>yes</td><td>no</td></tr>
+</tbody></table>
+</div>
+<h2 id="next-developments"><a class="header" href="#next-developments">Next developments</a></h2>
+<ul>
+<li>bring complete anonymity, ballots might be hidden (to avoid physical threats)</li>
+<li>bring more templates : <a href="https://en.wikipedia.org/wiki/Borda_count">Borda</a>, Samarkand</li>
+<li><a href="https://proofofhumanity.id/">Proof of Humanity</a></li>
+</ul>
+<h2 id="links"><a class="header" href="#links">Links</a></h2>
+<ul>
+<li>
+<p><a href="https://tzvote.marigold.dev/">TzVote DAPP (Web based - mainnet)</a></p>
+</li>
+<li>
+<p><a href="https://play.google.com/store/apps/details?id=dev.marigold.tzvote">TzVote DAPP (Android - mainnet)</a></p>
+</li>
+<li>
+<p>TEZOS COMMUNITY DAPP (iOS) Soon</p>
+</li>
+<li>
+<p><a href="https://ghostnet.tzvote.marigold.dev">TzVote DAPP (Web based - ghostnet)</a></p>
+</li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="user-guide"><a class="header" href="#user-guide">User Guide</a></h1>
+<h2 id="login"><a class="header" href="#login"><a href="./LOGIN.html">Login</a></a></h2>
+<p>Login and logout</p>
+<p>Connection to TzCommunity backend</p>
+<h2 id="create-a-poll"><a class="header" href="#create-a-poll"><a href="./CREATE.html">Create a poll</a></a></h2>
+<p>Create either :</p>
+<ul>
+<li>permissioned poll</li>
+<li>baker poll</li>
+</ul>
+<h2 id="manage-a-poll-details--results"><a class="header" href="#manage-a-poll-details--results"><a href="./MANAGE.html">Manage a poll (Details &amp; Results) </a></a></h2>
+<p>Manage a poll :</p>
+<ul>
+<li>See details and change parameters</li>
+<li>See results</li>
+</ul>
+<h2 id="vote-on-a-poll"><a class="header" href="#vote-on-a-poll"><a href="./VOTE.html">Vote on a poll</a></a></h2>
+<p>Vote and confirm with your wallet</p>
+<h2 id="search"><a class="header" href="#search"><a href="./SEARCH.html">Search</a></a></h2>
+<p>Search options</p>
+<h2 id="share-a-poll"><a class="header" href="#share-a-poll"><a href="./SHARE.html">Share a poll</a></a></h2>
+<p>Share with community</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="login-1"><a class="header" href="#login-1">Login</a></h1>
+<p>On the Home page you have a login button</p>
+<p>Click on it</p>
+<p><img src="./images/login.png" alt="login" /></p>
+<p>Select your preferred wallet, your account</p>
+<blockquote>
+<p>A second popup will ask you to sign a payload, once done you will be logged on TzCommunity backend and all Tezos addresses will be resolve to human-readable social account aliases (only if you have the right to see it)</p>
+</blockquote>
+<p><img src="./images/search.png" alt="search" /></p>
+<blockquote>
+<p>If you have linked your social account on <a href="https://tezos-community.com">TzCommunity</a>, your profile will appear on the Logout bottom button and everywhere else on the application. I recommend you to link your account with your tz1 address to make it more friendly, it is totally free and more UX friendly.</p>
+</blockquote>
+<h2 id="logout"><a class="header" href="#logout">Logout</a></h2>
+<p>Click on the bottom button <strong>LOGOUT</strong></p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="create-a-poll-1"><a class="header" href="#create-a-poll-1">Create a poll</a></h1>
+<p>Click on the bottom-right floating button to display the voting templates</p>
+<p><img src="./images/create.png" alt="create" /></p>
+<h2 id="create-a-permissioned-poll"><a class="header" href="#create-a-permissioned-poll">Create a permissioned poll</a></h2>
+<p>Permissioned poll creates a poll with allowed voters. Only the creator of the poll can choose who can vote</p>
+<p><img src="./images/permissioned.png" alt="permissioned" /></p>
+<ol>
+<li>Add a question</li>
+<li>Add dates from and to</li>
+<li>Add at minimum 1 option</li>
+<li>Add voters :</li>
+</ol>
+<ul>
+<li>individual voter : add an address, one by one</li>
+<li>bakers delegatees : add all baker delegatees from a baker address</li>
+<li>Import CSV file : add all addresses from the CSV (comma separated, only 1 column)</li>
+<li>add my delegatees (baker only) : import all my delegatees</li>
+</ul>
+<p>Once all fields are filled, you can click on top-right <strong>CREATE</strong> button</p>
+<h2 id="create-a-baker-poll"><a class="header" href="#create-a-baker-poll">Create a baker poll</a></h2>
+<p>Anyone can create a baker poll but only bakers will be allowed to vote on it. For the final result, ballot weight is relative to baker's total stake</p>
+<p><img src="./images/baker.png" alt="baker" /></p>
+<ol>
+<li>Add a question</li>
+<li>Select a Tezos voting period. Your poll will stick to it, so the end date is an estimation</li>
+<li>Add at minimum 1 option</li>
+</ol>
+<p>Once all fields are filled, you can click on top-right <strong>CREATE</strong> button</p>
+<blockquote>
+<p>You don't need to specified bakers addresses, it is automatically filtered by the smart contract in case voter is not a baker</p>
+</blockquote>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="manage-a-poll"><a class="header" href="#manage-a-poll">Manage a poll</a></h1>
+<p>Each poll has a dedicated page / url for management</p>
+<p><img src="./images/manage.png" alt="manage" /></p>
+<h2 id="details"><a class="header" href="#details">Details</a></h2>
+<p>You can see here the details of the poll, and you can vote (it is the right time)</p>
+<p><img src="./images/details.png" alt="details" /></p>
+<blockquote>
+<p>You can also <a href="./SHARE.html">share the poll</a> (top-right button)</p>
+</blockquote>
+<blockquote>
+<p>It your are the creator of poll, you can also manage some settings, like adding or removing voters for example</p>
+</blockquote>
+<h2 id="results"><a class="header" href="#results">Results</a></h2>
+<p><img src="./images/results.png" alt="results" /></p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="vote-on-a-poll-1"><a class="header" href="#vote-on-a-poll-1">Vote on a poll</a></h1>
+<p>Votable poll have a <strong>VOTE</strong> button</p>
+<blockquote>
+<p>Tips : Filter with <strong>Votable</strong> to find votable polls faster</p>
+</blockquote>
+<p><img src="./images/vote.png" alt="vote" /></p>
+<p>Clikc on the button, to open the choices</p>
+<p><img src="./images/voting.png" alt="voting" /></p>
+<p>Select an option to answer and click on <strong>CONFIRM</strong></p>
+<p>Confirm the transaction with your wallet</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="search-1"><a class="header" href="#search-1">Search</a></h1>
+<p><img src="./images/search.png" alt="search" /></p>
+<h2 id="filters"><a class="header" href="#filters">Filters</a></h2>
+<p>Use top filter to faster search</p>
+<p><img src="./images/filter.png" alt="filter" /></p>
+<ul>
+<li>Votable : filter only votable polls</li>
+<li>Open : filter only open polls. It means that voting time is active. On the contrary, polls in the future or with end date passed are locked</li>
+<li>Mine : filter only poll where I am the creator</li>
+<li>Filter by template : by template type, baker or permissioned</li>
+</ul>
+<h2 id="icons"><a class="header" href="#icons">Icons</a></h2>
+<p><img src="./images/icons.png" alt="icons" /></p>
+<ol>
+<li>template type : baker or permissioned</li>
+<li>status : locked or ongoing</li>
+<li>tzkt link : see the poll on an indexer</li>
+<li>share button : shortcut to share the poll to someone</li>
+</ol>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="share-a-poll-1"><a class="header" href="#share-a-poll-1">Share a poll</a></h1>
+<p><img src="./images/share.png" alt="share" /></p>
+<p>If you click on the share button :</p>
+<ul>
+<li>web version : the url link will be copied to your clipboard</li>
+<li>mobile version : a contextual menu will popup to select the application though with you will share this link</li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="contributors"><a class="header" href="#contributors">Contributors</a></h1>
+<p>Made with love by <a href="https://www.marigold.dev/team">Marigold team</a></p>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+
+            </nav>
+
+        </div>
+
+
+
+        <script>
+            window.playground_line_numbers = true;
+        </script>
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+        <script src="ace.js"></script>
+        <script src="editor.js"></script>
+        <script src="mode-rust.js"></script>
+        <script src="theme-dawn.js"></script>
+        <script src="theme-tomorrow_night.js"></script>
+
+        <script src="elasticlunr.min.js"></script>
+        <script src="mark.min.js"></script>
+        <script src="searcher.js"></script>
+
+        <script src="clipboard.min.js"></script>
+        <script src="highlight.js"></script>
+        <script src="book.js"></script>
+
+        <!-- Custom JS scripts -->
+        <script src="theme/marigold.js"></script>
+
+        <script>
+        window.addEventListener('load', function() {
+            MathJax.Hub.Register.StartupHook('End', function() {
+                window.setTimeout(window.print, 100);
+            });
+        });
+        </script>
+
+    </div>
+    </body>
+</html>
