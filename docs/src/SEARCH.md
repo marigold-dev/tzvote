@@ -20,4 +20,4 @@ Use top filter to faster search
 1. template type : baker or permissioned
 1. status : locked or ongoing
 1. tzkt link : see the poll on an indexer
-1. share button : shortcut to share the poll to someone
+1. share button : shortcut to share the poll with someone
