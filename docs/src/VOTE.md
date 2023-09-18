@@ -6,7 +6,7 @@ Votable poll have a **VOTE** button
 
 ![vote](./images/vote.png)
 
-Clikc on the button, to open the choices
+Click on the button, to open the choices
 
 ![voting](./images/voting.png)
 
