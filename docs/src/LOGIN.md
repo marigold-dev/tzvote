@@ -8,7 +8,7 @@ Click on it
 
 Select your preferred wallet, your account
 
-> A second popup will ask you to sign a payload, once done you will be logged on TzCommunity backend and all Tezos addresses will be resolve to human-readable social account aliases (only if you have the right to see it)
+> A second popup will ask you to sign a payload, once done you will be logged on TzCommunity backend and all Tezos addresses will be resolved to human-readable social account aliases (only if you have the right to see it)
 
 ![search](./images/search.png)
 

@@ -105,7 +105,7 @@ export const Results: React.FC<ResultsProps> = ({ match }) => {
   const [contract, setContract] = useState<VotingContract>();
 
   //CONTEXT
-  const { Tezos, userAddress } = React.useContext(
+  const { Tezos, userAddress, bakerPower } = React.useContext(
     UserContext
   ) as UserContextType;
 

@@ -26,6 +26,7 @@ import {
   useIonAlert,
 } from "@ionic/react";
 import * as api from "@tzkt/sdk-api";
+
 import {
   addCircleOutline,
   lockClosedOutline,
@@ -108,6 +109,9 @@ export const Settings: React.FC<SettingsProps> = ({ match }) => {
   const refreshData = async (): Promise<void> => {
     let contract: VotingContract;
     let contractFromTzkt: api.Contract = await api.contractsGetByAddress(id);
+    let contractStorageFromTzkt: Blob = await api.contractsGetStorage(id);
+
+    contractFromTzkt.storage = JSON.parse(await contractStorageFromTzkt.text());
     switch (type) {
       case VOTING_TEMPLATE.PERMISSIONEDSIMPLEPOLL.name: {
         contract =
@@ -640,7 +644,7 @@ export const Settings: React.FC<SettingsProps> = ({ match }) => {
               <>
                 <IonCard>
                   <IonCardHeader>
-                    <IonTitle>Voters</IonTitle>
+                    <IonTitle>Manage voters</IonTitle>
                     <IonCardSubtitle>
                       <IonRow>
                         <IonInput
