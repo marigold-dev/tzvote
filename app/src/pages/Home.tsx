@@ -1,5 +1,6 @@
 import { NetworkType } from "@airgap/beacon-sdk";
 import {
+  IonButton,
   IonCard,
   IonCardContent,
   IonCardHeader,
@@ -12,6 +13,7 @@ import {
   IonHeader,
   IonIcon,
   IonImg,
+  IonLabel,
   IonPage,
   IonRow,
   IonTitle,
@@ -21,6 +23,7 @@ import { Tzip16Module } from "@taquito/tzip16";
 import {
   albumsOutline,
   constructOutline,
+  documentTextOutline,
   fileTrayFullOutline,
 } from "ionicons/icons";
 import React, { useState } from "react";
@@ -71,6 +74,18 @@ const Home: React.FC = () => {
           <h1 style={{ paddingTop: "5vh" }}>Web3 voting app</h1>
 
           <ConnectButton />
+
+          <IonButton
+            onClick={() =>
+              window.open("https://marigold-dev.github.io/tzvote", "_blank")
+            }
+            color="dark"
+            target="_blank"
+          >
+            {" "}
+            <IonIcon icon={documentTextOutline}></IonIcon>
+            <IonLabel> &nbsp;Documentation</IonLabel>
+          </IonButton>
 
           <IonGrid>
             <IonRow>
