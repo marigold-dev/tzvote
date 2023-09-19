@@ -12,7 +12,7 @@ You can see here the details of the poll, and you can vote (it is the right time
 
 > You can also [share the poll](./SHARE.md) (top-right button)
 
-> It your are the creator of poll, you can also manage some settings, like adding or removing voters for example
+> If you are the creator of the poll, you can also manage some settings, like adding or removing voters for example
 
 ## Results
 
