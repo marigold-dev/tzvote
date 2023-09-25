@@ -106,9 +106,9 @@ KT1CXVRgTKeEn2F2fqVX7tWcMrYRn8vaJwUa
 ## Compile both for the frontend
 
 ```bash
-TAQ_LIGO_IMAGE=ligolang/ligo:0.72.0 taq compile tezosTemplate3.jsligo --json && mv artifacts/tezosTemplate3.json ./app/src/contracttemplates/
+TAQ_LIGO_IMAGE=ligolang/ligo:0.73.0 taq compile tezosTemplate3.jsligo --json && mv artifacts/tezosTemplate3.json ./app/src/contracttemplates/
 
-TAQ_LIGO_IMAGE=ligolang/ligo:0.72.0 taq compile permissionedSimplePoll.jsligo --json && mv artifacts/permissionedSimplePoll.json ./app/src/contracttemplates/
+TAQ_LIGO_IMAGE=ligolang/ligo:0.73.0 taq compile permissionedSimplePoll.jsligo --json && mv artifacts/permissionedSimplePoll.json ./app/src/contracttemplates/
 ```
 
 Generate types

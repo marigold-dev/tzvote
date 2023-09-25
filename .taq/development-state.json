@@ -56,61 +56,6 @@
                 }
             ]
         },
-        "@taqueria/plugin-ligo.compile.1694088723831": {
-            "task": "compile",
-            "plugin": "@taqueria/plugin-ligo",
-            "time": 1694088723831,
-            "output": [
-                {
-                    "source": "votingPeriodOracle.jsligo",
-                    "artifact": "artifacts/votingPeriodOracle.tz\nartifacts/votingPeriodOracle.default_storage.tz\nartifacts/votingPeriodOracle.storage.mainnet.tz\nartifacts/votingPeriodOracle.storage.ghostnet.tz\nvotingPeriodOracle.parameterList.jsligo not compiled"
-                }
-            ]
-        },
-        "@taqueria/plugin-ligo.compile.1694155018441": {
-            "task": "compile",
-            "plugin": "@taqueria/plugin-ligo",
-            "time": 1694155018441,
-            "output": [
-                {
-                    "source": "tezosTemplate3.jsligo",
-                    "artifact": "artifacts/tezosTemplate3.tz\ntezosTemplate3.storageList.jsligo not compiled\ntezosTemplate3.storageList.jsligo not compiled\ntezosTemplate3.storageList.jsligo not compiled\ntezosTemplate3.parameterList.jsligo not compiled"
-                }
-            ]
-        },
-        "@taqueria/plugin-ligo.compile.1694155070501": {
-            "task": "compile",
-            "plugin": "@taqueria/plugin-ligo",
-            "time": 1694155070501,
-            "output": [
-                {
-                    "source": "tezosTemplate3.jsligo",
-                    "artifact": "artifacts/tezosTemplate3.tz\nartifacts/tezosTemplate3.default_storage.tz\nartifacts/tezosTemplate3.storage.mainnet.tz\nartifacts/tezosTemplate3.storage.ghostnet.tz\ntezosTemplate3.parameterList.jsligo not compiled"
-                }
-            ]
-        },
-        "@taqueria/plugin-ligo.compile.1694155170483": {
-            "task": "compile",
-            "plugin": "@taqueria/plugin-ligo",
-            "time": 1694155170483,
-            "output": [
-                {
-                    "source": "permissionedSimplePoll.jsligo",
-                    "artifact": "artifacts/permissionedSimplePoll.tz\npermissionedSimplePoll.storageList.jsligo not compiled\npermissionedSimplePoll.storageList.jsligo not compiled\npermissionedSimplePoll.storageList.jsligo not compiled\npermissionedSimplePoll.parameterList.jsligo not compiled"
-                }
-            ]
-        },
-        "@taqueria/plugin-ligo.compile.1694155309921": {
-            "task": "compile",
-            "plugin": "@taqueria/plugin-ligo",
-            "time": 1694155309921,
-            "output": [
-                {
-                    "source": "permissionedSimplePoll.jsligo",
-                    "artifact": "artifacts/permissionedSimplePoll.tz\nartifacts/permissionedSimplePoll.default_storage.tz\nartifacts/permissionedSimplePoll.storage.mainnet.tz\nartifacts/permissionedSimplePoll.storage.ghostnet.tz\npermissionedSimplePoll.parameterList.jsligo not compiled"
-                }
-            ]
-        },
         "@taqueria/plugin-ligo.test.1694155725821": {
             "task": "test",
             "plugin": "@taqueria/plugin-ligo",
@@ -163,6 +108,61 @@
                 {
                     "contract": "unit_permissionedSimplePoll.jsligo",
                     "testResults": "\"voteContract\"\nKT1PYhmzo4nnkkyJYa4yrPRMdGFwaJJ5jH38(None)\n(\"expected error : \" , \"Option does not exist\" , \" Actual : \")\n\"Option does not exist\"\nSuccess (1703n)\n{from_ = timestamp(1970-01-01T00:00:00Z) ; name = \"Which is the cutiest pokemon?\" ; options = [\"Mew\" ; \"Pikachu\"] ; owner = tz1hkMbkLPkvhxyqsQoBoLPqb1mruSzZx3zy ; registeredVoters = [tz1hkMbkLPkvhxyqsQoBoLPqb1mruSzZx3zy ; tz1LwyuRUjqRJ9HFepP9uym7B6AKQLBdRGm2 ; tz1SccDTZWrqoqQscvjeMTBvf6zSK4snmrup] ; results = [\"Pikachu\" -> 1] ; to = timestamp(1970-01-01T00:30:00Z) ; votes = [tz1hkMbkLPkvhxyqsQoBoLPqb1mruSzZx3zy -> \"Pikachu\"]}\n(\"expected voteCount : \" , 1)\n(\"actual voteCount : \" , 1)\n(\"expected error : \" , \"A vote with option Pikachu  already exists for this user\" , \" Actual : \")\n\"A vote with option Pikachu  already exists for this user\"\nSuccess (391n)\n{from_ = timestamp(1970-01-01T00:00:00Z) ; name = \"Which is the cutiest pokemon?\" ; options = [\"Mew\" ; \"Pikachu\"] ; owner = tz1hkMbkLPkvhxyqsQoBoLPqb1mruSzZx3zy ; registeredVoters = [tz1hkMbkLPkvhxyqsQoBoLPqb1mruSzZx3zy ; tz1LwyuRUjqRJ9HFepP9uym7B6AKQLBdRGm2 ; tz1SccDTZWrqoqQscvjeMTBvf6zSK4snmrup] ; results = [\"Pikachu\" -> 2] ; to = timestamp(1970-01-01T00:30:00Z) ; votes = [tz1LwyuRUjqRJ9HFepP9uym7B6AKQLBdRGm2 -> \"Pikachu\" ; tz1hkMbkLPkvhxyqsQoBoLPqb1mruSzZx3zy -> \"Pikachu\"]}\n(\"expected voteCount : \" , 2)\n(\"actual voteCount : \" , 2)\n(\"expected error : \" , \"A vote with option Pikachu  already exists for this user\" , \" Actual : \")\n\"A vote with option Pikachu  already exists for this user\"\nSuccess (394n)\n{from_ = timestamp(1970-01-01T00:00:00Z) ; name = \"Which is the cutiest pokemon?\" ; options = [\"Mew\" ; \"Pikachu\"] ; owner = tz1hkMbkLPkvhxyqsQoBoLPqb1mruSzZx3zy ; registeredVoters = [tz1hkMbkLPkvhxyqsQoBoLPqb1mruSzZx3zy ; tz1LwyuRUjqRJ9HFepP9uym7B6AKQLBdRGm2 ; tz1SccDTZWrqoqQscvjeMTBvf6zSK4snmrup] ; results = [\"Mew\" -> 1 ; \"Pikachu\" -> 2] ; to = timestamp(1970-01-01T00:30:00Z) ; votes = [tz1LwyuRUjqRJ9HFepP9uym7B6AKQLBdRGm2 -> \"Pikachu\" ; tz1SccDTZWrqoqQscvjeMTBvf6zSK4snmrup -> \"Mew\" ; tz1hkMbkLPkvhxyqsQoBoLPqb1mruSzZx3zy -> \"Pikachu\"]}\n(\"expected voteCount : \" , 1)\n(\"actual voteCount : \" , 1)\n(\"expected error : \" , \"User is not registered\" , \" Actual : \")\n\"User is not registered\"\n(\"expected error : \" , \"User has to be owner\" , \" Actual : \")\n\"User has to be owner\"\nSuccess (398n)\n{from_ = timestamp(1970-01-01T00:00:00Z) ; name = \"Which is the cutiest pokemon?\" ; options = [\"Mew\" ; \"Pikachu\"] ; owner = tz1hkMbkLPkvhxyqsQoBoLPqb1mruSzZx3zy ; registeredVoters = [tz1Pn35MsdrTuLWHztgeMXHuRxisq1DpxDxU ; tz1hkMbkLPkvhxyqsQoBoLPqb1mruSzZx3zy ; tz1LwyuRUjqRJ9HFepP9uym7B6AKQLBdRGm2 ; tz1SccDTZWrqoqQscvjeMTBvf6zSK4snmrup] ; results = [\"Mew\" -> 1 ; \"Pikachu\" -> 2] ; to = timestamp(1970-01-01T00:30:00Z) ; votes = [tz1LwyuRUjqRJ9HFepP9uym7B6AKQLBdRGm2 -> \"Pikachu\" ; tz1SccDTZWrqoqQscvjeMTBvf6zSK4snmrup -> \"Mew\" ; tz1hkMbkLPkvhxyqsQoBoLPqb1mruSzZx3zy -> \"Pikachu\"]}\n(\"expected error : \" , \"User is already registered\" , \" Actual : \")\n\"User is already registered\"\n(\"expected error : \" , \"User has to be owner\" , \" Actual : \")\n\"User has to be owner\"\nSuccess (399n)\n{from_ = timestamp(1970-01-01T00:00:00Z) ; name = \"Which is the cutiest pokemon?\" ; options = [\"Mew\" ; \"Pikachu\"] ; owner = tz1hkMbkLPkvhxyqsQoBoLPqb1mruSzZx3zy ; registeredVoters = [tz1hkMbkLPkvhxyqsQoBoLPqb1mruSzZx3zy ; tz1LwyuRUjqRJ9HFepP9uym7B6AKQLBdRGm2 ; tz1SccDTZWrqoqQscvjeMTBvf6zSK4snmrup] ; results = [\"Mew\" -> 1 ; \"Pikachu\" -> 2] ; to = timestamp(1970-01-01T00:30:00Z) ; votes = [tz1LwyuRUjqRJ9HFepP9uym7B6AKQLBdRGm2 -> \"Pikachu\" ; tz1SccDTZWrqoqQscvjeMTBvf6zSK4snmrup -> \"Mew\" ; tz1hkMbkLPkvhxyqsQoBoLPqb1mruSzZx3zy -> \"Pikachu\"]}\n(\"expected error : \" , \"User not found\" , \" Actual : \")\n\"User not found\"\n(\"expected error : \" , \"Not yet the time to vote\" , \" Actual : \")\n\"Not yet the time to vote\"\nEverything at the top-level was executed.\n- testOriginate exited with value true.\n- testSender1VoteUnknownOption exited with value true.\n- testSender1VotePikachu exited with value true.\n- testSender1VotePikachuAgainAndFail exited with value true.\n- testSender2VotePikachu exited with value true.\n- testSender2VoteMewAndFail exited with value true.\n- testSender3VoteMew exited with value true.\n- testjohndoeNotRegistered exited with value true.\n- testjohndoeAddjohndoe exited with value true.\n- testSender1Addjohndoe exited with value true.\n- testSender1AddjohndoeAgainAndFail exited with value true.\n- testjohndoeRemovejohndoe exited with value true.\n- testSender1Removejohndoe exited with value true.\n- testSender1RemovejohndoeAgainAndFail exited with value true.\n- testVoteOutOfDate exited with value true.\n\n🎉 All tests passed 🎉"
+                }
+            ]
+        },
+        "@taqueria/plugin-ligo.compile.1695651561772": {
+            "task": "compile",
+            "plugin": "@taqueria/plugin-ligo",
+            "time": 1695651561772,
+            "output": [
+                {
+                    "source": "permissionedSimplePoll.jsligo",
+                    "artifact": "No contract modules found in \"permissionedSimplePoll.jsligo\""
+                }
+            ]
+        },
+        "@taqueria/plugin-ligo.compile.1695651731676": {
+            "task": "compile",
+            "plugin": "@taqueria/plugin-ligo",
+            "time": 1695651731676,
+            "output": [
+                {
+                    "source": "permissionedSimplePoll.jsligo",
+                    "artifact": "No contract modules found in \"permissionedSimplePoll.jsligo\""
+                }
+            ]
+        },
+        "@taqueria/plugin-ligo.compile.1695651849797": {
+            "task": "compile",
+            "plugin": "@taqueria/plugin-ligo",
+            "time": 1695651849797,
+            "output": [
+                {
+                    "source": "permissionedSimplePoll.jsligo",
+                    "artifact": "No contract modules found in \"permissionedSimplePoll.jsligo\""
+                }
+            ]
+        },
+        "@taqueria/plugin-ligo.compile.1695651907499": {
+            "task": "compile",
+            "plugin": "@taqueria/plugin-ligo",
+            "time": 1695651907499,
+            "output": [
+                {
+                    "source": "permissionedSimplePoll.jsligo",
+                    "artifact": "No contract modules found in \"permissionedSimplePoll.jsligo\""
+                }
+            ]
+        },
+        "@taqueria/plugin-ligo.compile.1695652160473": {
+            "task": "compile",
+            "plugin": "@taqueria/plugin-ligo",
+            "time": 1695652160473,
+            "output": [
+                {
+                    "source": "permissionedSimplePoll.jsligo",
+                    "artifact": "artifacts/permissionedSimplePoll.json\npermissionedSimplePoll.storageList.jsligo not compiled\npermissionedSimplePoll.storageList.jsligo not compiled\npermissionedSimplePoll.storageList.jsligo not compiled\npermissionedSimplePoll.parameterList.jsligo not compiled"
                 }
             ]
         }

@@ -1,4 +1,5 @@
 #include "./listUtils.jsligo"
+
 type storage = {
   name: string,
   from_: timestamp,
@@ -37,21 +38,15 @@ const vote = (opt: string, store: storage): return_ => {
 
   let opt_: option<string> =
     List.find_opt(((s: string) => s == opt), store.options);
-  if (opt_ == (None() as option<string>)) return failwith(
-    "Option does not exist"
-  );
+  if (opt_ == (None() as option<string>)) return failwith("Option does not exist");
   //check if sender has not yet voted
 
-  match(
-    Map.find_opt(Tezos.get_source(), store.votes),
-    {
-      Some: (voted: string) =>
-        failwith(
-          "A vote with option " + voted + "  already exists for this user"
-        ),
-      None: () => unit
-    }
-  );
+  match(Map.find_opt(Tezos.get_source(), store.votes)) {
+    when (Some(voted)):
+      failwith("A vote with option " + voted + "  already exists for this user")
+    when (None):
+      unit
+  };
   //check if voting period is between from and to date
 
   if (Tezos.get_now() < store.from_ || Tezos.get_now() > store.to) return failwith(
@@ -63,13 +58,12 @@ const vote = (opt: string, store: storage): return_ => {
     list([]) as list<operation>,
     {
       ...store,
-      results: match(
-        Map.find_opt(opt, store.results),
-        {
-          Some: (r: int) => Map.add(opt, r + 1, store.results),
-          None: () => Map.add(opt, 1, store.results)
-        }
-      ),
+      results: match(Map.find_opt(opt, store.results)) {
+        when (Some(r)):
+          Map.add(opt, r + 1, store.results)
+        when (None):
+          Map.add(opt, 1, store.results)
+      },
       votes: Map.add(Tezos.get_source(), opt, store.votes)
     }
   ]
@@ -125,17 +119,15 @@ const removeVoter = (voter: address, store: storage): return_ => {
   if (Tezos.get_now() > store.to) return failwith("Too late to remove voter");
   //check if sender has not yet voted
 
-  match(
-    Map.find_opt(voter, store.votes),
-    {
-      Some: (voted: string) =>
-        failwith(
-          "A vote with option " + voted +
-            "  already exists for this user, we cannot remove it"
-        ),
-      None: () => unit
-    }
-  );
+  match(Map.find_opt(voter, store.votes)) {
+    when (Some(voted)):
+      failwith(
+        "A vote with option " + voted
+        + "  already exists for this user, we cannot remove it"
+      )
+    when (None):
+      unit
+  };
   return [
     list([]) as list<operation>,
     {

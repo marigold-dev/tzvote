@@ -1,14 +1,14 @@
 {
-  "contracts": {
-    "votingPeriodOracle": {
-      "address": "KT1C8Varn3RWkSk6jJBVSRUHkmmXArGefifp"
+    "contracts": {
+        "votingPeriodOracle": {
+            "address": "KT1C8Varn3RWkSk6jJBVSRUHkmmXArGefifp"
+        },
+        "tezosTemplate3": {
+            "address": "KT1FohLnkN7zNk4fQy99D4TJoM83Ln8JJz4c"
+        },
+        "permissionedSimplePoll": {
+            "address": "KT1CXVRgTKeEn2F2fqVX7tWcMrYRn8vaJwUa"
+        }
     },
-    "tezosTemplate3": {
-      "address": "KT1FohLnkN7zNk4fQy99D4TJoM83Ln8JJz4c"
-    },
-    "permissionedSimplePoll": {
-      "address": "KT1CXVRgTKeEn2F2fqVX7tWcMrYRn8vaJwUa"
-    }
-  },
-  "networkName": "mainnet"
+    "networkName": "mainnet"
 }
