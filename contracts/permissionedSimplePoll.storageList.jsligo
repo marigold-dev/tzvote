@@ -1,26 +1,25 @@
-#import "permissionedSimplePoll.jsligo" "Contract"
-const default_storage =
-    {
-        name: "Which is the cutiest pokemon?",
-        from_: ("2023-01-01t00:00:00Z" as timestamp),
-        to: ("2024-01-01t00:00:00Z" as timestamp),
-        options: list(["Mew", "Pikachu"]),
-        owner: ("tz1VSUr8wwNhLAzempoch5d6hLRiTh8Cjcjb" as address),
-        registeredVoters: list([]) as list<address>,
-        votes: (Map.empty as map<address, string>),
-        results: (Map.empty as map<string, int>)
-    };
+const default_storage = {
+    name: "Which is the cutiest pokemon?",
+    from_: ("2023-01-01t00:00:00Z" as timestamp),
+    to: ("2024-01-01t00:00:00Z" as timestamp),
+    options: list(["Mew", "Pikachu"]),
+    owner: ("tz1VSUr8wwNhLAzempoch5d6hLRiTh8Cjcjb" as address),
+    registeredVoters: list([]) as list<address>,
+    votes: (Map.empty as map<address, string>),
+    results: (Map.empty as map<string, int>)
+};
 
-const mainnet =
-    {
-        name: "Which is the cutiest pokemon?",
-        from_: ("2023-01-01t00:00:00Z" as timestamp),
-        to: ("2024-01-01t00:00:00Z" as timestamp),
-        options: list(["Mew", "Pikachu"]),
-        owner: ("tz1QYD1zbK2gTUu1YWX8m7hPcKNkuXoxPo73" as address),
-        registeredVoters: list([]) as list<address>,
-        votes: (Map.empty as map<address, string>),
-        results: (Map.empty as map<string, int>)
-    };
+/*
+const mainnet = {
+    name: "Which is the cutiest pokemon?",
+    from_: ("2023-01-01t00:00:00Z" as timestamp),
+    to: ("2024-01-01t00:00:00Z" as timestamp),
+    options: list(["Mew", "Pikachu"]),
+    owner: ("tz1QYD1zbK2gTUu1YWX8m7hPcKNkuXoxPo73" as address),
+    registeredVoters: list([]) as list<address>,
+    votes: (Map.empty as map<address, string>),
+    results: (Map.empty as map<string, int>)
+};
 
 const ghostnet = default_storage;
+*/

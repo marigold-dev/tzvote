@@ -13,8 +13,7 @@ type storage = {
 
 type return_ = [list<operation>, storage];
 
-type parameter =
-  ["Vote", string] | ["AddVoter", address] | ["RemoveVoter", address];
+
 
 /**
  * Vote on one existing option. Can only vote once. Can only vote if part of voter list. Can only vote if period is between from and to. 

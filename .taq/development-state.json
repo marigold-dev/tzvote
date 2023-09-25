@@ -111,58 +111,58 @@
                 }
             ]
         },
-        "@taqueria/plugin-ligo.compile.1695651561772": {
+        "@taqueria/plugin-ligo.compile.1695658162266": {
             "task": "compile",
             "plugin": "@taqueria/plugin-ligo",
-            "time": 1695651561772,
+            "time": 1695658162266,
             "output": [
                 {
                     "source": "permissionedSimplePoll.jsligo",
-                    "artifact": "No contract modules found in \"permissionedSimplePoll.jsligo\""
+                    "artifact": "artifacts/permissionedSimplePoll.json\npermissionedSimplePoll.storageList.jsligo not compiled\npermissionedSimplePoll.parameterList.jsligo not compiled"
                 }
             ]
         },
-        "@taqueria/plugin-ligo.compile.1695651731676": {
+        "@taqueria/plugin-ligo.compile.1695658211218": {
             "task": "compile",
             "plugin": "@taqueria/plugin-ligo",
-            "time": 1695651731676,
+            "time": 1695658211218,
             "output": [
                 {
                     "source": "permissionedSimplePoll.jsligo",
-                    "artifact": "No contract modules found in \"permissionedSimplePoll.jsligo\""
+                    "artifact": "artifacts/permissionedSimplePoll.json\npermissionedSimplePoll.storageList.jsligo not compiled\npermissionedSimplePoll.storageList.jsligo not compiled\npermissionedSimplePoll.parameterList.jsligo not compiled"
                 }
             ]
         },
-        "@taqueria/plugin-ligo.compile.1695651849797": {
+        "@taqueria/plugin-ligo.compile.1695658256018": {
             "task": "compile",
             "plugin": "@taqueria/plugin-ligo",
-            "time": 1695651849797,
+            "time": 1695658256018,
             "output": [
                 {
                     "source": "permissionedSimplePoll.jsligo",
-                    "artifact": "No contract modules found in \"permissionedSimplePoll.jsligo\""
+                    "artifact": "artifacts/permissionedSimplePoll.json\nNo storage expressions found\npermissionedSimplePoll.parameterList.jsligo not compiled"
                 }
             ]
         },
-        "@taqueria/plugin-ligo.compile.1695651907499": {
+        "@taqueria/plugin-ligo.compile.1695658356875": {
             "task": "compile",
             "plugin": "@taqueria/plugin-ligo",
-            "time": 1695651907499,
+            "time": 1695658356875,
             "output": [
                 {
                     "source": "permissionedSimplePoll.jsligo",
-                    "artifact": "No contract modules found in \"permissionedSimplePoll.jsligo\""
+                    "artifact": "artifacts/permissionedSimplePoll.json\npermissionedSimplePoll.storageList.jsligo not compiled\npermissionedSimplePoll.storageList.jsligo not compiled\npermissionedSimplePoll.parameterList.jsligo not compiled"
                 }
             ]
         },
-        "@taqueria/plugin-ligo.compile.1695652160473": {
+        "@taqueria/plugin-ligo.compile.1695658374343": {
             "task": "compile",
             "plugin": "@taqueria/plugin-ligo",
-            "time": 1695652160473,
+            "time": 1695658374343,
             "output": [
                 {
                     "source": "permissionedSimplePoll.jsligo",
-                    "artifact": "artifacts/permissionedSimplePoll.json\npermissionedSimplePoll.storageList.jsligo not compiled\npermissionedSimplePoll.storageList.jsligo not compiled\npermissionedSimplePoll.storageList.jsligo not compiled\npermissionedSimplePoll.parameterList.jsligo not compiled"
+                    "artifact": "artifacts/permissionedSimplePoll.json\npermissionedSimplePoll.storageList.jsligo not compiled\npermissionedSimplePoll.storageList.jsligo not compiled\npermissionedSimplePoll.parameterList.jsligo not compiled"
                 }
             ]
         }
