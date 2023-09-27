@@ -56,61 +56,6 @@
                 }
             ]
         },
-        "@taqueria/plugin-ligo.test.1694155748229": {
-            "task": "test",
-            "plugin": "@taqueria/plugin-ligo",
-            "time": 1694155748229,
-            "output": [
-                {
-                    "contract": "unit_permissionedSimplePoll.jsligo",
-                    "testResults": "Some tests failed :("
-                }
-            ]
-        },
-        "@taqueria/plugin-ligo.test.1694155764074": {
-            "task": "test",
-            "plugin": "@taqueria/plugin-ligo",
-            "time": 1694155764074,
-            "output": [
-                {
-                    "contract": "unit_permissionedSimplePoll.jsligo",
-                    "testResults": "Some tests failed :("
-                }
-            ]
-        },
-        "@taqueria/plugin-ligo.test.1694155877966": {
-            "task": "test",
-            "plugin": "@taqueria/plugin-ligo",
-            "time": 1694155877966,
-            "output": [
-                {
-                    "contract": "unit_permissionedSimplePoll.jsligo",
-                    "testResults": "Some tests failed :("
-                }
-            ]
-        },
-        "@taqueria/plugin-ligo.test.1694155910088": {
-            "task": "test",
-            "plugin": "@taqueria/plugin-ligo",
-            "time": 1694155910088,
-            "output": [
-                {
-                    "contract": "unit_permissionedSimplePoll.jsligo",
-                    "testResults": "\"voteContract\"\nKT1PYhmzo4nnkkyJYa4yrPRMdGFwaJJ5jH38(None)\n(\"expected error : \" , \"Option does not exist\" , \" Actual : \")\n\"Option does not exist\"\nSuccess (1703n)\n{from_ = timestamp(1970-01-01T00:00:00Z) ; name = \"Which is the cutiest pokemon?\" ; options = [\"Mew\" ; \"Pikachu\"] ; owner = tz1hkMbkLPkvhxyqsQoBoLPqb1mruSzZx3zy ; registeredVoters = [tz1hkMbkLPkvhxyqsQoBoLPqb1mruSzZx3zy ; tz1LwyuRUjqRJ9HFepP9uym7B6AKQLBdRGm2 ; tz1SccDTZWrqoqQscvjeMTBvf6zSK4snmrup] ; results = [\"Pikachu\" -> 1] ; to = timestamp(1970-01-01T00:30:00Z) ; votes = [tz1hkMbkLPkvhxyqsQoBoLPqb1mruSzZx3zy -> \"Pikachu\"]}\n(\"expected voteCount : \" , 1)\n(\"actual voteCount : \" , 1)\n(\"expected error : \" , \"A vote with option Pikachu  already exists for this user\" , \" Actual : \")\n\"A vote with option Pikachu  already exists for this user\"\nSuccess (391n)\n{from_ = timestamp(1970-01-01T00:00:00Z) ; name = \"Which is the cutiest pokemon?\" ; options = [\"Mew\" ; \"Pikachu\"] ; owner = tz1hkMbkLPkvhxyqsQoBoLPqb1mruSzZx3zy ; registeredVoters = [tz1hkMbkLPkvhxyqsQoBoLPqb1mruSzZx3zy ; tz1LwyuRUjqRJ9HFepP9uym7B6AKQLBdRGm2 ; tz1SccDTZWrqoqQscvjeMTBvf6zSK4snmrup] ; results = [\"Pikachu\" -> 2] ; to = timestamp(1970-01-01T00:30:00Z) ; votes = [tz1LwyuRUjqRJ9HFepP9uym7B6AKQLBdRGm2 -> \"Pikachu\" ; tz1hkMbkLPkvhxyqsQoBoLPqb1mruSzZx3zy -> \"Pikachu\"]}\n(\"expected voteCount : \" , 2)\n(\"actual voteCount : \" , 2)\n(\"expected error : \" , \"A vote with option Pikachu  already exists for this user\" , \" Actual : \")\n\"A vote with option Pikachu  already exists for this user\"\nSuccess (394n)\n{from_ = timestamp(1970-01-01T00:00:00Z) ; name = \"Which is the cutiest pokemon?\" ; options = [\"Mew\" ; \"Pikachu\"] ; owner = tz1hkMbkLPkvhxyqsQoBoLPqb1mruSzZx3zy ; registeredVoters = [tz1hkMbkLPkvhxyqsQoBoLPqb1mruSzZx3zy ; tz1LwyuRUjqRJ9HFepP9uym7B6AKQLBdRGm2 ; tz1SccDTZWrqoqQscvjeMTBvf6zSK4snmrup] ; results = [\"Mew\" -> 1 ; \"Pikachu\" -> 2] ; to = timestamp(1970-01-01T00:30:00Z) ; votes = [tz1LwyuRUjqRJ9HFepP9uym7B6AKQLBdRGm2 -> \"Pikachu\" ; tz1SccDTZWrqoqQscvjeMTBvf6zSK4snmrup -> \"Mew\" ; tz1hkMbkLPkvhxyqsQoBoLPqb1mruSzZx3zy -> \"Pikachu\"]}\n(\"expected voteCount : \" , 1)\n(\"actual voteCount : \" , 1)\n(\"expected error : \" , \"User is not registered\" , \" Actual : \")\n\"User is not registered\"\n(\"expected error : \" , \"User has to be owner\" , \" Actual : \")\n\"User has to be owner\"\nSuccess (398n)\n{from_ = timestamp(1970-01-01T00:00:00Z) ; name = \"Which is the cutiest pokemon?\" ; options = [\"Mew\" ; \"Pikachu\"] ; owner = tz1hkMbkLPkvhxyqsQoBoLPqb1mruSzZx3zy ; registeredVoters = [tz1Pn35MsdrTuLWHztgeMXHuRxisq1DpxDxU ; tz1hkMbkLPkvhxyqsQoBoLPqb1mruSzZx3zy ; tz1LwyuRUjqRJ9HFepP9uym7B6AKQLBdRGm2 ; tz1SccDTZWrqoqQscvjeMTBvf6zSK4snmrup] ; results = [\"Mew\" -> 1 ; \"Pikachu\" -> 2] ; to = timestamp(1970-01-01T00:30:00Z) ; votes = [tz1LwyuRUjqRJ9HFepP9uym7B6AKQLBdRGm2 -> \"Pikachu\" ; tz1SccDTZWrqoqQscvjeMTBvf6zSK4snmrup -> \"Mew\" ; tz1hkMbkLPkvhxyqsQoBoLPqb1mruSzZx3zy -> \"Pikachu\"]}\n(\"expected error : \" , \"User is already registered\" , \" Actual : \")\n\"User is already registered\"\n(\"expected error : \" , \"User has to be owner\" , \" Actual : \")\n\"User has to be owner\"\nSuccess (399n)\n{from_ = timestamp(1970-01-01T00:00:00Z) ; name = \"Which is the cutiest pokemon?\" ; options = [\"Mew\" ; \"Pikachu\"] ; owner = tz1hkMbkLPkvhxyqsQoBoLPqb1mruSzZx3zy ; registeredVoters = [tz1hkMbkLPkvhxyqsQoBoLPqb1mruSzZx3zy ; tz1LwyuRUjqRJ9HFepP9uym7B6AKQLBdRGm2 ; tz1SccDTZWrqoqQscvjeMTBvf6zSK4snmrup] ; results = [\"Mew\" -> 1 ; \"Pikachu\" -> 2] ; to = timestamp(1970-01-01T00:30:00Z) ; votes = [tz1LwyuRUjqRJ9HFepP9uym7B6AKQLBdRGm2 -> \"Pikachu\" ; tz1SccDTZWrqoqQscvjeMTBvf6zSK4snmrup -> \"Mew\" ; tz1hkMbkLPkvhxyqsQoBoLPqb1mruSzZx3zy -> \"Pikachu\"]}\n(\"expected error : \" , \"User not found\" , \" Actual : \")\n\"User not found\"\n(\"expected error : \" , \"Not yet the time to vote\" , \" Actual : \")\n\"Not yet the time to vote\"\nEverything at the top-level was executed.\n- testOriginate exited with value true.\n- testSender1VoteUnknownOption exited with value true.\n- testSender1VotePikachu exited with value true.\n- testSender1VotePikachuAgainAndFail exited with value true.\n- testSender2VotePikachu exited with value true.\n- testSender2VoteMewAndFail exited with value true.\n- testSender3VoteMew exited with value true.\n- testjohndoeNotRegistered exited with value true.\n- testjohndoeAddjohndoe exited with value true.\n- testSender1Addjohndoe exited with value true.\n- testSender1AddjohndoeAgainAndFail exited with value true.\n- testjohndoeRemovejohndoe exited with value true.\n- testSender1Removejohndoe exited with value true.\n- testSender1RemovejohndoeAgainAndFail exited with value true.\n- testVoteOutOfDate exited with value true.\n\n🎉 All tests passed 🎉"
-                }
-            ]
-        },
-        "@taqueria/plugin-ligo.test.1695802689951": {
-            "task": "test",
-            "plugin": "@taqueria/plugin-ligo",
-            "time": 1695802689951,
-            "output": [
-                {
-                    "contract": "unit_votingPeriodOracle.jsligo",
-                    "testResults": "\"For keypair :\"\n(\"p2sk3q7yHgCWEW6bYF6K7jPtxaQw1C6nxwZ7hnfocGdPe2JSExd8Ad\" , p2pk68TEugzd4FJjUR9tXpt4rmJJXsh32gFGKHRRmw5ykUeW2BMLBvN)\n\"New account\"\ntz3WbAtT7ayRX9B2pVYi4hRNyfTeRF4G2vrr\n1000000000mutez\n\"with voting power :\"\n0n\n(\"expected error : \" , \"You are not the admin !!!\" , \" Actual : \")\n\"You are not the admin !!!\"\n{admin = tz1hkMbkLPkvhxyqsQoBoLPqb1mruSzZx3zy ; votingPeriodIndex = 25n}\n{admin = tz1hkMbkLPkvhxyqsQoBoLPqb1mruSzZx3zy ; votingPeriodIndex = 26n}\nEverything at the top-level was executed.\n- testOriginate exited with value true.\n- testSender1UpdateNotAdmin exited with value true.\n- testAdminUpdateGhost exited with value true.\n- testAdminUpdateGhostAgain exited with value true.\n\n🎉 All tests passed 🎉"
-                }
-            ]
-        },
         "@taqueria/plugin-ligo.compile.1695802784114": {
             "task": "compile",
             "plugin": "@taqueria/plugin-ligo",
@@ -163,6 +108,61 @@
                 {
                     "source": "permissionedSimplePoll.jsligo",
                     "artifact": "artifacts/permissionedSimplePoll.tz\nartifacts/permissionedSimplePoll.default_storage.tz\nartifacts/permissionedSimplePoll.storage.mainnet.tz\nartifacts/permissionedSimplePoll.storage.ghostnet.tz\nartifacts/permissionedSimplePoll.parameter.default_parameter.tz"
+                }
+            ]
+        },
+        "@taqueria/plugin-ligo.test.1695807606700": {
+            "task": "test",
+            "plugin": "@taqueria/plugin-ligo",
+            "time": 1695807606701,
+            "output": [
+                {
+                    "contract": "./contracts/votingPeriodOracle.jsligo",
+                    "testResults": "Some tests failed :("
+                }
+            ]
+        },
+        "@taqueria/plugin-ligo.test.1695807645264": {
+            "task": "test",
+            "plugin": "@taqueria/plugin-ligo",
+            "time": 1695807645264,
+            "output": [
+                {
+                    "contract": "unit_votingPeriodOracle.jsligo",
+                    "testResults": "Some tests failed :("
+                }
+            ]
+        },
+        "@taqueria/plugin-ligo.test.1695807696194": {
+            "task": "test",
+            "plugin": "@taqueria/plugin-ligo",
+            "time": 1695807696194,
+            "output": [
+                {
+                    "contract": "unit_votingPeriodOracle.jsligo",
+                    "testResults": "\"For keypair :\"\n(\"spsk1k3pfo3MNNwBwETZ6WZg9csYAJAkzodkKL23g2fEu1WyNLmT3q\" , sppk7b1CfYXGoaLeaEjiK9pHm4ixEwnwsA4Ca5wVKD9h8uAe1dQ7uJo)\n\"New account\"\ntz2T1dw5dSPoaWZ5ztPLu15sZnxD7P5ecoF1\n1000000000mutez\n\"with voting power :\"\n0n\n(\"expected error : \" , \"You are not the admin !!!\" , \" Actual : \")\n\"You are not the admin !!!\"\n{admin = tz1hkMbkLPkvhxyqsQoBoLPqb1mruSzZx3zy ; votingPeriodIndex = 25n}\n{admin = tz1hkMbkLPkvhxyqsQoBoLPqb1mruSzZx3zy ; votingPeriodIndex = 26n}\nEverything at the top-level was executed.\n- testOriginate exited with value true.\n- testSender1UpdateNotAdmin exited with value true.\n- testAdminUpdateGhost exited with value true.\n- testAdminUpdateGhostAgain exited with value true.\n\n🎉 All tests passed 🎉"
+                }
+            ]
+        },
+        "@taqueria/plugin-ligo.test.1695807706895": {
+            "task": "test",
+            "plugin": "@taqueria/plugin-ligo",
+            "time": 1695807706895,
+            "output": [
+                {
+                    "contract": "unit_permissionedSimplePoll.jsligo",
+                    "testResults": "\"voteContract\"\nKT198rWi6NEDA5K7DZEVGxnBgxrcPPVqkjxR(None)\n(\"expected error : \" , \"Option does not exist\" , \" Actual : \")\n\"Option does not exist\"\nSuccess (1649n)\n{from_ = timestamp(1970-01-01T00:00:00Z) ; name = \"Which is the cutiest pokemon?\" ; options = [\"Mew\" ; \"Pikachu\"] ; owner = tz1hkMbkLPkvhxyqsQoBoLPqb1mruSzZx3zy ; registeredVoters = [tz1hkMbkLPkvhxyqsQoBoLPqb1mruSzZx3zy ; tz1LwyuRUjqRJ9HFepP9uym7B6AKQLBdRGm2 ; tz1SccDTZWrqoqQscvjeMTBvf6zSK4snmrup] ; results = [\"Pikachu\" -> 1] ; to = timestamp(1970-01-01T00:30:00Z) ; votes = [tz1hkMbkLPkvhxyqsQoBoLPqb1mruSzZx3zy -> \"Pikachu\"]}\n(\"expected voteCount : \" , 1)\n(\"actual voteCount : \" , 1)\n(\"expected error : \" , \"A vote with option Pikachu  already exists for this user\" , \" Actual : \")\n\"A vote with option Pikachu  already exists for this user\"\nSuccess (390n)\n{from_ = timestamp(1970-01-01T00:00:00Z) ; name = \"Which is the cutiest pokemon?\" ; options = [\"Mew\" ; \"Pikachu\"] ; owner = tz1hkMbkLPkvhxyqsQoBoLPqb1mruSzZx3zy ; registeredVoters = [tz1hkMbkLPkvhxyqsQoBoLPqb1mruSzZx3zy ; tz1LwyuRUjqRJ9HFepP9uym7B6AKQLBdRGm2 ; tz1SccDTZWrqoqQscvjeMTBvf6zSK4snmrup] ; results = [\"Pikachu\" -> 2] ; to = timestamp(1970-01-01T00:30:00Z) ; votes = [tz1LwyuRUjqRJ9HFepP9uym7B6AKQLBdRGm2 -> \"Pikachu\" ; tz1hkMbkLPkvhxyqsQoBoLPqb1mruSzZx3zy -> \"Pikachu\"]}\n(\"expected voteCount : \" , 2)\n(\"actual voteCount : \" , 2)\n(\"expected error : \" , \"A vote with option Pikachu  already exists for this user\" , \" Actual : \")\n\"A vote with option Pikachu  already exists for this user\"\nSuccess (393n)\n{from_ = timestamp(1970-01-01T00:00:00Z) ; name = \"Which is the cutiest pokemon?\" ; options = [\"Mew\" ; \"Pikachu\"] ; owner = tz1hkMbkLPkvhxyqsQoBoLPqb1mruSzZx3zy ; registeredVoters = [tz1hkMbkLPkvhxyqsQoBoLPqb1mruSzZx3zy ; tz1LwyuRUjqRJ9HFepP9uym7B6AKQLBdRGm2 ; tz1SccDTZWrqoqQscvjeMTBvf6zSK4snmrup] ; results = [\"Mew\" -> 1 ; \"Pikachu\" -> 2] ; to = timestamp(1970-01-01T00:30:00Z) ; votes = [tz1LwyuRUjqRJ9HFepP9uym7B6AKQLBdRGm2 -> \"Pikachu\" ; tz1SccDTZWrqoqQscvjeMTBvf6zSK4snmrup -> \"Mew\" ; tz1hkMbkLPkvhxyqsQoBoLPqb1mruSzZx3zy -> \"Pikachu\"]}\n(\"expected voteCount : \" , 1)\n(\"actual voteCount : \" , 1)\n(\"expected error : \" , \"User is not registered\" , \" Actual : \")\n\"User is not registered\"\n(\"expected error : \" , \"User has to be owner\" , \" Actual : \")\n\"User has to be owner\"\nSuccess (397n)\n{from_ = timestamp(1970-01-01T00:00:00Z) ; name = \"Which is the cutiest pokemon?\" ; options = [\"Mew\" ; \"Pikachu\"] ; owner = tz1hkMbkLPkvhxyqsQoBoLPqb1mruSzZx3zy ; registeredVoters = [tz1Pn35MsdrTuLWHztgeMXHuRxisq1DpxDxU ; tz1hkMbkLPkvhxyqsQoBoLPqb1mruSzZx3zy ; tz1LwyuRUjqRJ9HFepP9uym7B6AKQLBdRGm2 ; tz1SccDTZWrqoqQscvjeMTBvf6zSK4snmrup] ; results = [\"Mew\" -> 1 ; \"Pikachu\" -> 2] ; to = timestamp(1970-01-01T00:30:00Z) ; votes = [tz1LwyuRUjqRJ9HFepP9uym7B6AKQLBdRGm2 -> \"Pikachu\" ; tz1SccDTZWrqoqQscvjeMTBvf6zSK4snmrup -> \"Mew\" ; tz1hkMbkLPkvhxyqsQoBoLPqb1mruSzZx3zy -> \"Pikachu\"]}\n(\"expected error : \" , \"User is already registered\" , \" Actual : \")\n\"User is already registered\"\n(\"expected error : \" , \"User has to be owner\" , \" Actual : \")\n\"User has to be owner\"\nSuccess (398n)\n{from_ = timestamp(1970-01-01T00:00:00Z) ; name = \"Which is the cutiest pokemon?\" ; options = [\"Mew\" ; \"Pikachu\"] ; owner = tz1hkMbkLPkvhxyqsQoBoLPqb1mruSzZx3zy ; registeredVoters = [tz1hkMbkLPkvhxyqsQoBoLPqb1mruSzZx3zy ; tz1LwyuRUjqRJ9HFepP9uym7B6AKQLBdRGm2 ; tz1SccDTZWrqoqQscvjeMTBvf6zSK4snmrup] ; results = [\"Mew\" -> 1 ; \"Pikachu\" -> 2] ; to = timestamp(1970-01-01T00:30:00Z) ; votes = [tz1LwyuRUjqRJ9HFepP9uym7B6AKQLBdRGm2 -> \"Pikachu\" ; tz1SccDTZWrqoqQscvjeMTBvf6zSK4snmrup -> \"Mew\" ; tz1hkMbkLPkvhxyqsQoBoLPqb1mruSzZx3zy -> \"Pikachu\"]}\n(\"expected error : \" , \"User not found\" , \" Actual : \")\n\"User not found\"\n(\"expected error : \" , \"Not yet the time to vote\" , \" Actual : \")\n\"Not yet the time to vote\"\nEverything at the top-level was executed.\n- testOriginate exited with value true.\n- testSender1VoteUnknownOption exited with value true.\n- testSender1VotePikachu exited with value true.\n- testSender1VotePikachuAgainAndFail exited with value true.\n- testSender2VotePikachu exited with value true.\n- testSender2VoteMewAndFail exited with value true.\n- testSender3VoteMew exited with value true.\n- testjohndoeNotRegistered exited with value true.\n- testjohndoeAddjohndoe exited with value true.\n- testSender1Addjohndoe exited with value true.\n- testSender1AddjohndoeAgainAndFail exited with value true.\n- testjohndoeRemovejohndoe exited with value true.\n- testSender1Removejohndoe exited with value true.\n- testSender1RemovejohndoeAgainAndFail exited with value true.\n- testVoteOutOfDate exited with value true.\n\n🎉 All tests passed 🎉"
+                }
+            ]
+        },
+        "@taqueria/plugin-ligo.test.1695807720382": {
+            "task": "test",
+            "plugin": "@taqueria/plugin-ligo",
+            "time": 1695807720382,
+            "output": [
+                {
+                    "contract": "unit_tezosTemplate3.jsligo",
+                    "testResults": "Some tests failed :("
                 }
             ]
         }
