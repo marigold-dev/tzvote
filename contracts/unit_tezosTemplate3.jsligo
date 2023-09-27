@@ -127,7 +127,7 @@ const _8 = Test.log(oracleContract);
   * END PREPARE ORACLE
   */
 
-const initial_storage = {
+const initial_storage: TZ.storage = {
   name: "Which is the cutiest pokemon?",
   votingPeriodIndex: 25 as nat,
   options: list(["Mew", "Pikachu"]),
