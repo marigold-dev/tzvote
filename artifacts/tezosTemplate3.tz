@@ -47,6 +47,10 @@
                        FAILWITH } ;
                    DUP 3 ;
                    GET 10 ;
+                   CONTRACT nat ;
+                   IF_NONE { PUSH string "CONTRACT DOES NOT EXIST" ; FAILWITH } { DROP } ;
+                   DUP 3 ;
+                   GET 10 ;
                    UNIT ;
                    VIEW "currentVotingPeriod" nat ;
                    IF_NONE

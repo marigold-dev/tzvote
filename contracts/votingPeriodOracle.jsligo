@@ -14,6 +14,6 @@ const updateCurrentVotingPeriod = (currentVotingIndex: nat, store: storage): ret
 };
 
 @view
-const currentVotingPeriod = (_: unit, store: storage): nat => {
+export const currentVotingPeriod = (_: unit, store: storage): nat => {
     return store.votingPeriodIndex
 };

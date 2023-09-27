@@ -194,7 +194,7 @@ const _testVoteFailOutOfDate = (
   k: key_hash,
   message: string
 ): bool => {
-  let initial_storage = {
+  let initial_storage: TZ.storage = {
     name: "Which is the cutiest pokemon?",
     votingPeriodIndex: 99999 as nat,
     options: list(["Mew", "Pikachu"]),
