@@ -1,4 +1,4 @@
-type storage = {
+export type storage = {
   name: string,
   votingPeriodIndex: nat,
   options: list<string>,
@@ -20,13 +20,15 @@ const vote = ([opt, senderHashKey]: [string, key_hash], store: storage): return_
 
   let opt_: option<string> =
     List.find_opt(((s: string) => s == opt), store.options);
-  if (opt_ == (None() as option<string>)) return failwith("Option does not exist");
+  if (opt_ == (None() as option<string>)) return failwith(
+    "Option does not exist"
+  );
   //check if sender has not yet voted
 
   match(Map.find_opt(Tezos.get_source(), store.votes)) {
     when (Some(voted)):
       failwith("A vote with option " + voted + "  already exists for this user")
-    when (None):
+    when (None()):
       unit
   };
   //call view
@@ -52,7 +54,7 @@ const vote = ([opt, senderHashKey]: [string, key_hash], store: storage): return_
                   r + (int(Tezos.voting_power(senderHashKey))),
                   store.results
                 )
-              when (None):
+              when (None()):
                 Map.add(
                   opt,
                   (int(Tezos.voting_power(senderHashKey))),
@@ -63,7 +65,7 @@ const vote = ([opt, senderHashKey]: [string, key_hash], store: storage): return_
           }
         ]
       }
-    when (None):
+    when (None()):
       failwith("Cannot find view currentVotingPeriod on given oracle address")
   }
 };

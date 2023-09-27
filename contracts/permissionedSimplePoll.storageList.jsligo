@@ -1,4 +1,6 @@
-const default_storage = {
+#import "permissionedSimplePoll.jsligo" "Contract"
+
+const default_storage: Contract.storage = {
     name: "Which is the cutiest pokemon?",
     from_: ("2023-01-01t00:00:00Z" as timestamp),
     to: ("2024-01-01t00:00:00Z" as timestamp),
@@ -9,8 +11,7 @@ const default_storage = {
     results: (Map.empty as map<string, int>)
 };
 
-/*
-const mainnet = {
+const mainnet: Contract.storage = {
     name: "Which is the cutiest pokemon?",
     from_: ("2023-01-01t00:00:00Z" as timestamp),
     to: ("2024-01-01t00:00:00Z" as timestamp),
@@ -21,5 +22,4 @@ const mainnet = {
     results: (Map.empty as map<string, int>)
 };
 
-const ghostnet = default_storage;
-*/
+const ghostnet: Contract.storage = default_storage;

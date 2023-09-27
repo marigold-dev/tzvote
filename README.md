@@ -11,7 +11,7 @@ The Oracle is here to store missing information of current **voting period index
 ## compile
 
 ```bash
-TAQ_LIGO_IMAGE=ligolang/ligo:0.72.0 taq compile votingPeriodOracle.jsligo
+TAQ_LIGO_IMAGE=ligolang/ligo:0.73.0 taq compile votingPeriodOracle.jsligo
 ```
 
 ## Test
@@ -19,7 +19,7 @@ TAQ_LIGO_IMAGE=ligolang/ligo:0.72.0 taq compile votingPeriodOracle.jsligo
 ### Dry run
 
 ```bash
-taq simulate votingPeriodOracle.tz --param pokeGame.parameter.default_parameter.tz  --sender alice --protocol nairobi
+taq simulate votingPeriodOracle.tz --param pokeGame.parameter.default_parameter.tz  --sender alice
 ```
 
 ### Unit tests
@@ -52,7 +52,7 @@ taq call votingPeriodOracle --param pokeGame.parameter.default_parameter.tz  -e 
 ## Compile Tezos baker contract
 
 ```bash
-TAQ_LIGO_IMAGE=ligolang/ligo:0.72.0 taq compile tezosTemplate3.jsligo
+TAQ_LIGO_IMAGE=ligolang/ligo:0.73.0 taq compile tezosTemplate3.jsligo
 ```
 
 ### Unit tests

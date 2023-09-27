@@ -1,6 +1,6 @@
 #include "./listUtils.jsligo"
 
-type storage = {
+export type storage = {
   name: string,
   from_: timestamp,
   to: timestamp,
@@ -12,8 +12,6 @@ type storage = {
 };
 
 type return_ = [list<operation>, storage];
-
-
 
 /**
  * Vote on one existing option. Can only vote once. Can only vote if part of voter list. Can only vote if period is between from and to. 
@@ -37,13 +35,15 @@ const vote = (opt: string, store: storage): return_ => {
 
   let opt_: option<string> =
     List.find_opt(((s: string) => s == opt), store.options);
-  if (opt_ == (None() as option<string>)) return failwith("Option does not exist");
+  if (opt_ == (None() as option<string>)) return failwith(
+    "Option does not exist"
+  );
   //check if sender has not yet voted
 
   match(Map.find_opt(Tezos.get_source(), store.votes)) {
     when (Some(voted)):
       failwith("A vote with option " + voted + "  already exists for this user")
-    when (None):
+    when (None()):
       unit
   };
   //check if voting period is between from and to date
@@ -60,7 +60,7 @@ const vote = (opt: string, store: storage): return_ => {
       results: match(Map.find_opt(opt, store.results)) {
         when (Some(r)):
           Map.add(opt, r + 1, store.results)
-        when (None):
+        when (None()):
           Map.add(opt, 1, store.results)
       },
       votes: Map.add(Tezos.get_source(), opt, store.votes)
@@ -124,7 +124,7 @@ const removeVoter = (voter: address, store: storage): return_ => {
         "A vote with option " + voted
         + "  already exists for this user, we cannot remove it"
       )
-    when (None):
+    when (None()):
       unit
   };
   return [

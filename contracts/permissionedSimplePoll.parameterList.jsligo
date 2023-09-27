@@ -1,2 +1,3 @@
-#import "permissionedSimplePoll.jsligo" "TZ"
-const default_parameter: parameter_of TZ = Vote("Pikachu");
+#import "permissionedSimplePoll.jsligo" "Contract"
+
+const default_parameter: parameter_of Contract = Vote("Pikachu");

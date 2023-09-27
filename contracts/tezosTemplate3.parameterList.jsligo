@@ -1,5 +1,6 @@
-#import "tezosTemplate3.jsligo" "TZ"
-const default_parameter: parameter_of TZ =
+#import "tezosTemplate3.jsligo" "Contract"
+
+const default_parameter: parameter_of Contract =
     Vote(
         [
             "Pikachu",

@@ -1,22 +1,21 @@
 #import "tezosTemplate3.jsligo" "Contract"
-const default_storage =
-    {
-        name: "Which is the cutiest pokemon?",
-        votingPeriodIndex: (6 as nat),
-        options: list(["Mew", "Pikachu"]),
-        votes: (Map.empty as map<address, string>),
-        results: (Map.empty as map<string, int>),
-        votingPeriodOracle: ("KT19cxHuiRiKktLb5bj9MWGrmHzncjreExcY" as address)
-    };
 
-const mainnet =
-    {
-        name: "Which is the cutiest pokemon?",
-        votingPeriodIndex: (6 as nat),
-        options: list(["Mew", "Pikachu"]),
-        votes: (Map.empty as map<address, string>),
-        results: (Map.empty as map<string, int>),
-        votingPeriodOracle: ("KT1ThrY7xDKEo2BXeHjjQ4vcF1Mo5rUhtW48" as address)
-    };
+const default_storage: Contract.storage = {
+    name: "Which is the cutiest pokemon?",
+    votingPeriodIndex: (6 as nat),
+    options: list(["Mew", "Pikachu"]),
+    votes: (Map.empty as map<address, string>),
+    results: (Map.empty as map<string, int>),
+    votingPeriodOracle: ("KT19cxHuiRiKktLb5bj9MWGrmHzncjreExcY" as address)
+};
 
-const ghostnet = default_storage;
+const mainnet: Contract.storage = {
+    name: "Which is the cutiest pokemon?",
+    votingPeriodIndex: (6 as nat),
+    options: list(["Mew", "Pikachu"]),
+    votes: (Map.empty as map<address, string>),
+    results: (Map.empty as map<string, int>),
+    votingPeriodOracle: ("KT1ThrY7xDKEo2BXeHjjQ4vcF1Mo5rUhtW48" as address)
+};
+
+const ghostnet: Contract.storage = default_storage;

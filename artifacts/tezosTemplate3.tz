@@ -1,9 +1,10 @@
 { parameter (pair string key_hash) ;
   storage
-    (pair (pair (pair (string %name) (list %options string))
-                (map %results string int)
-                (map %votes address string))
+    (pair (string %name)
           (nat %votingPeriodIndex)
+          (list %options string)
+          (map %votes address string)
+          (map %results string int)
           (address %votingPeriodOracle)) ;
   code { UNPAIR ;
          UNPAIR ;
@@ -16,9 +17,7 @@
          IF { DROP 3 ; PUSH string "Sender has no rolls and cannot vote" ; FAILWITH }
             { NONE string ;
               DUP 4 ;
-              CAR ;
-              CAR ;
-              CDR ;
+              GET 5 ;
               NIL string ;
               SWAP ;
               ITER { CONS } ;
@@ -35,9 +34,7 @@
               EQ ;
               IF { DROP 3 ; PUSH string "Option does not exist" ; FAILWITH }
                  { DUP 3 ;
-                   CAR ;
-                   CDR ;
-                   CDR ;
+                   GET 7 ;
                    SOURCE ;
                    GET ;
                    IF_NONE
@@ -49,8 +46,7 @@
                        CONCAT ;
                        FAILWITH } ;
                    DUP 3 ;
-                   CDR ;
-                   CDR ;
+                   GET 10 ;
                    UNIT ;
                    VIEW "currentVotingPeriod" nat ;
                    IF_NONE
@@ -58,70 +54,49 @@
                        PUSH string "Cannot find view currentVotingPeriod on given oracle address" ;
                        FAILWITH }
                      { DUP 4 ;
-                       CDR ;
-                       CAR ;
+                       GET 3 ;
                        SWAP ;
                        COMPARE ;
                        NEQ ;
                        IF { DROP 3 ; PUSH string "Not yet the time to vote" ; FAILWITH }
                           { DUP 3 ;
                             DUP 4 ;
-                            CAR ;
-                            DUP ;
-                            CDR ;
-                            DUP 6 ;
-                            CAR ;
-                            CDR ;
-                            CAR ;
-                            DUP 5 ;
+                            GET 9 ;
+                            DUP 3 ;
                             GET ;
                             IF_NONE
-                              { DUP 6 ;
-                                CAR ;
-                                CDR ;
-                                CAR ;
-                                DIG 5 ;
+                              { DUP 4 ;
+                                GET 9 ;
+                                DIG 3 ;
                                 VOTING_POWER ;
                                 INT ;
-                                DUP 6 ;
+                                DUP 4 ;
                                 SWAP ;
                                 SOME ;
                                 SWAP ;
                                 UPDATE }
-                              { DUP 7 ;
-                                CAR ;
-                                CDR ;
-                                CAR ;
-                                DIG 6 ;
+                              { DUP 5 ;
+                                GET 9 ;
+                                DIG 4 ;
                                 VOTING_POWER ;
                                 INT ;
                                 DIG 2 ;
                                 ADD ;
-                                DUP 6 ;
+                                DUP 4 ;
                                 SWAP ;
                                 SOME ;
                                 SWAP ;
                                 UPDATE } ;
-                            UPDATE 1 ;
-                            UPDATE 2 ;
-                            UPDATE 1 ;
-                            DUP ;
-                            CAR ;
-                            DUP ;
-                            CDR ;
-                            DIG 4 ;
-                            CAR ;
-                            CDR ;
-                            CDR ;
-                            DIG 4 ;
+                            UPDATE 9 ;
+                            DIG 2 ;
+                            GET 7 ;
+                            DIG 2 ;
                             SOURCE ;
                             SWAP ;
                             SOME ;
                             SWAP ;
                             UPDATE ;
-                            UPDATE 2 ;
-                            UPDATE 2 ;
-                            UPDATE 1 ;
+                            UPDATE 7 ;
                             NIL operation ;
                             PAIR } } } } } }
 
