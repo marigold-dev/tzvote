@@ -43,7 +43,7 @@ const initAccount = ([accList, keypair]: [list<address>, [string, key]]): list<
   transfer_to_contract(c, unit, (1000 as tez));
   Test.log("New account");
   Test.log(Tezos.address(c));
-  Test.log(Test.get_balance(Tezos.address(c)));
+  Test.log(Test.get_balance_of_address(Tezos.address(c)));
   Test.log("with voting power :");
   let vp: michelson_program =
     Test.run((phk: key_hash) => Tezos.voting_power(phk), hk);
@@ -114,10 +114,10 @@ const oracleInitialStorage = { admin: faucet, votingPeriodIndex: 25 as nat };
 
 const mStorage = Test.compile_value(oracleInitialStorage);
 
-const [oracletaddr, _b, _6] =
-  Test.originate_module(contract_of(VPO), oracleInitialStorage, 0 as tez);
+const oracleOrig =
+  Test.originate(contract_of(VPO), oracleInitialStorage, 0 as tez);
 
-const oracleContract = Test.to_contract(oracletaddr);
+const oracleContract = Test.to_contract(oracleOrig.addr);
 
 const _7 = Test.log("oracleContract");
 
@@ -136,10 +136,9 @@ const initial_storage: TZ.storage = {
   votingPeriodOracle: Tezos.address(oracleContract)
 };
 
-const [taddr, _a, _9] =
-  Test.originate_module(contract_of(TZ), initial_storage, 0 as tez);
+const orig = Test.originate(contract_of(TZ), initial_storage, 0 as tez);
 
-const contr = Test.to_contract(taddr);
+const contr = Test.to_contract(orig.addr);
 
 const _10 = Test.log("voteContract");
 
@@ -147,11 +146,11 @@ const _11 = Test.log(contr);
 
 const _testOriginate = (): bool => {
   Test.assert(
-    (Test.get_storage(taddr) as TZ.storage).name
+    (Test.get_storage(orig.addr) as TZ.storage).name
     == "Which is the cutiest pokemon?"
   );
   Test.assert(
-    (Test.get_storage(taddr) as TZ.storage).votingPeriodIndex == (25 as nat)
+    (Test.get_storage(orig.addr) as TZ.storage).votingPeriodIndex == (25 as nat)
   );
   return true
 };
@@ -160,12 +159,12 @@ const _testVote = (s: address, o: string, k: key_hash, voteCount: int): bool => 
   Test.set_source(s);
   Test.log("BEFORE RUN");
   Test.log(s);
-  Test.log(Test.get_balance(s));
+  Test.log(Test.get_balance_of_address(s));
   const status = Test.transfer_to_contract(contr, (Vote([o, k])), 1 as mutez);
   Test.log(status);
   Test.log("AFTER RUN");
-  Test.log(Test.get_balance(s));
-  const st = (Test.get_storage(taddr) as TZ.storage);
+  Test.log(Test.get_balance_of_address(s));
+  const st = (Test.get_storage(orig.addr) as TZ.storage);
   Test.log(st);
   Test.assert_with_error(
     Option.unopt(Map.find_opt(s, st.votes)) == o,
@@ -202,9 +201,8 @@ const _testVoteFailOutOfDate = (
     results: (Map.empty as map<string, int>),
     votingPeriodOracle: Tezos.address(oracleContract)
   };
-  const [taddr, _, _1] =
-    Test.originate_module(contract_of(TZ), initial_storage, 0 as tez);
-  const oldContr = Test.to_contract(taddr);
+  const newOrig = Test.originate(contract_of(TZ), initial_storage, 0 as tez);
+  const oldContr = Test.to_contract(newOrig.addr);
   Test.set_source(s);
   return assert_failure(
     Test.transfer_to_contract(oldContr, (Vote([o, k])), 1 as mutez),

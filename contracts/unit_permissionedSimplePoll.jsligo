@@ -51,10 +51,11 @@ const initial_storage: PSP.storage = {
   results: (Map.empty as map<string, int>)
 };
 
-const [taddr, _3, _4] =
-  Test.originate_module(contract_of(PSP), initial_storage, 0 as tez);
+const orig = Test.originate(contract_of(PSP), initial_storage, 0 as tez);
 
-const contr = Test.to_contract(taddr);
+const contr = Test.to_contract(orig.addr);
+
+const contrAddress = Tezos.address(contr);
 
 const _5 = Test.log("voteContract");
 
@@ -62,7 +63,7 @@ const _6 = Test.log(contr);
 
 const _testOriginate = (): bool => {
   assert(
-    (Test.get_storage(taddr) as PSP.storage).name
+    (Test.get_storage(orig.addr) as PSP.storage).name
     == "Which is the cutiest pokemon?"
   );
   return true
@@ -72,7 +73,7 @@ const _testVote = (s: address, o: string, voteCount: int): bool => {
   Test.set_source(s);
   const status = Test.transfer_to_contract(contr, (Vote(o)), 1 as mutez);
   Test.log(status);
-  const st = (Test.get_storage(taddr) as PSP.storage);
+  const st = (Test.get_storage(orig.addr) as PSP.storage);
   Test.log(st);
   assert(Option.unopt(Map.find_opt(s, st.votes)) == o);
   Test.log(["expected voteCount : ", voteCount]);
@@ -90,9 +91,8 @@ const _testVoteFail = (s: address, o: string, message: string): bool => {
 };
 
 const _testVoteFailOutOfDate = (s: address, o: string, message: string): bool => {
-  const [taddr, _, _1] =
-    Test.originate_module(contract_of(PSP), initial_storage, 0 as tez);
-  const oldContr = Test.to_contract(taddr);
+  const orig = Test.originate(contract_of(PSP), initial_storage, 0 as tez);
+  const oldContr = Test.to_contract(orig.addr);
   Test.set_source(s);
   return assert_failure(
     Test.transfer_to_contract(oldContr, (Vote(o)), 1 as mutez),
@@ -104,7 +104,7 @@ const _testAddVoter = (s1: address, s2: address): bool => {
   Test.set_source(s1);
   const status = Test.transfer_to_contract(contr, (AddVoter(s2)), 1 as mutez);
   Test.log(status);
-  const st = (Test.get_storage(taddr) as PSP.storage);
+  const st = (Test.get_storage_of_address(contrAddress) as PSP.storage);
   Test.log(st);
   assert(
     Option.unopt(List.find_opt(((a: address) => a == s2), st.registeredVoters))
@@ -125,7 +125,7 @@ const _testRemoveVoter = (s1: address, s2: address): bool => {
   Test.set_source(s1);
   const status = Test.transfer_to_contract(contr, (RemoveVoter(s2)), 1 as mutez);
   Test.log(status);
-  const st = (Test.get_storage(taddr) as PSP.storage);
+  const st = (Test.get_storage_of_address(contrAddress) as PSP.storage);
   Test.log(st);
   assert(
     List.find_opt(((a: address) => a == s2), st.registeredVoters)
