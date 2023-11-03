@@ -1,3 +1,5 @@
 #import "permissionedSimplePoll.jsligo" "Contract"
 
-const default_parameter: parameter_of Contract = Vote("Pikachu");
+const pikachu = "Pikachu";
+
+const default_parameter: parameter_of Contract = Vote(pikachu);

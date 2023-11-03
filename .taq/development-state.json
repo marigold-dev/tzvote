@@ -56,61 +56,6 @@
                 }
             ]
         },
-        "@taqueria/plugin-ligo.compile.1695802981845": {
-            "task": "compile",
-            "plugin": "@taqueria/plugin-ligo",
-            "time": 1695802981845,
-            "output": [
-                {
-                    "source": "permissionedSimplePoll.jsligo",
-                    "artifact": "artifacts/permissionedSimplePoll.tz\nartifacts/permissionedSimplePoll.default_storage.tz\nartifacts/permissionedSimplePoll.storage.mainnet.tz\nartifacts/permissionedSimplePoll.storage.ghostnet.tz\npermissionedSimplePoll.parameterList.jsligo not compiled"
-                }
-            ]
-        },
-        "@taqueria/plugin-ligo.compile.1695803012349": {
-            "task": "compile",
-            "plugin": "@taqueria/plugin-ligo",
-            "time": 1695803012349,
-            "output": [
-                {
-                    "source": "permissionedSimplePoll.jsligo",
-                    "artifact": "artifacts/permissionedSimplePoll.tz\nartifacts/permissionedSimplePoll.default_storage.tz\nartifacts/permissionedSimplePoll.storage.mainnet.tz\nartifacts/permissionedSimplePoll.storage.ghostnet.tz\nartifacts/permissionedSimplePoll.parameter.default_parameter.tz"
-                }
-            ]
-        },
-        "@taqueria/plugin-ligo.compile.1695823544632": {
-            "task": "compile",
-            "plugin": "@taqueria/plugin-ligo",
-            "time": 1695823544632,
-            "output": [
-                {
-                    "source": "tezosTemplate3.jsligo",
-                    "artifact": "No contract modules found in \"tezosTemplate3.jsligo\""
-                }
-            ]
-        },
-        "@taqueria/plugin-ligo.compile.1695823640662": {
-            "task": "compile",
-            "plugin": "@taqueria/plugin-ligo",
-            "time": 1695823640662,
-            "output": [
-                {
-                    "source": "tezosTemplate3.jsligo",
-                    "artifact": "artifacts/tezosTemplate3.tz\nartifacts/tezosTemplate3.default_storage.tz\nartifacts/tezosTemplate3.storage.mainnet.tz\nartifacts/tezosTemplate3.storage.ghostnet.tz\ntezosTemplate3.parameterList.jsligo not compiled"
-                }
-            ]
-        },
-        "@taqueria/plugin-ligo.compile.1695887657143": {
-            "task": "compile",
-            "plugin": "@taqueria/plugin-ligo",
-            "time": 1695887657143,
-            "output": [
-                {
-                    "source": "votingPeriodOracle.jsligo",
-                    "artifact": "artifacts/votingPeriodOracle.tz\nartifacts/votingPeriodOracle.default_storage.tz\nartifacts/votingPeriodOracle.storage.mainnet.tz\nartifacts/votingPeriodOracle.storage.ghostnet.tz\nartifacts/votingPeriodOracle.parameter.default_parameter.tz"
-                }
-            ]
-        },
         "@taqueria/plugin-ligo.test.1696254705672": {
             "task": "test",
             "plugin": "@taqueria/plugin-ligo",
@@ -163,6 +108,61 @@
                 {
                     "contract": "unit_tezosTemplate3.jsligo",
                     "testResults": "\"For keypair :\"\n(\"p2sk2p6wqWTRizXLhA4doQW9DUQ6fhUmw9S6Ba1vAwMu3Hwn8RzrJ9\" , p2pk66R4kwhjwFVB68mL5kzhJ6WpRLztZyXerHEu5X1weKUaECDiJPT)\n\"New account\"\ntz3M6AbrScQUmPudfaCK8oofWYbXtrtCJMK6\n1500000000mutez\n\"with voting power :\"\n6500000000n\n\"For keypair :\"\n(\"edsk3EVBcXH1116ucjrXDqbRqZCHeNq9L5oeEE5y9y7xCr65bnwpqi\" , edpkutbVmDgkVJs9cvHqwJP5XJrU59ixxQ1rhXcDSgzFf6xET73XcC)\n\"New account\"\ntz1f4yRANFaaeVuinXx4Z1JHfTm9uDUVbscx\n7500000000mutez\n\"with voting power :\"\n12500000000n\n\"For keypair :\"\n(\"spsk2TREP7qHvoVZ3EXpvhq6tfhFPvEoP87bjtHwwmFKCvSPDPA4Js\" , sppk7ZTMah9w1ZLnxAJbUjUE4qa147gNgXB4B31UHcq45xAHcStXJ95)\n\"New account\"\ntz2P1BEVjsnEDQJHspGwHPyMh8S4wzxiEV7v\n13500000000mutez\n\"with voting power :\"\n18500000000n\n\"For keypair :\"\n(\"p2sk3QuFwC6wLpBiWBcs2Rjheg3KTdnnLVXpfqS5ZSXafLPJLs3d9p\" , p2pk66H2YEvLE4JEVYDG5qc6ZNjmnzXLrPyrDRJPiQc3T9fKoWLuC6y)\n\"New account\"\ntz3Ud37GhtHPw6HV2Fe4MvSwtXZ1yW2soUQ4\n1000000000mutez\n\"with voting power :\"\n0n\n\"oracleContract\"\nKT1UGzDVyHzNCNUQzJwM4HgTgbaMscFBgVh5(None)\n\"voteContract\"\nKT1CHtzEJA66dCHxMRvrCEpf7WpwW2DWXCzt(None)\n\"************* testSender1VoteUnknownOption *************\"\n(\"expected error : \" , \"Option does not exist\" , \" Actual : \")\n\"Option does not exist\"\n\"************* testSender1VotePikachu *************\"\n\"BEFORE RUN\"\ntz3M6AbrScQUmPudfaCK8oofWYbXtrtCJMK6\n1497597000mutez\nSuccess (3301n)\n\"AFTER RUN\"\n1496581749mutez\n{name = \"Which is the cutiest pokemon?\" ; options = [\"Mew\" ; \"Pikachu\"] ; results = [\"Pikachu\" -> 6500000000] ; votes = [tz3M6AbrScQUmPudfaCK8oofWYbXtrtCJMK6 -> \"Pikachu\"] ; votingPeriodIndex = 25n ; votingPeriodOracle = KT1UGzDVyHzNCNUQzJwM4HgTgbaMscFBgVh5}\n(\"expected voteCount : \" , 6500000000)\n(\"actual voteCount : \" , 6500000000)\n\"************* testSender1VotePikachuAgainAndFail *************\"\n(\"expected error : \" , \"A vote with option Pikachu  already exists for this user\" , \" Actual : \")\n\"A vote with option Pikachu  already exists for this user\"\n\"************* testSender2VotePikachu *************\"\n\"BEFORE RUN\"\ntz1f4yRANFaaeVuinXx4Z1JHfTm9uDUVbscx\n7500000000mutez\nSuccess (1976n)\n\"AFTER RUN\"\n7498989499mutez\n{name = \"Which is the cutiest pokemon?\" ; options = [\"Mew\" ; \"Pikachu\"] ; results = [\"Pikachu\" -> 19000000000] ; votes = [tz1f4yRANFaaeVuinXx4Z1JHfTm9uDUVbscx -> \"Pikachu\" ; tz3M6AbrScQUmPudfaCK8oofWYbXtrtCJMK6 -> \"Pikachu\"] ; votingPeriodIndex = 25n ; votingPeriodOracle = KT1UGzDVyHzNCNUQzJwM4HgTgbaMscFBgVh5}\n(\"expected voteCount : \" , 19000000000)\n(\"actual voteCount : \" , 19000000000)\n\"************* testSender2VoteMewAndFail *************\"\n(\"expected error : \" , \"A vote with option Pikachu  already exists for this user\" , \" Actual : \")\n\"A vote with option Pikachu  already exists for this user\"\n\"************* testSender3VoteMew *************\"\n\"BEFORE RUN\"\ntz2P1BEVjsnEDQJHspGwHPyMh8S4wzxiEV7v\n13500000000mutez\nSuccess (1965n)\n\"AFTER RUN\"\n13498986499mutez\n{name = \"Which is the cutiest pokemon?\" ; options = [\"Mew\" ; \"Pikachu\"] ; results = [\"Mew\" -> 18500000000 ; \"Pikachu\" -> 19000000000] ; votes = [tz1f4yRANFaaeVuinXx4Z1JHfTm9uDUVbscx -> \"Pikachu\" ; tz2P1BEVjsnEDQJHspGwHPyMh8S4wzxiEV7v -> \"Mew\" ; tz3M6AbrScQUmPudfaCK8oofWYbXtrtCJMK6 -> \"Pikachu\"] ; votingPeriodIndex = 25n ; votingPeriodOracle = KT1UGzDVyHzNCNUQzJwM4HgTgbaMscFBgVh5}\n(\"expected voteCount : \" , 18500000000)\n(\"actual voteCount : \" , 18500000000)\n\"************* testjohndoeNotABaker *************\"\n(\"expected error : \" , \"Sender has no rolls and cannot vote\" , \" Actual : \")\n\"Sender has no rolls and cannot vote\"\n\"************* testVoteOutOfDate *************\"\n(\"expected error : \" , \"Not yet the time to vote\" , \" Actual : \")\n\"Not yet the time to vote\"\nEverything at the top-level was executed.\n- testOriginate exited with value true.\n- testSender1VoteUnknownOption exited with value true.\n- testSender1VotePikachu exited with value true.\n- testSender1VotePikachuAgainAndFail exited with value true.\n- testSender2VotePikachu exited with value true.\n- testSender2VoteMewAndFail exited with value true.\n- testSender3VoteMew exited with value true.\n- testjohndoeNotABaker exited with value true.\n- testVoteOutOfDate exited with value true.\n\n🎉 All tests passed 🎉"
+                }
+            ]
+        },
+        "@taqueria/plugin-ligo.compile.1699020244124": {
+            "task": "compile",
+            "plugin": "@taqueria/plugin-ligo",
+            "time": 1699020244124,
+            "output": [
+                {
+                    "source": "permissionedSimplePoll.jsligo",
+                    "artifact": "artifacts/permissionedSimplePoll.tz\nartifacts/permissionedSimplePoll.default_storage.tz\nartifacts/permissionedSimplePoll.storage.mainnet.tz\nartifacts/permissionedSimplePoll.storage.ghostnet.tz\npermissionedSimplePoll.parameterList.jsligo not compiled\nartifacts/permissionedSimplePoll.parameter.default_parameter.tz"
+                }
+            ]
+        },
+        "@taqueria/plugin-ligo.compile.1699024888043": {
+            "task": "compile",
+            "plugin": "@taqueria/plugin-ligo",
+            "time": 1699024888043,
+            "output": [
+                {
+                    "source": "permissionedSimplePoll.jsligo",
+                    "artifact": "artifacts/permissionedSimplePoll.tz\nartifacts/permissionedSimplePoll.default_storage.tz\nartifacts/permissionedSimplePoll.storage.mainnet.tz\nartifacts/permissionedSimplePoll.storage.ghostnet.tz\nartifacts/permissionedSimplePoll.parameter.default_parameter.tz"
+                }
+            ]
+        },
+        "@taqueria/plugin-ligo.compile.1699025229648": {
+            "task": "compile",
+            "plugin": "@taqueria/plugin-ligo",
+            "time": 1699025229648,
+            "output": [
+                {
+                    "source": "permissionedSimplePoll.jsligo",
+                    "artifact": "artifacts/permissionedSimplePoll.tz\nartifacts/permissionedSimplePoll.default_storage.tz\nartifacts/permissionedSimplePoll.storage.mainnet.tz\nartifacts/permissionedSimplePoll.storage.ghostnet.tz\npermissionedSimplePoll.parameterList.jsligo not compiled\nartifacts/permissionedSimplePoll.parameter.default_parameter.tz"
+                }
+            ]
+        },
+        "@taqueria/plugin-ligo.compile.1699025913808": {
+            "task": "compile",
+            "plugin": "@taqueria/plugin-ligo",
+            "time": 1699025913808,
+            "output": [
+                {
+                    "source": "permissionedSimplePoll.jsligo",
+                    "artifact": "artifacts/permissionedSimplePoll.tz\nartifacts/permissionedSimplePoll.default_storage.tz\nartifacts/permissionedSimplePoll.storage.mainnet.tz\nartifacts/permissionedSimplePoll.storage.ghostnet.tz\npermissionedSimplePoll.parameterList.jsligo not compiled\nartifacts/permissionedSimplePoll.parameter.default_parameter.tz"
+                }
+            ]
+        },
+        "@taqueria/plugin-ligo.compile.1699025929327": {
+            "task": "compile",
+            "plugin": "@taqueria/plugin-ligo",
+            "time": 1699025929328,
+            "output": [
+                {
+                    "source": "tezosTemplate3.jsligo",
+                    "artifact": "artifacts/tezosTemplate3.tz\nartifacts/tezosTemplate3.default_storage.tz\nartifacts/tezosTemplate3.storage.mainnet.tz\nartifacts/tezosTemplate3.storage.ghostnet.tz\ntezosTemplate3.parameterList.jsligo not compiled\nartifacts/tezosTemplate3.parameter.default_parameter.tz"
                 }
             ]
         }

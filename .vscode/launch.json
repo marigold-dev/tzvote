@@ -9,33 +9,179 @@
       "request": "launch",
       "name": "Permission vote Pikachu",
       "logDir": "",
-      "entrypoint": "main",
+      "program": "/home/zamrokk/delegator-votes/contracts/permissionedSimplePoll.runner.jsligo",
+      "entrypoint": "vote",
       "parameterLang": "LIGO",
-      "parameter": "Vote(\"Pikachu\")",
+      "parameter": "pikachu",
       "storageLang": "LIGO",
-      "storage": "{  name : \"Which is the cutiest pokemon?\" , from_ : (\"1969-01-01t00:00:00Z\" as timestamp), to : (\"2030-01-01t00:00:00Z\" as timestamp) ,  options : list([\"Mew\",\"Pikachu\"]) , owner : (\"tz1VApBuWHuaTfDHtKzU3NBtWFYsxJvvWhYk\" as address) , registeredVoters : list([\"tz29EDhZ4D3XueHxm5RGZsJLHRtj3qSA2MzH\" as address]) as list<address>,  votes : (Map.empty as map<address, string>),  results : (Map.empty as map<string, int>)}"
+      "storage": "default_storage",
+      "contractEnv": {
+        "now": "2023-11-11T00:00:00Z",
+        "level": "10000",
+        "sender": "tz1VSUr8wwNhLAzempoch5d6hLRiTh8Cjcjb",
+        "source": "tz1VSUr8wwNhLAzempoch5d6hLRiTh8Cjcjb",
+        "self": "KT1XQcegsEtio9oGbLUHA8SKX4iZ2rpEXY9b",
+        "amount": "0",
+        "balance": "1000000",
+        "chainId": "NetXH12Aer3be93",
+        "votingPowers": {
+          "kind": "simple",
+          "contents": {
+            "tz1VSUr8wwNhLAzempoch5d6hLRiTh8Cjcjb": "42000000"
+          }
+        }
+      }
     },
     {
       "type": "ligo",
       "request": "launch",
+
       "name": "Permission vote UNKNOWN will fail",
       "logDir": "",
-      "entrypoint": "main",
+      "program": "/home/zamrokk/delegator-votes/contracts/permissionedSimplePoll.runner.jsligo",
+
+      "entrypoint": "vote",
       "parameterLang": "LIGO",
-      "parameter": "Vote(\"UNKNOWN\")",
+      "parameter": "\"UNKNOWN\"",
       "storageLang": "LIGO",
-      "storage": "{  name : \"Which is the cutiest pokemon?\" , from_ : (\"1969-01-01t00:00:00Z\" as timestamp), to : (\"2030-01-01t00:00:00Z\" as timestamp) ,  options : list([\"Mew\",\"Pikachu\"]) , owner : (\"tz1VApBuWHuaTfDHtKzU3NBtWFYsxJvvWhYk\" as address) , registeredVoters : list([\"tz29EDhZ4D3XueHxm5RGZsJLHRtj3qSA2MzH\" as address]) as list<address>,  votes : (Map.empty as map<address, string>),  results : (Map.empty as map<string, int>)}"
+      "storage": "default_storage",
+      "contractEnv": {
+        "now": "2023-11-11T00:00:00Z",
+        "level": "10000",
+        "sender": "tz1VSUr8wwNhLAzempoch5d6hLRiTh8Cjcjb",
+        "source": "tz1VSUr8wwNhLAzempoch5d6hLRiTh8Cjcjb",
+        "self": "KT1XQcegsEtio9oGbLUHA8SKX4iZ2rpEXY9b",
+        "amount": "0",
+        "balance": "1000000",
+        "chainId": "NetXH12Aer3be93",
+        "votingPowers": {
+          "kind": "simple",
+          "contents": {
+            "tz1VSUr8wwNhLAzempoch5d6hLRiTh8Cjcjb": "42000000"
+          }
+        }
+      }
     },
     {
       "type": "ligo",
       "request": "launch",
+      "moduleName": "(*@AskOnStart@*)",
+
       "name": "Permission UNKNOWN command will fail",
       "logDir": "",
-      "entrypoint": "main",
+      "program": "/home/zamrokk/delegator-votes/contracts/permissionedSimplePoll.runner.jsligo",
+
+      "entrypoint": "UNKNOWN",
       "parameterLang": "LIGO",
-      "parameter": "UNKNOWN(\"UNKNOWN\")",
+      "parameter": "\"UNKNOWN\"",
       "storageLang": "LIGO",
-      "storage": "{  name : \"Which is the cutiest pokemon?\" , from_ : (\"1969-01-01t00:00:00Z\" as timestamp), to : (\"2030-01-01t00:00:00Z\" as timestamp) ,  options : list([\"Mew\",\"Pikachu\"]) , owner : (\"tz1VApBuWHuaTfDHtKzU3NBtWFYsxJvvWhYk\" as address) , registeredVoters : list([\"tz29EDhZ4D3XueHxm5RGZsJLHRtj3qSA2MzH\" as address]) as list<address>,  votes : (Map.empty as map<address, string>),  results : (Map.empty as map<string, int>)}"
+      "storage": "default_storage",
+      "contractEnv": {
+        "now": "2023-11-11T00:00:00Z",
+        "level": "10000",
+        "sender": "tz1VSUr8wwNhLAzempoch5d6hLRiTh8Cjcjb",
+        "source": "tz1VSUr8wwNhLAzempoch5d6hLRiTh8Cjcjb",
+        "self": "KT1XQcegsEtio9oGbLUHA8SKX4iZ2rpEXY9b",
+        "amount": "0",
+        "balance": "1000000",
+        "chainId": "NetXH12Aer3be93",
+        "votingPowers": {
+          "kind": "simple",
+          "contents": {
+            "tz1VSUr8wwNhLAzempoch5d6hLRiTh8Cjcjb": "42000000"
+          }
+        }
+      }
+    },
+    {
+      "type": "ligo",
+      "request": "launch",
+      "name": "Permission addVoter Bob",
+      "logDir": "",
+      "program": "/home/zamrokk/delegator-votes/contracts/permissionedSimplePoll.runner.jsligo",
+
+      "entrypoint": "addVoter",
+      "parameterLang": "LIGO",
+      "parameter": "\"tz1aSkwEot3L2kmUvcoxzjMomb9mvBNuzFK6\" as address",
+      "storageLang": "LIGO",
+      "storage": "default_storage",
+      "contractEnv": {
+        "now": "2023-11-11T00:00:00Z",
+        "level": "10000",
+        "sender": "tz1VSUr8wwNhLAzempoch5d6hLRiTh8Cjcjb",
+        "source": "tz1VSUr8wwNhLAzempoch5d6hLRiTh8Cjcjb",
+        "self": "KT1XQcegsEtio9oGbLUHA8SKX4iZ2rpEXY9b",
+        "amount": "0",
+        "balance": "1000000",
+        "chainId": "NetXH12Aer3be93",
+        "votingPowers": {
+          "kind": "simple",
+          "contents": {
+            "tz1VSUr8wwNhLAzempoch5d6hLRiTh8Cjcjb": "42000000"
+          }
+        }
+      }
+    },
+
+    {
+      "type": "ligo",
+      "request": "launch",
+      "name": "Permission vote Pikachu will Fail , too late",
+      "logDir": "",
+      "program": "/home/zamrokk/delegator-votes/contracts/permissionedSimplePoll.runner.jsligo",
+
+      "entrypoint": "vote",
+      "parameterLang": "LIGO",
+      "parameter": "\"Pikachu\"",
+      "storageLang": "LIGO",
+      "storage": "default_storage",
+      "contractEnv": {
+        "now": "2025-11-11T00:00:00Z",
+        "level": "10000",
+        "sender": "tz1VSUr8wwNhLAzempoch5d6hLRiTh8Cjcjb",
+        "source": "tz1VSUr8wwNhLAzempoch5d6hLRiTh8Cjcjb",
+        "self": "KT1XQcegsEtio9oGbLUHA8SKX4iZ2rpEXY9b",
+        "amount": "0",
+        "balance": "1000000",
+        "chainId": "NetXH12Aer3be93",
+        "votingPowers": {
+          "kind": "simple",
+          "contents": {
+            "tz1VSUr8wwNhLAzempoch5d6hLRiTh8Cjcjb": "42000000"
+          }
+        }
+      }
+    },
+
+    {
+      "type": "ligo",
+      "request": "launch",
+      "name": "Baker vote Pikachu",
+      "logDir": "",
+      "entrypoint": "", //vote
+      "program": "/home/zamrokk/delegator-votes/contracts/tezosTemplate3.runner.jsligo",
+      "parameterLang": "LIGO",
+      "parameter": "pikachuAndKeyHash",
+      "storageLang": "LIGO",
+      "storage": "default_storage",
+      "contractEnv": {
+        "now": "2023-11-11T00:00:00Z",
+        "level": "10000",
+        "sender": "tz1VSUr8wwNhLAzempoch5d6hLRiTh8Cjcjb",
+        "source": "tz1VSUr8wwNhLAzempoch5d6hLRiTh8Cjcjb",
+        "self": "KT1XQcegsEtio9oGbLUHA8SKX4iZ2rpEXY9b",
+        "amount": "0",
+        "balance": "1000000",
+        "chainId": "NetXH12Aer3be93",
+        "votingPowers": {
+          "kind": "simple",
+          "contents": {
+            "tz1VSUr8wwNhLAzempoch5d6hLRiTh8Cjcjb": "42000000"
+          }
+        }
+      }
     }
   ]
 }
+
+// ({  name : "Which is the cutiest pokemon?" , from_ : ("2023-11-11T00:00:00Z" as timestamp), to : ("2024-11-11T00:00:00Z" as timestamp) ,  options : list(["Mew","Pikachu"]) , owner : ("tz1VSUr8wwNhLAzempoch5d6hLRiTh8Cjcjb" as address) , registeredVoters : list(["tz1VSUr8wwNhLAzempoch5d6hLRiTh8Cjcjb" as address]) as list<address>,  votes : (Map.empty as map<address, string>),  results : (Map.empty as map<string, int>)}) as storage
