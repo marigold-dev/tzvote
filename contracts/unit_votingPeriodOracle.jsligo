@@ -1,32 +1,25 @@
 #import "votingPeriodOracle.jsligo" "VPO"
+
 //util function
 
 const assert_failure = (result: test_exec_result, message: string): bool => {
-  return match(
-    result,
-    {
-      Success: (_) => false,
-      Fail: (tee) =>
-        match(
-          tee,
-          {
-            Other: (msg) => {
-              Test.log("ERROR Other : " + msg);
-              return false
-            },
-            Balance_too_low: (record) => {
-              Test.log("ERROR Balance_too_low");
-              return false
-            },
-            Rejected: (s) => {
-              Test.log(["expected error : ", message, " Actual : "]);
-              Test.log(s[0]);
-              return ((Test.eval(message)) == s[0])
-            }
+  return match(result) {
+    when (Success(_)):
+      false
+    when (Fail(tee)):
+      match(tee) {
+        when (Other(msg)):
+          do { Test.log("ERROR Other : " + msg); return false }
+        when (Balance_too_low(_record)):
+          do { Test.log("ERROR Balance_too_low"); return false }
+        when (Rejected(s)):
+          do {
+            Test.log(["expected error : ", message, " Actual : "]);
+            Test.log(s[0]);
+            return ((Test.eval(message)) == s[0])
           }
-        )
-    }
-  )
+      }
+  }
 };
 
 //util
@@ -44,10 +37,11 @@ const initAccount = (keypair: [string, key]): address => {
   let c: contract<unit> = Tezos.implicit_account(hk);
   //set balance to avoid empty implicit accounts
 
-  let _: test_exec_result = Test.transfer_to_contract(c, unit, (1000 as tez));
+  Test.
+  transfer_to_contract(c, unit, (1000 as tez));
   Test.log("New account");
   Test.log(Tezos.address(c));
-  Test.log(Test.get_balance(Tezos.address(c)));
+  Test.log(Test.get_balance_of_address(Tezos.address(c)));
   Test.log("with voting power :");
   let vp: michelson_program =
     Test.run((phk: key_hash) => Tezos.voting_power(phk), hk);
@@ -55,7 +49,7 @@ const initAccount = (keypair: [string, key]): address => {
   return Tezos.address(c)
 };
 
-let _ = Test.reset_state(3 as nat, list([]) as list<tez>);
+const _ = Test.reset_state(3 as nat, list([]) as list<tez>);
 
 const baker1 = Test.nth_bootstrap_account(0);
 
@@ -65,23 +59,25 @@ const senderKey1: [string, key] = Test.new_account();
 
 const sender1 = initAccount(senderKey1);
 
-const _ = Test.set_source(admin);
+const _1 = Test.set_source(admin);
 
-const _ = Test.set_baker(baker1);
+const _2 = Test.set_baker(baker1);
 
 const initial_storage = { votingPeriodIndex: 0 as nat, admin: admin };
 
-const [taddr, _, _] =
-  Test.originate_module(contract_of (VPO), initial_storage, 0 as tez);
+const orig = Test.originate(contract_of(VPO), initial_storage, 0 as tez);
 
-const contr = Test.to_contract(taddr);
+const contr = Test.to_contract(orig.addr);
 
 const contrAddress = Tezos.address(contr);
 
 const _testOriginate = (): bool => {
-  assert((Test.get_storage(taddr) as VPO.storage).admin == admin);
   assert(
-    (Test.get_storage(taddr) as VPO.storage).votingPeriodIndex == (0 as nat)
+    (Test.get_storage_of_address(contrAddress) as VPO.storage).admin == admin
+  );
+  assert(
+    (Test.get_storage_of_address(contrAddress) as VPO.storage).votingPeriodIndex
+    == (0 as nat)
   );
   return true
 };
@@ -94,7 +90,7 @@ const _testUpdate = (s: address, value: nat): bool => {
       UpdateCurrentVotingPeriod(value),
       1 as mutez
     );
-  let st = (Test.get_storage(taddr) as VPO.storage);
+  let st = (Test.get_storage_of_address(contrAddress) as VPO.storage);
   Test.log(st);
   assert(st.votingPeriodIndex == value);
   return true

@@ -1,4 +1,4 @@
-type storage = {
+export type storage = {
   name: string,
   votingPeriodIndex: nat,
   options: list<string>,
@@ -25,24 +25,19 @@ const vote = ([opt, senderHashKey]: [string, key_hash], store: storage): return_
   );
   //check if sender has not yet voted
 
-  match(
-    Map.find_opt(Tezos.get_source(), store.votes),
-    {
-      Some: (voted: string) =>
-        failwith(
-          "A vote with option " + voted + "  already exists for this user"
-        ),
-      None: () => unit
-    }
-  );
+  match(Map.find_opt(Tezos.get_source(), store.votes)) {
+    when (Some(voted)):
+      failwith("A vote with option " + voted + "  already exists for this user")
+    when (None()):
+      unit
+  };
   //call view
 
   let votingPeriodIndexOpt: option<nat> =
     Tezos.call_view("currentVotingPeriod", unit, store.votingPeriodOracle);
-  return match(
-    votingPeriodIndexOpt,
-    {
-      Some: (votingPeriodIndex) => {
+  return match(votingPeriodIndexOpt) {
+    when (Some(votingPeriodIndex)):
+      do {
         if (votingPeriodIndex != store.votingPeriodIndex) return failwith(
           "Not yet the time to vote"
         );
@@ -52,29 +47,25 @@ const vote = ([opt, senderHashKey]: [string, key_hash], store: storage): return_
           list([]) as list<operation>,
           {
             ...store,
-            results: match(
-              Map.find_opt(opt, store.results),
-              {
-                Some: (r: int) =>
-                  Map.add(
-                    opt,
-                    r + (int(Tezos.voting_power(senderHashKey))),
-                    store.results
-                  ),
-                None: () =>
-                  Map.add(
-                    opt,
-                    (int(Tezos.voting_power(senderHashKey))),
-                    store.results
-                  )
-              }
-            ),
+            results: match(Map.find_opt(opt, store.results)) {
+              when (Some(r)):
+                Map.add(
+                  opt,
+                  r + (int(Tezos.voting_power(senderHashKey))),
+                  store.results
+                )
+              when (None()):
+                Map.add(
+                  opt,
+                  (int(Tezos.voting_power(senderHashKey))),
+                  store.results
+                )
+            },
             votes: Map.add(Tezos.get_source(), opt, store.votes)
           }
         ]
-      },
-      None: () =>
-        failwith("Cannot find view currentVotingPeriod on given oracle address")
-    }
-  )
+      }
+    when (None()):
+      failwith("Cannot find view currentVotingPeriod on given oracle address")
+  }
 };

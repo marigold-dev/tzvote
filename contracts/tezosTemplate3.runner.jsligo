@@ -1,0 +1,5 @@
+#include "tezosTemplate3.jsligo"
+
+#include "tezosTemplate3.storageList.jsligo"
+
+#include "tezosTemplate3.parameterList.jsligo"

@@ -1,7 +1,9 @@
-(Pair (Pair (Pair "2023-01-01T00:00:00Z" "Which is the cutiest pokemon?")
-            { "Mew" ; "Pikachu" }
-            "tz1VSUr8wwNhLAzempoch5d6hLRiTh8Cjcjb")
-      (Pair {} {})
+(Pair "Which is the cutiest pokemon?"
+      "2023-01-01T00:00:00Z"
       "2024-01-01T00:00:00Z"
+      { "Mew" ; "Pikachu" }
+      "tz1VSUr8wwNhLAzempoch5d6hLRiTh8Cjcjb"
+      {}
+      {}
       {})
 

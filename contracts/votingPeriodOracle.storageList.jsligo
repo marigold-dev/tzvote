@@ -1,14 +1,13 @@
 #import "votingPeriodOracle.jsligo" "Contract"
-const default_storage =
-    {
-        votingPeriodIndex: 0 as nat,
-        admin: ("tz1VSUr8wwNhLAzempoch5d6hLRiTh8Cjcjb" as address)
-    };
 
-const mainnet =
-    {
-        votingPeriodIndex: 0 as nat,
-        admin: ("tz1QYD1zbK2gTUu1YWX8m7hPcKNkuXoxPo73" as address)
-    };
+const default_storage: Contract.storage = {
+    votingPeriodIndex: 0 as nat,
+    admin: ("tz1VSUr8wwNhLAzempoch5d6hLRiTh8Cjcjb" as address)
+};
+
+const mainnet = {
+    votingPeriodIndex: 0 as nat,
+    admin: ("tz1QYD1zbK2gTUu1YWX8m7hPcKNkuXoxPo73" as address)
+};
 
 const ghostnet = default_storage;

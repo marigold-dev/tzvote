@@ -1,0 +1,5 @@
+#include "permissionedSimplePoll.jsligo"
+
+#include "permissionedSimplePoll.storageList.jsligo"
+
+#include "permissionedSimplePoll.parameterList.jsligo"

@@ -1,3 +1,4 @@
 #import "votingPeriodOracle.jsligo" "Contract"
+
 const default_parameter: parameter_of Contract =
     UpdateCurrentVotingPeriod(6 as nat);

@@ -1,0 +1,66 @@
+{
+  // Use IntelliSense to learn about possible attributes.
+  // Hover to view descriptions of existing attributes.
+  // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "ligo",
+      "request": "launch",
+      "name": "Permission vote Pikachu",
+      "logDir": "",
+      "program": "/home/zamrokk/delegator-votes/contracts/permissionedSimplePoll.jsligo",
+      "entrypoint": "vote",
+      "parameterLang": "LIGO",
+      "parameter": "\"Pikachu\"",
+      "storageLang": "LIGO",
+      "storage": "({  name : \"Which is the cutiest pokemon?\" , from_ : \"2023-11-11T00:00:00Z\" as timestamp, to : \"2024-11-11T00:00:00Z\" as timestamp ,  options : list([\"Mew\",\"Pikachu\"]) , owner : \"tz1VSUr8wwNhLAzempoch5d6hLRiTh8Cjcjb\" as address , registeredVoters : list([\"tz1VSUr8wwNhLAzempoch5d6hLRiTh8Cjcjb\" as address]) as list<address>,  votes : Map.empty as map<address, string>,  results : Map.empty as map<string, int>}) as storage",
+      "contractEnv": {
+        "now": "2023-11-11T00:00:00Z",
+        "level": "10000",
+        "sender": "tz1VSUr8wwNhLAzempoch5d6hLRiTh8Cjcjb",
+        "source": "tz1VSUr8wwNhLAzempoch5d6hLRiTh8Cjcjb",
+        "self": "KT1XQcegsEtio9oGbLUHA8SKX4iZ2rpEXY9b",
+        "amount": "0",
+        "balance": "1000000",
+        "chainId": "NetXH12Aer3be93",
+        "votingPowers": {
+          "kind": "simple",
+          "contents": {
+            "tz1VSUr8wwNhLAzempoch5d6hLRiTh8Cjcjb": "42000000"
+          }
+        }
+      }
+    },
+    {
+      "type": "ligo",
+      "request": "launch",
+
+      "name": "Permission vote UNKNOWN will fail",
+      "logDir": "",
+      "program": "/home/zamrokk/delegator-votes/contracts/permissionedSimplePoll.jsligo",
+
+      "entrypoint": "vote",
+      "parameterLang": "LIGO",
+      "parameter": "\"UNKNOWN\"",
+      "storageLang": "LIGO",
+      "storage": "({  name : \"Which is the cutiest pokemon?\" , from_ : \"2023-11-11T00:00:00Z\" as timestamp, to : \"2024-11-11T00:00:00Z\" as timestamp ,  options : list([\"Mew\",\"Pikachu\"]) , owner : \"tz1VSUr8wwNhLAzempoch5d6hLRiTh8Cjcjb\" as address , registeredVoters : list([\"tz1VSUr8wwNhLAzempoch5d6hLRiTh8Cjcjb\" as address]) as list<address>,  votes : Map.empty as map<address, string>,  results : Map.empty as map<string, int>}) as storage",
+      "contractEnv": {
+        "now": "2023-11-11T00:00:00Z",
+        "level": "10000",
+        "sender": "tz1VSUr8wwNhLAzempoch5d6hLRiTh8Cjcjb",
+        "source": "tz1VSUr8wwNhLAzempoch5d6hLRiTh8Cjcjb",
+        "self": "KT1XQcegsEtio9oGbLUHA8SKX4iZ2rpEXY9b",
+        "amount": "0",
+        "balance": "1000000",
+        "chainId": "NetXH12Aer3be93",
+        "votingPowers": {
+          "kind": "simple",
+          "contents": {
+            "tz1VSUr8wwNhLAzempoch5d6hLRiTh8Cjcjb": "42000000"
+          }
+        }
+      }
+    }
+  ]
+}

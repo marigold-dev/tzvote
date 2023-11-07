@@ -1,37 +1,32 @@
 #import "tezosTemplate3.jsligo" "TZ"
+
 #import "votingPeriodOracle.jsligo" "VPO"
+
 //util function
 
 const assert_failure = (result: test_exec_result, message: string): bool => {
-  return match(
-    result,
-    {
-      Success: (_: nat) => false,
-      Fail: (tee: test_exec_error) =>
-        match(
-          tee,
-          {
-            Other: (msg) => {
-              Test.log("ERROR Other : " + msg);
-              return false
-            },
-            Balance_too_low: (_record) => {
-              Test.log("ERROR Balance_too_low");
-              return false
-            },
-            Rejected: (s) => {
-              Test.log(["expected error : ", message, " Actual : "]);
-              Test.log(s[0]);
-              return ((Test.eval(message)) == s[0])
-            }
+  return match(result) {
+    when (Success(_)):
+      false
+    when (Fail(tee)):
+      match(tee) {
+        when (Other(msg)):
+          do { Test.log("ERROR Other : " + msg); return false }
+        when (Balance_too_low(_record)):
+          do { Test.log("ERROR Balance_too_low"); return false }
+        when (Rejected(s)):
+          do {
+            Test.log(["expected error : ", message, " Actual : "]);
+            Test.log(s[0]);
+            return ((Test.eval(message)) == s[0])
           }
-        )
-    }
-  )
+      }
+  }
 };
 
-const initAccount = ([accList, keypair]: [list<address>, [string, key]])
-  : list<address> => {
+const initAccount = ([accList, keypair]: [list<address>, [string, key]]): list<
+  address
+> => {
   Test.log("For keypair :");
   Test.log(keypair);
   //add this account to test context
@@ -44,10 +39,11 @@ const initAccount = ([accList, keypair]: [list<address>, [string, key]])
   let c: contract<unit> = Tezos.implicit_account(hk);
   //set balance to avoid empty implicit accounts
 
-  let _: test_exec_result = Test.transfer_to_contract(c, unit, (1000 as tez));
+  Test.
+  transfer_to_contract(c, unit, (1000 as tez));
   Test.log("New account");
   Test.log(Tezos.address(c));
-  Test.log(Test.get_balance(Tezos.address(c)));
+  Test.log(Test.get_balance_of_address(Tezos.address(c)));
   Test.log("with voting power :");
   let vp: michelson_program =
     Test.run((phk: key_hash) => Tezos.voting_power(phk), hk);
@@ -63,11 +59,11 @@ const _ = Test.baker_account(senderKey1, Some((6500 as tez)));
 
 const senderKey2: [string, key] = Test.new_account();
 
-const _ = Test.baker_account(senderKey2, Some((12500 as tez)));
+const _1 = Test.baker_account(senderKey2, Some((12500 as tez)));
 
 const senderKey3: [string, key] = Test.new_account();
 
-const _ = Test.baker_account(senderKey3, Some((18500 as tez)));
+const _2 = Test.baker_account(senderKey3, Some((18500 as tez)));
 
 const johndoeKey: [string, key] = Test.new_account();
 
@@ -76,7 +72,7 @@ const keys: list<[string, key]> =
 
 // reset state
 
-const _ = Test.reset_state(2 as nat, list([]) as list<tez>);
+const _3 = Test.reset_state(2 as nat, list([]) as list<tez>);
 
 const faucet = Test.nth_bootstrap_account(0);
 
@@ -106,9 +102,9 @@ const sender1: address =
     )
   );
 
-const _ = Test.set_baker(faucet);
+const _4 = Test.set_baker(faucet);
 
-const _ = Test.set_source(sender1);
+const _5 = Test.set_source(sender1);
 
 /**
   * PREPARE ORACLE
@@ -118,45 +114,43 @@ const oracleInitialStorage = { admin: faucet, votingPeriodIndex: 25 as nat };
 
 const mStorage = Test.compile_value(oracleInitialStorage);
 
-const [oracletaddr, _, _] =
-  Test.originate_module(contract_of (VPO), oracleInitialStorage, 0 as tez);
+const oracleOrig =
+  Test.originate(contract_of(VPO), oracleInitialStorage, 0 as tez);
 
-const oracleContract = Test.to_contract(oracletaddr);
+const oracleContract = Test.to_contract(oracleOrig.addr);
 
-const log_ = Test.log("oracleContract");
+const _7 = Test.log("oracleContract");
 
-const log_1 = Test.log(oracleContract);
+const _8 = Test.log(oracleContract);
 
 /**
   * END PREPARE ORACLE
   */
 
-const initial_storage =
-  {
-    name: "Which is the cutiest pokemon?",
-    votingPeriodIndex: 25 as nat,
-    options: list(["Mew", "Pikachu"]),
-    votes: (Map.empty as map<address, string>),
-    results: (Map.empty as map<string, int>),
-    votingPeriodOracle: Tezos.address(oracleContract)
-  };
+const initial_storage: TZ.storage = {
+  name: "Which is the cutiest pokemon?",
+  votingPeriodIndex: 25 as nat,
+  options: list(["Mew", "Pikachu"]),
+  votes: (Map.empty as map<address, string>),
+  results: (Map.empty as map<string, int>),
+  votingPeriodOracle: Tezos.address(oracleContract)
+};
 
-const [taddr, _, _] =
-  Test.originate_module(contract_of (TZ), initial_storage, 0 as tez);
+const orig = Test.originate(contract_of(TZ), initial_storage, 0 as tez);
 
-const contr = Test.to_contract(taddr);
+const contr = Test.to_contract(orig.addr);
 
-const log_2 = Test.log("voteContract");
+const _10 = Test.log("voteContract");
 
-const log_3 = Test.log(contr);
+const _11 = Test.log(contr);
 
 const _testOriginate = (): bool => {
   Test.assert(
-    (Test.get_storage(taddr) as TZ.storage).name ==
-      "Which is the cutiest pokemon?"
+    (Test.get_storage(orig.addr) as TZ.storage).name
+    == "Which is the cutiest pokemon?"
   );
   Test.assert(
-    (Test.get_storage(taddr) as TZ.storage).votingPeriodIndex == (25 as nat)
+    (Test.get_storage(orig.addr) as TZ.storage).votingPeriodIndex == (25 as nat)
   );
   return true
 };
@@ -165,12 +159,12 @@ const _testVote = (s: address, o: string, k: key_hash, voteCount: int): bool => 
   Test.set_source(s);
   Test.log("BEFORE RUN");
   Test.log(s);
-  Test.log(Test.get_balance(s));
+  Test.log(Test.get_balance_of_address(s));
   const status = Test.transfer_to_contract(contr, (Vote([o, k])), 1 as mutez);
   Test.log(status);
   Test.log("AFTER RUN");
-  Test.log(Test.get_balance(s));
-  const st = (Test.get_storage(taddr) as TZ.storage);
+  Test.log(Test.get_balance_of_address(s));
+  const st = (Test.get_storage(orig.addr) as TZ.storage);
   Test.log(st);
   Test.assert_with_error(
     Option.unopt(Map.find_opt(s, st.votes)) == o,
@@ -185,8 +179,7 @@ const _testVote = (s: address, o: string, k: key_hash, voteCount: int): bool => 
   return true
 };
 
-const _testVoteFail = (s: address, o: string, k: key_hash, message: string)
-  : bool => {
+const _testVoteFail = (s: address, o: string, k: key_hash, message: string): bool => {
   Test.set_source(s);
   return assert_failure(
     Test.transfer_to_contract(contr, (Vote([o, k])), 1 as mutez),
@@ -200,18 +193,16 @@ const _testVoteFailOutOfDate = (
   k: key_hash,
   message: string
 ): bool => {
-  let initial_storage =
-    {
-      name: "Which is the cutiest pokemon?",
-      votingPeriodIndex: 99999 as nat,
-      options: list(["Mew", "Pikachu"]),
-      votes: (Map.empty as map<address, string>),
-      results: (Map.empty as map<string, int>),
-      votingPeriodOracle: Tezos.address(oracleContract)
-    };
-  const [taddr, _, _] =
-    Test.originate_module(contract_of (TZ), initial_storage, 0 as tez);
-  const oldContr = Test.to_contract(taddr);
+  let initial_storage: TZ.storage = {
+    name: "Which is the cutiest pokemon?",
+    votingPeriodIndex: 99999 as nat,
+    options: list(["Mew", "Pikachu"]),
+    votes: (Map.empty as map<address, string>),
+    results: (Map.empty as map<string, int>),
+    votingPeriodOracle: Tezos.address(oracleContract)
+  };
+  const newOrig = Test.originate(contract_of(TZ), initial_storage, 0 as tez);
+  const oldContr = Test.to_contract(newOrig.addr);
   Test.set_source(s);
   return assert_failure(
     Test.transfer_to_contract(oldContr, (Vote([o, k])), 1 as mutez),
@@ -221,7 +212,7 @@ const _testVoteFailOutOfDate = (
 
 const testOriginate = _testOriginate();
 
-const _ = Test.log("************* testSender1VoteUnknownOption *************");
+const _12 = Test.log("************* testSender1VoteUnknownOption *************");
 
 const testSender1VoteUnknownOption =
   _testVoteFail(
@@ -231,12 +222,12 @@ const testSender1VoteUnknownOption =
     "Option does not exist"
   );
 
-const _ = Test.log("************* testSender1VotePikachu *************");
+const _13 = Test.log("************* testSender1VotePikachu *************");
 
 const testSender1VotePikachu =
   _testVote(sender1, "Pikachu", Crypto.hash_key(senderKey1[1]), 6500000000);
 
-const _ =
+const _14 =
   Test.log("************* testSender1VotePikachuAgainAndFail *************");
 
 const testSender1VotePikachuAgainAndFail =
@@ -247,12 +238,12 @@ const testSender1VotePikachuAgainAndFail =
     "A vote with option Pikachu  already exists for this user"
   );
 
-const _ = Test.log("************* testSender2VotePikachu *************");
+const _15 = Test.log("************* testSender2VotePikachu *************");
 
 const testSender2VotePikachu =
   _testVote(sender2, "Pikachu", Crypto.hash_key(senderKey2[1]), 19000000000);
 
-const _ = Test.log("************* testSender2VoteMewAndFail *************");
+const _16 = Test.log("************* testSender2VoteMewAndFail *************");
 
 const testSender2VoteMewAndFail =
   _testVoteFail(
@@ -262,12 +253,12 @@ const testSender2VoteMewAndFail =
     "A vote with option Pikachu  already exists for this user"
   );
 
-const _ = Test.log("************* testSender3VoteMew *************");
+const _17 = Test.log("************* testSender3VoteMew *************");
 
 const testSender3VoteMew =
   _testVote(sender3, "Mew", Crypto.hash_key(senderKey3[1]), 18500000000);
 
-const _ = Test.log("************* testjohndoeNotABaker *************");
+const _18 = Test.log("************* testjohndoeNotABaker *************");
 
 const testjohndoeNotABaker =
   _testVoteFail(
@@ -279,7 +270,7 @@ const testjohndoeNotABaker =
 
 //test out of time period for voting
 
-const _ = Test.log("************* testVoteOutOfDate *************");
+const _19 = Test.log("************* testVoteOutOfDate *************");
 
 const testVoteOutOfDate =
   _testVoteFailOutOfDate(

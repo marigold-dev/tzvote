@@ -1,4 +1,7 @@
-(Pair (Pair (Pair "Which is the cutiest pokemon?" { "Mew" ; "Pikachu" }) {} {})
+(Pair "Which is the cutiest pokemon?"
       6
+      { "Mew" ; "Pikachu" }
+      {}
+      {}
       "KT19cxHuiRiKktLb5bj9MWGrmHzncjreExcY")
 
