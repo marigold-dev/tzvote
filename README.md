@@ -2,7 +2,9 @@
 
 [logo]: https://i.imgflip.com/r56sp.jpg?a456398 "Vote"
 
-[Full details here](https://hackmd.io/EBB3pObiT5y5eJs4tPQjXQ?view)
+* [Full details of the architecture can be found here](https://hackmd.io/EBB3pObiT5y5eJs4tPQjXQ?view)
+
+* [Documentation](https://marigold-dev.github.io/tzvote/)
 
 # Oracle
 
