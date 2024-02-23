@@ -140,6 +140,10 @@ ionic capacitor sync android
 ionic capacitor update android
 ```
 
+# TzCommunity
+
+* TzVote utilizes [TzCommunity](https://github.com/marigold-dev/tezos-community) to retrieve people's profile data.
+
 # TIPS
 
 Add one of my account **alice** as a baker
